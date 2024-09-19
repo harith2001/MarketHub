@@ -1,0 +1,6 @@
+@MarketHub_HostAddress = http://localhost:5003
+
+GET {{MarketHub_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
