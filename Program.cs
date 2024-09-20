@@ -18,6 +18,17 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 
 // Add services to the container
 builder.Services.AddControllers();
+
+//login and cookie
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", config =>
+    {
+        config.Cookie.Name = "MarketHub.User.Login.Cookie";
+        config.LoginPath = "/api/User/login";
+        config.AccessDeniedPath = "/api/User/accessdenied";
+    });
+
+
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,6 +39,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

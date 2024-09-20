@@ -3,6 +3,9 @@ using MarketHub.Repositories;
 using MarketHub.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace MarketHub.Controllers
 {
@@ -55,8 +58,51 @@ namespace MarketHub.Controllers
                 return BadRequest(new { message = "Invalid user role." });
             }
 
+            //hash the password
+            user.Password = PasswordHasherUtil.HashPassword(user.Password);
+
             await _userRepository.CreateUserAsync(user);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+        }
+
+        //login a user
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(loginModel.Email);
+            if (user == null || !PasswordHasherUtil.PasswordVerification(user.Password, loginModel.Password))
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            // create user claims for authentication
+            var claims = new List<Claim>
+            {
+                 new Claim(ClaimTypes.Name, user.Name),
+                 new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                //IsPersistent = loginModel.RememberMe 
+            };
+
+            // Sign in the user with cookie authentication
+            await HttpContext.SignInAsync(
+                "CookieAuth",
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return Ok(new { message = "Login successful." });
+        }
+
+        //logout a user
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("CookieAuth");
+            return Ok(new { message = "Logout successful." });
         }
 
         // update an existing user
@@ -82,3 +128,12 @@ namespace MarketHub.Controllers
         }
     }
 }
+
+//{
+//    "Id": "",
+//  "name": "Disara",
+//  "email": "disara@gmail.com",
+//  "password": "123456",
+//  "role": "CSR",
+//  "isActive": true
+//}
