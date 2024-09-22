@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using MarketHub.Models.Entities;
 using MarketHub.Models;
+using MarketHub.Models.DTO;
 using Microsoft.Extensions.Options;
 
 namespace MarketHub.Repositories
@@ -38,5 +39,22 @@ namespace MarketHub.Repositories
         //delete user
         public async Task DeleteUserAsync(string User_ID) =>
            await _users.DeleteOneAsync(user => user.User_ID == User_ID);
+
+        //get vendors by name 
+        public async Task<List<VendorDTO>> GetVendorsByNameAsync(string name) 
+        {
+            var filter = Builders<User>.Filter.Eq(user => user.Name, name) & Builders<User>.Filter.Eq(user => user.Role, "Vendor");
+
+            var projection = Builders<User>.Projection.Expression(user => new VendorDTO
+            {
+                User_ID = user.User_ID,
+                Name = user.Name,
+                Email = user.Email,
+                IsActive = user.IsActive
+            });
+
+            var result = await _users.Find(filter).Project(projection).ToListAsync();
+            return result;
+        }
     }
 }

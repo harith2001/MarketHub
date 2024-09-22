@@ -135,14 +135,13 @@ namespace MarketHub.Controllers
             return NoContent();
         }
 
+        //get vendors by name
+        [HttpGet("vendors/{name}")]
+        public async Task<IActionResult> GetVendorsByName(string name)
+        {
+            var vendors = await _userRepository.GetVendorsByNameAsync(name);
+            return Ok(vendors);
+        }
+
     }
 }
-
-//{
-//    "Id": "",
-//  "name": "Disara",
-//  "email": "disara@gmail.com",
-//  "password": "123456",
-//  "role": "CSR",
-//  "isActive": true
-//}
