@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
-namespace MarketHub.Models
+namespace MarketHub.Models.Entities
 {
     public class User
     {

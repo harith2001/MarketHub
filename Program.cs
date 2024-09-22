@@ -1,3 +1,4 @@
+using MarketHub.Models.Entities;
 using MarketHub.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -30,6 +31,7 @@ builder.Services.AddAuthentication("CookieAuth")
 
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<OrderRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

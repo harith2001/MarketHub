@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using MarketHub.Models.Entities;
 using MarketHub.Models;
 using Microsoft.Extensions.Options;
 

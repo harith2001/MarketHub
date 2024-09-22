@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MarketHub.Repositories;
+using MarketHub.Models.Entities;
 using MarketHub.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -45,6 +46,13 @@ namespace MarketHub.Controllers
             var user = await _userRepository.GetUserByIdAsync(User_ID);
             if (user == null) return NotFound();
             return Ok(user);
+        }
+
+        //access denied
+        [HttpGet("accessdenied")]
+        public IActionResult AccessDenied()
+        {
+            return Unauthorized(new { message = "Access denied." });
         }
 
         // create a new user / register 
@@ -126,6 +134,7 @@ namespace MarketHub.Controllers
             await _userRepository.DeleteUserAsync(User_ID);
             return NoContent();
         }
+
     }
 }
 

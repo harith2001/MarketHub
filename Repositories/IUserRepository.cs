@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MarketHub.Models;
+using MarketHub.Models.Entities;
 
 namespace MarketHub.Repositories
 {
