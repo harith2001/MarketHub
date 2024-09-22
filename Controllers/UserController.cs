@@ -39,10 +39,10 @@ namespace MarketHub.Controllers
 
 
         // get user by ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        [HttpGet("{User_ID}")]
+        public async Task<IActionResult> GetUserById(string User_ID)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(User_ID);
             if (user == null) return NotFound();
             return Ok(user);
         }
@@ -52,7 +52,7 @@ namespace MarketHub.Controllers
         public async Task<IActionResult> CreateNewUser([FromBody] User user)
         {
             // Check if role is valid
-            var validRoles = new List<string> { "Administrator", "Vendor", "CSR" };
+            var validRoles = new List<string> { "Admin", "Vendor", "CSR" ,"Customer" };
             if (!validRoles.Contains(user.Role))
             {
                 return BadRequest(new { message = "Invalid user role." });
@@ -62,7 +62,7 @@ namespace MarketHub.Controllers
             user.Password = PasswordHasherUtil.HashPassword(user.Password);
 
             await _userRepository.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUserById), new { User_ID = user.User_ID }, user);
         }
 
         //login a user
@@ -106,24 +106,24 @@ namespace MarketHub.Controllers
         }
 
         // update an existing user
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
+        [HttpPut("{User_ID}")]
+        public async Task<IActionResult> UpdateUser(string User_ID, [FromBody] User updatedUser)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(id);
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
             if (existingUser == null) return NotFound();
 
-            await _userRepository.UpdateUserAsync(id, updatedUser);
+            await _userRepository.UpdateUserAsync(User_ID, updatedUser);
             return Ok(existingUser);
         }
 
         // delete a user
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
+        [HttpDelete("{User_ID}")]
+        public async Task<IActionResult> DeleteUser(string User_ID)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(User_ID);
             if (user == null) return NotFound();
 
-            await _userRepository.DeleteUserAsync(id);
+            await _userRepository.DeleteUserAsync(User_ID);
             return NoContent();
         }
     }

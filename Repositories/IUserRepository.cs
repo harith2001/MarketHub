@@ -8,9 +8,9 @@ namespace MarketHub.Repositories
     {
         Task<List<User>> GetAllUsersAsync();
         Task<User> GetUserByEmailAsync(string email);
-        Task<User> GetUserByIdAsync(string id);
+        Task<User> GetUserByIdAsync(string User_ID);
         Task CreateUserAsync(User user);
-        Task UpdateUserAsync(string id, User updatedUser);
-        Task DeleteUserAsync(string id);
+        Task UpdateUserAsync(string User_ID, User updatedUser);
+        Task DeleteUserAsync(string User_ID);
     }
 }

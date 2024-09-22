@@ -23,19 +23,19 @@ namespace MarketHub.Repositories
           await _users.Find(user => user.Email == email).FirstOrDefaultAsync();
 
         //get user by id
-        public async Task<User> GetUserByIdAsync(string id) =>
-             await _users.Find(user => user.Id == id).FirstOrDefaultAsync();
+        public async Task<User> GetUserByIdAsync(string User_ID) =>
+             await _users.Find(user => user.User_ID == User_ID).FirstOrDefaultAsync();
 
         //create new user / register
         public async Task CreateUserAsync(User user) =>
                         await _users.InsertOneAsync(user);
 
         //update user
-        public async Task UpdateUserAsync(string id, User updatedUser) =>
-            await _users.ReplaceOneAsync(user => user.Id == id, updatedUser);
+        public async Task UpdateUserAsync(string User_ID, User updatedUser) =>
+            await _users.ReplaceOneAsync(user => user.User_ID == User_ID, updatedUser);
 
         //delete user
-        public async Task DeleteUserAsync(string id) =>
-           await _users.DeleteOneAsync(user => user.Id == id);
+        public async Task DeleteUserAsync(string User_ID) =>
+           await _users.DeleteOneAsync(user => user.User_ID == User_ID);
     }
 }
