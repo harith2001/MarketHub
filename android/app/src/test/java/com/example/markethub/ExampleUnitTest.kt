@@ -1,4 +1,4 @@
-package com.markethub
+package com.example.markethub
 
 import org.junit.Test
 
