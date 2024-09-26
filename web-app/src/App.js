@@ -6,9 +6,10 @@ import Signup from "./pages/SignUp";
 import Products from './pages/Products';
 
 function App() {
+  const userRole = 'Vendor';
   return (
     <Router>
-      <Navigationbar/>
+      <Navigationbar userRole={userRole}/>
         <Routes>
           <Route path="/" element={<Dashboard/>} />
           <Route path="/sign-in" element={<Signin />} />
