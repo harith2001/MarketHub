@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Signin from "./pages/SignIn";
 import Signup from "./pages/SignUp";
 import Products from './pages/Products';
+import VendorReviews from './pages/VendorReiews';
 
 function App() {
   const userRole = 'Vendor';
@@ -14,7 +15,8 @@ function App() {
           <Route path="/" element={<Dashboard/>} />
           <Route path="/sign-in" element={<Signin />} />
         <Route path="/sign-up" element={<Signup />} />
-        <Route path="/products" element={<Products />} />
+        <Route path="/vendor/products" element={<Products />} />
+        <Route path="/vendor/reviews" element={<VendorReviews/>}/>
         </Routes>
     </Router>
   );
