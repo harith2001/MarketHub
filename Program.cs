@@ -33,6 +33,7 @@ builder.Services.AddAuthentication("CookieAuth")
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<OrderRepository>();
 builder.Services.AddSingleton<VendorRatingRepository>();
+builder.Services.AddSingleton<PaymentRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

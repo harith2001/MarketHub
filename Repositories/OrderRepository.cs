@@ -39,6 +39,10 @@ namespace MarketHub.Repositories
         public async Task<Order> GetOrderByOrderIdAsync(string OrderID) =>
             await _orders.Find(order => order.OrderID == OrderID).FirstOrDefaultAsync();
 
+        //get a specific status by Order_ID
+        public async Task<string> GetOrderStatusAsync(string OrderID) =>
+            (await _orders.Find(order => order.OrderID == OrderID).FirstOrDefaultAsync()).Status;
+
         //update an order
         public async Task UpdateOrderStatusAsync(string OrderID, string Status) =>
           await _orders.UpdateOneAsync(order => order.OrderID == OrderID,

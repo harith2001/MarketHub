@@ -55,6 +55,14 @@ namespace MarketHub.Controllers
             return Ok(order);
         }
 
+        //get order status
+        [HttpGet("{OrderID}/status")]
+        public async Task<IActionResult> GetOrderStatus(string OrderID)
+        {
+            var status = await _orderRepository.GetOrderStatusAsync(OrderID);
+            return Ok(new { status });
+        }
+
         // update order status
         [HttpPut("{OrderID}/{Status}")]
         public async Task<IActionResult> UpdateOrderStatus(string OrderID, string Status)

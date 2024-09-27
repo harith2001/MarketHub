@@ -28,8 +28,10 @@ namespace MarketHub.Models.Entities
 
 		public string ShippingAddress { get; set; }
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-		public string GenerateOrderID()
+
+        public string GenerateOrderID()
 		{
 			Random random = new Random();
 			int randomNumber = random.Next(1000, 9999);

@@ -23,7 +23,7 @@ namespace MarketHub.Models.Entities
 
         public string Comment { get; set; }
 
-        public DateTime TimeStamp { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
 

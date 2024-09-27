@@ -34,6 +34,8 @@ namespace MarketHub.Models.Entities
             }
         }
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
         //genereate based on role
         private string GenerateCustomUserId(string role)
         {
