@@ -7,7 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 const Navigationbar = ({ userRole }) => {
   const navigate = useNavigate();
   return (
-    <Navbar expand="lg" className="bg-success bg-opacity50 px-3">
+    <Navbar expand="lg" className="bg-success bg-opacity-70 px-3">
       <Navbar.Brand onClick={() => navigate('/')} className="text-white">
         MarketHub
       </Navbar.Brand>
@@ -22,6 +22,9 @@ const Navigationbar = ({ userRole }) => {
             <>
               <Nav.Link onClick={() => navigate('/vendor/products')} className="text-white">
                 Products
+              </Nav.Link>
+              <Nav.Link onClick={() => navigate('/vendor/orders')} className="text-white">
+                Orders
               </Nav.Link>
               <Nav.Link onClick={() => navigate('/vendor/reviews')} className="text-white">
                 Reviews
