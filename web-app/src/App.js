@@ -8,6 +8,7 @@ import VendorReviews from './pages/VendorReiews';
 import VendorOrders from './pages/VendoeOrders';
 import SignupRequestForm from './components/SignupRequestForm';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageProducts from './pages/admin/ManageProducts';
 
 function App() {
   const userRole = 'Vendor';
@@ -22,7 +23,8 @@ function App() {
         <Route path="/vendor/products" element={<Products />} />
         <Route path="/vendor/reviews" element={<VendorReviews />} />
         <Route path="/vendor/orders" element={<VendorOrders />} />
-        <Route path="/admin/users" element={<ManageUsers/>}/>
+        <Route path="/admin/users" element={<ManageUsers />} />
+        <Route path="/admin/producs" element={<ManageProducts/>}/>
         </Routes>
     </Router>
   );
