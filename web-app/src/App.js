@@ -6,6 +6,8 @@ import Signup from "./pages/SignUp";
 import Products from './pages/Products';
 import VendorReviews from './pages/VendorReiews';
 import VendorOrders from './pages/VendoeOrders';
+import SignupRequestForm from './components/SignupRequestForm';
+import ManageUsers from './pages/admin/ManageUsers';
 
 function App() {
   const userRole = 'Vendor';
@@ -16,9 +18,11 @@ function App() {
           <Route path="/" element={<Dashboard/>} />
           <Route path="/sign-in" element={<Signin />} />
         <Route path="/sign-up" element={<Signup />} />
+        <Route path="/signup-request" element={<SignupRequestForm/>}/>
         <Route path="/vendor/products" element={<Products />} />
         <Route path="/vendor/reviews" element={<VendorReviews />} />
         <Route path="/vendor/orders" element={<VendorOrders />} />
+        <Route path="/admin/users" element={<ManageUsers/>}/>
         </Routes>
     </Router>
   );
