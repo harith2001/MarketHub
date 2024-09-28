@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.markethub.screens.ProfileScreen
 import com.example.markethub.ui.theme.Primary
 
 enum class BottomNavScreen(val route: String, val icon: ImageVector, val title: String) {
@@ -111,13 +112,6 @@ fun OrdersScreen() {
 fun HomeScreen() {
     Surface(modifier = Modifier.fillMaxSize()) {
         Text(text = "Home Screen", modifier = Modifier.padding(16.dp))
-    }
-}
-
-@Composable
-fun ProfileScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Profile Screen", modifier = Modifier.padding(16.dp))
     }
 }
 

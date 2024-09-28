@@ -89,7 +89,7 @@ fun ValidatedTextFieldComponent(
             label = { Text(text = label) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
             isError = errorMessage != null,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (errorMessage != null) errorColor else
@@ -153,8 +153,7 @@ fun PasswordField(
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        // Password TextField with visibility toggle
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),) {
         OutlinedTextField(
             value = passwordValue,
             onValueChange = { newValue ->
