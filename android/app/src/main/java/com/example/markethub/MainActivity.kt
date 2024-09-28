@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.markethub.screens.MainScreen
 import com.example.markethub.screens.OnboardingScreen
 import com.example.markethub.screens.SplashScreen
 import com.example.markethub.screens.SignInScreen
@@ -30,17 +29,17 @@ class MainActivity : ComponentActivity() {
                         OnboardingScreen(navController = navController, context = this@MainActivity)
                     }
                     composable("Home") {
-                        MainScreen()
+                        Home()
                     }
                     composable("SignIn") {
                         SignInScreen(
-                            onLoginClick = { /* Handle Login Click */ },
+                            onLoginClick = { navController.navigate("Home") },
                             onSignUpClick = { navController.navigate("SignUp") }
                         )
                     }
                     composable("SignUp") {
                         SignUpScreen(
-                            onSignUpClick = { /* Handle Sign Up Click */ },
+                            onSignUpClick = { navController.navigate("Home") },
                             onSignInClick = { navController.navigate("SignIn") }
                         )
                     }
