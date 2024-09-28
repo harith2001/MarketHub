@@ -1,6 +1,8 @@
+using MarketHub.Models.Entities;
 using MarketHub.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MarketHub.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,47 +20,36 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 // Add services to the container
 builder.Services.AddControllers();
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//login and cookie
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", config =>
+    {
+        config.Cookie.Name = "MarketHub.User.Login.Cookie";
+        config.LoginPath = "/api/User/login";
+        config.AccessDeniedPath = "/api/User/accessdenied";
+    });
+
+
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<OrderRepository>();
+builder.Services.AddSingleton<VendorRatingRepository>();
+builder.Services.AddSingleton<PaymentRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//swagger enable
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+//swagger url 
+var swaggerUrl = $"http://localhost:5000/swagger/index.html";
+Console.WriteLine($"Swagger UI is available at: {swaggerUrl}");
+
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -28,8 +28,8 @@ project.fragment.lock.json
 *.cache
 
 # Ignore sensitive configuration files
-#appsettings.json
-#appsettings.Development.json
+appsettings.json
+appsettings.Development.json
 appsettings.Production.json
 .env
 
