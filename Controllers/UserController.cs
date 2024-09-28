@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MarketHub.Controllers
 {
@@ -78,9 +79,9 @@ namespace MarketHub.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             var user = await _userRepository.GetUserByEmailAsync(loginModel.Email);
-            if (user == null || !PasswordHasherUtil.PasswordVerification(user.Password, loginModel.Password))
+            if (user == null || !PasswordHasherUtil.PasswordVerification(user.Password, loginModel.Password) ||!user.IsActive)
             {
-                return Unauthorized(new { message = "Invalid email or password." });
+                return Unauthorized(new { message = "Invalid email or password, or inactive account" });
             }
 
             // create user claims for authentication
@@ -111,6 +112,18 @@ namespace MarketHub.Controllers
         {
             await HttpContext.SignOutAsync("CookieAuth");
             return Ok(new { message = "Logout successful." });
+        }
+
+        //update the IsActive status of a user - only for admin and CSR
+        [Authorize(Roles = "Admin,CSR")]
+        [HttpPut("status/{User_ID}")]
+        public async Task<IActionResult> UpdateUserStatus(string User_ID, [FromBody] User updatedUser)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
+            if (existingUser == null) return NotFound();
+
+            await _userRepository.UpdateUserAsync(User_ID, updatedUser);
+            return Ok(existingUser);
         }
 
         // update an existing user

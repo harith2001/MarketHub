@@ -8,11 +8,11 @@ namespace MarketHub.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VendorRatngController : ControllerBase
+    public class VendorRatingController : ControllerBase
     {
         private readonly VendorRatingRepository _vendorRatingRepository;
 
-        public VendorRatngController(VendorRatingRepository vendorRatingRepository)
+        public VendorRatingController(VendorRatingRepository vendorRatingRepository)
         {
             _vendorRatingRepository = vendorRatingRepository;
         }
