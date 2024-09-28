@@ -7,10 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.markethub.screens.OnboardingScreen
 import com.example.markethub.screens.SplashScreen
-import com.example.markethub.screens.SignInScreen
-import com.example.markethub.screens.SignUpScreen
+import com.example.markethub.screens.auth.SignInScreen
+import com.example.markethub.screens.auth.SignUpScreen
+import com.example.markethub.screens.onboarding.OnboardingScreen
 import com.example.markethub.ui.theme.MarketHubTheme
 
 class MainActivity : ComponentActivity() {

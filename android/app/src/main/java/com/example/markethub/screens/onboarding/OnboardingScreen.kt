@@ -1,4 +1,4 @@
-package com.example.markethub.screens
+package com.example.markethub.screens.onboarding
 
 import android.content.Context
 import androidx.compose.animation.core.animateDpAsState

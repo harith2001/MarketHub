@@ -1,4 +1,4 @@
-package com.example.markethub.screens
+package com.example.markethub.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

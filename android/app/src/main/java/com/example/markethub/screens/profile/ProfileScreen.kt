@@ -1,4 +1,4 @@
-package com.example.markethub.screens
+package com.example.markethub.screens.profile
 
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
