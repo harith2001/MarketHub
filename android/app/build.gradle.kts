@@ -72,4 +72,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation (libs.accompanist.pager)
+    implementation(libs.androidx.material.icons.extended)
 }

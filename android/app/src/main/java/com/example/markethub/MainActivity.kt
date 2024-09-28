@@ -7,6 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.markethub.screens.MainScreen
+import com.example.markethub.screens.OnboardingScreen
+import com.example.markethub.screens.SplashScreen
+import com.example.markethub.screens.SignInScreen
+import com.example.markethub.screens.SignUpScreen
 import com.example.markethub.ui.theme.MarketHubTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,6 +31,18 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("Home") {
                         MainScreen()
+                    }
+                    composable("SignIn") {
+                        SignInScreen(
+                            onLoginClick = { /* Handle Login Click */ },
+                            onSignUpClick = { navController.navigate("SignUp") }
+                        )
+                    }
+                    composable("SignUp") {
+                        SignUpScreen(
+                            onSignUpClick = { /* Handle Sign Up Click */ },
+                            onSignInClick = { navController.navigate("SignIn") }
+                        )
                     }
                 }
             }

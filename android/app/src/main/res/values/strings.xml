@@ -3,4 +3,11 @@
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="title_activity_get_started">GetStartedActivity</string>
     <string name="title_activity_on_boarding">OnBoardingActivity</string>
+    <string name="hey_there">Hey there,</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="sign_up">Sign up</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="welcome_back">Welcome back,</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
 </resources>

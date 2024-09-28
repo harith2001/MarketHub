@@ -1,4 +1,4 @@
-package com.example.markethub
+package com.example.markethub.screens
 
 import android.content.Context
 import androidx.compose.animation.core.animateDpAsState
@@ -36,6 +36,8 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.markethub.MainActivity
+import com.example.markethub.R
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -173,7 +175,7 @@ fun ButtonsSection(
                 onClick = {
                     onBoardingIsFinished(context = context)
                     navController.popBackStack()
-                    navController.navigate("Home")
+                    navController.navigate("SignUp")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(id = R.color.theme_color),
@@ -232,6 +234,6 @@ fun IndicatorSingleDot(isSelected: Boolean) {
 private fun onBoardingIsFinished(context: MainActivity) {
     val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
-    editor.putBoolean("isFinished", true)
+    editor.putBoolean("isFinished", false) // Change this to true
     editor.apply()
 }

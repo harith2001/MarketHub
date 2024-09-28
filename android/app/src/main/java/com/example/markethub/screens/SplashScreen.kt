@@ -1,4 +1,4 @@
-package com.example.markethub
+package com.example.markethub.screens
 
 import android.content.Context
 import androidx.compose.animation.core.Animatable
@@ -22,6 +22,8 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.markethub.MainActivity
+import com.example.markethub.R
 import kotlinx.coroutines.delay
 
 @Composable

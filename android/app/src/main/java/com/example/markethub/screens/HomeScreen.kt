@@ -1,4 +1,4 @@
-package com.example.markethub
+package com.example.markethub.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
