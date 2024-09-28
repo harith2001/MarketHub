@@ -233,7 +233,7 @@ public class ProductController : ControllerBase
                     $"Product {product.productName} is low on stock",
                     $"The product {product.productName} has a low quantity of {product.quantity}.",
                     "stock",
-                    "v-001"
+                     vendorId
                     );
             }
 
