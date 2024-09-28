@@ -11,7 +11,16 @@ import com.example.markethub.screens.SplashScreen
 import com.example.markethub.screens.auth.SignInScreen
 import com.example.markethub.screens.auth.SignUpScreen
 import com.example.markethub.screens.onboarding.OnboardingScreen
+import com.example.markethub.screens.product.ProductDetailScreen
 import com.example.markethub.ui.theme.MarketHubTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+
+// Define a CompositionLocal to provide the NavController globally
+val LocalNavController = compositionLocalOf<NavController> { error("No NavController found!") }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,31 +29,53 @@ class MainActivity : ComponentActivity() {
         setContent {
             MarketHubTheme {
                 val navController = rememberNavController()
+                val context = this
 
-                NavHost(navController = navController, startDestination = "Splash") {
-                    composable("Splash") {
-                        SplashScreen(navController = navController, context = this@MainActivity)
-                    }
-                    composable("Onboarding") {
-                        OnboardingScreen(navController = navController, context = this@MainActivity)
-                    }
-                    composable("Home") {
-                        Home()
-                    }
-                    composable("SignIn") {
-                        SignInScreen(
-                            onLoginClick = { navController.navigate("Home") },
-                            onSignUpClick = { navController.navigate("SignUp") }
-                        )
-                    }
-                    composable("SignUp") {
-                        SignUpScreen(
-                            onSignUpClick = { navController.navigate("Home") },
-                            onSignInClick = { navController.navigate("SignIn") }
-                        )
-                    }
+                CompositionLocalProvider(LocalNavController provides navController) {
+                    AppNavigation(navController, context)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AppNavigation(navController: NavHostController, context: MainActivity) {
+    NavHost(navController = navController, startDestination = "Splash") {
+        // Splash Screen Route
+        composable("Splash") {
+            SplashScreen(navController = navController, context = context)
+        }
+
+        // Onboarding Screen Route
+        composable("Onboarding") {
+            OnboardingScreen(navController = navController, context = context)
+        }
+
+        // Home Screen Route
+        composable("Home") {
+            Home()
+        }
+
+        // Sign In Screen Route
+        composable("SignIn") {
+            SignInScreen(
+                onLoginClick = { navController.navigate("Home") },
+                onSignUpClick = { navController.navigate("SignUp") }
+            )
+        }
+
+        // Sign Up Screen Route
+        composable("SignUp") {
+            SignUpScreen(
+                onSignUpClick = { navController.navigate("Home") },
+                onSignInClick = { navController.navigate("SignIn") }
+            )
+        }
+
+        // Product Detail Screen Route
+        composable("ProductDetailScreen") {
+            ProductDetailScreen()
         }
     }
 }

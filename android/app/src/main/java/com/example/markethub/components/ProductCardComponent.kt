@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.ui.theme.Primary
 
@@ -42,6 +43,7 @@ fun ProductCard(
     price: String,
     onFavoriteClick: () -> Unit = {}
 ) {
+    val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .width(160.dp)
@@ -59,7 +61,9 @@ fun ProductCard(
                 contentDescription = name,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { /* Handle image click */ }
+                    .clickable(onClick = {
+                        navController.navigate("ProductDetailScreen")
+                    }),
             )
             IconButton(
                 onClick = onFavoriteClick,
