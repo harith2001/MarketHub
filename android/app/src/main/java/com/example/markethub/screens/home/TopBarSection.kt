@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.markethub.LocalNavController
 import com.example.markethub.ui.theme.Primary
 
 @Composable
@@ -81,6 +82,7 @@ fun TopBarSection() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val navController = LocalNavController.current
                 IconButton(onClick = { /* Navigate to Favorites */ }) {
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
@@ -89,7 +91,7 @@ fun TopBarSection() {
                         modifier = Modifier.size(28.dp)
                     )
                 }
-                IconButton(onClick = { /* Navigate to Cart */ }) {
+                IconButton(onClick = { navController.navigate("Cart") }) {
                     Icon(
                         imageVector = Icons.Outlined.ShoppingCart,
                         contentDescription = "Cart Icon",

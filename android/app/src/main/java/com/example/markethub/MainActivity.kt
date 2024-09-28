@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.markethub.screens.cart.CartScreen
 
 // Define a CompositionLocal to provide the NavController globally
 val LocalNavController = compositionLocalOf<NavController> { error("No NavController found!") }
@@ -76,6 +77,11 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         // Product Detail Screen Route
         composable("ProductDetailScreen") {
             ProductDetailScreen()
+        }
+
+        // Cart Screen Route
+        composable("Cart") {
+            CartScreen()
         }
     }
 }
