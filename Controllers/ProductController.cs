@@ -8,16 +8,18 @@ public class ProductController : ControllerBase
     private readonly IMongoClient _mongoClient;
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<Product> _productCollection;
+    private readonly NotificationService _notificationService;
 
-    public ProductController(IMongoClient mongoClient)
+    public ProductController(IMongoClient mongoClient, NotificationService notificationService)
     {
         _mongoClient = mongoClient;
         _database = _mongoClient.GetDatabase("test");
         _productCollection = _database.GetCollection<Product>("products");
+        _notificationService = notificationService;
     }
 
     //get all products
-    [HttpGet("getAllProducts")]
+    [HttpGet("get-all-products")]
     public IActionResult GetAllProducts()
     {
         try
@@ -38,7 +40,7 @@ public class ProductController : ControllerBase
     }
 
     //get active products
-    [HttpGet("getAllActiveProducts")]
+    [HttpGet("get-all-active-products")]
     public IActionResult GetAllActiveProducts()
     {
         try
@@ -224,6 +226,17 @@ public class ProductController : ControllerBase
                 });
             }
 
+            foreach(var product in products)
+            {
+                _notificationService.CreateNotification(
+                    "Low Stock Alert",
+                    $"Product {product.productName} is low on stock",
+                    $"The product {product.productName} has a low quantity of {product.quantity}.",
+                    "stock",
+                    "v-001"
+                    );
+            }
+
             return Ok(products);
         }
         catch (Exception ex)
@@ -239,7 +252,7 @@ public class ProductController : ControllerBase
     }
 
     //create a new product
-    [HttpPost("addNewProduct")]
+    [HttpPost("add-new-product")]
     public IActionResult AddNewProduct([FromBody] Product newProduct)
     {
         try
@@ -278,7 +291,7 @@ public class ProductController : ControllerBase
     }
 
     //update a product
-    [HttpPatch("updateProduct/{productId}")]
+    [HttpPatch("update-product/{productId}")]
     public IActionResult UpdateProduct(String productId , [FromBody] Product updatedProduct)
     {
         if(updatedProduct == null)
@@ -355,7 +368,7 @@ public class ProductController : ControllerBase
     }
 
     //delete a product
-    [HttpDelete("deleteProduct/{productId}")]
+    [HttpDelete("delete-product/{productId}")]
     public IActionResult DeleteProduct(string productId)
     {
         try
