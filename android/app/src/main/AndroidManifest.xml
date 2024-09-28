@@ -13,6 +13,16 @@
         android:theme="@style/Theme.MarketHub"
         tools:targetApi="31">
         <activity
+            android:name=".OnBoardingActivity"
+            android:exported="false"
+            android:label="@string/title_activity_on_boarding"
+            android:theme="@style/Theme.MarketHub" />
+        <activity
+            android:name=".GetStartedActivity"
+            android:exported="false"
+            android:label="@string/title_activity_get_started"
+            android:theme="@style/Theme.MarketHub" />
+        <activity
             android:name=".SplashScreenActivity"
             android:exported="false"
             android:label="@string/title_activity_splash_screen"
