@@ -50,6 +50,7 @@ fun CartScreen(
     cartItems: List<CartItem> = sampleCartItems(),
 ) {
     var cartItemsState by remember { mutableStateOf(cartItems) }
+    val navController = LocalNavController.current
 
     Column(
         modifier = Modifier
@@ -57,7 +58,6 @@ fun CartScreen(
             .background(Color.White)
             .padding(16.dp)
     ) {
-        val navController = LocalNavController.current
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -110,7 +110,7 @@ fun CartScreen(
                 )
             }
             Button(
-                onClick = {},
+                onClick = { navController.navigate("Checkout") },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
