@@ -17,6 +17,17 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(settings.ConnectionString);
 });
 
+// Register the IMongoCollection<Notification> for dependency injection
+builder.Services.AddSingleton<IMongoCollection<Notification>>(sp =>
+{
+    var mongoClient = sp.GetRequiredService<IMongoClient>();
+    var database = mongoClient.GetDatabase("test"); 
+    return database.GetCollection<Notification>("Notification");
+});
+
+// Register the NotificationService for dependency injection
+builder.Services.AddSingleton<NotificationService>();
+
 // Add services to the container
 builder.Services.AddControllers();
 
