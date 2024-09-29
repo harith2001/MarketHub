@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.markethub.screens.home.HomeScreen
+import com.example.markethub.screens.orders.OrdersScreen
 import com.example.markethub.screens.profile.ProfileScreen
 import com.example.markethub.ui.theme.Primary
 
@@ -96,13 +97,6 @@ fun BottomNavigationBar(navController: NavHostController) {
                 )
             )
         }
-    }
-}
-
-@Composable
-fun OrdersScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Orders Screen", modifier = Modifier.padding(16.dp))
     }
 }
 
