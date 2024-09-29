@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.markethub.screens.cart.CartScreen
 import com.example.markethub.screens.checkout.CheckoutScreen
+import com.example.markethub.screens.favorites.MyFavoritesScreen
 import com.example.markethub.screens.orders.OrderDetailsScreen
 
 // Define a CompositionLocal to provide the NavController globally
@@ -94,6 +95,11 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         // Order Details Screen Route
         composable("OrderDetails") {
             OrderDetailsScreen()
+        }
+
+        // My Favorites Screen Route
+        composable("MyFavorites") {
+            MyFavoritesScreen()
         }
     }
 }

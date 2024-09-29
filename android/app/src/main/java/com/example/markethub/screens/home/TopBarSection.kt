@@ -83,7 +83,7 @@ fun TopBarSection() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val navController = LocalNavController.current
-                IconButton(onClick = { /* Navigate to Favorites */ }) {
+                IconButton(onClick = { navController.navigate("MyFavorites") }) {
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = "Favorites Icon",
