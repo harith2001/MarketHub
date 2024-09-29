@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
@@ -88,6 +89,7 @@ fun OrdersScreen(
 
 @Composable
 fun OrderCard(order: Order) {
+    val navController = LocalNavController.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -144,7 +146,7 @@ fun OrderCard(order: Order) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = { /* Navigate to Order Details */ },
+                onClick = { navController.navigate("OrderDetails") },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth()
             ) {
