@@ -2,6 +2,7 @@ package com.example.markethub.di
 
 import com.example.markethub.data.network.ApiService
 import com.example.markethub.domain.repository.AuthRepository
+import com.example.markethub.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:5003/api/")
+            .baseUrl("https://fakestoreapi.com/")  // FakeStore API URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -33,5 +34,11 @@ object NetworkModule {
     @Singleton
     fun provideAuthRepository(apiService: ApiService): AuthRepository {
         return AuthRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductRepository(apiService: ApiService): ProductRepository {
+        return ProductRepository(apiService)
     }
 }

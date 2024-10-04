@@ -1,55 +1,29 @@
 package com.example.markethub.screens.cart
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
-import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
 
-data class CartItem(
-    val id: Int,
-    val name: String,
-    val imageRes: Int,
-    var quantity: Int,
-    val price: Double
-)
-
 @Composable
-fun CartScreen(
-    cartItems: List<CartItem> = sampleCartItems(),
-) {
-    var cartItemsState by remember { mutableStateOf(cartItems) }
+fun CartScreen(viewModel: CartViewModel = hiltViewModel()) {
+    val cartItemsState = viewModel.cartItems.collectAsState().value
+    println("Cart Items: $cartItemsState")
     val navController = LocalNavController.current
 
     Column(
@@ -81,12 +55,10 @@ fun CartScreen(
                 CartItemCard(
                     cartItem = cartItemsState[index],
                     onQuantityChange = { newQuantity ->
-                        cartItemsState = cartItemsState.toMutableList().apply {
-                            this[index] = this[index].copy(quantity = newQuantity)
-                        }
+                        viewModel.updateQuantity(cartItemsState[index].id, newQuantity)
                     },
                     onRemoveItem = {
-                        cartItemsState = cartItemsState.toMutableList().apply { removeAt(index) }
+                        viewModel.removeItem(cartItemsState[index].id)
                     }
                 )
             }
@@ -120,21 +92,5 @@ fun CartScreen(
                 Text(text = "Checkout", fontSize = 16.sp, color = Color.White)
             }
         }
-    }
-}
-
-@Composable
-fun sampleCartItems(): List<CartItem> {
-    return listOf(
-        CartItem(id = 1, name = "Essentials Men's Short-Sleeve T-Shirt", imageRes = R.drawable.ic_placeholder, quantity = 1, price = 18.0),
-        CartItem(id = 2, name = "Comfort Fit Denim Jeans", imageRes = R.drawable.ic_placeholder, quantity = 2, price = 25.0)
-    )
-}
-
-@Preview
-@Composable
-fun CartScreenPreview() {
-    PreviewWrapper {
-        CartScreen()
     }
 }

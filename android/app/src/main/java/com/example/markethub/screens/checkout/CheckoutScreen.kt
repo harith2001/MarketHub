@@ -2,32 +2,13 @@ package com.example.markethub.screens.checkout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,21 +16,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
 import com.example.markethub.screens.PreviewWrapper
-import com.example.markethub.screens.cart.CartItem
 import com.example.markethub.screens.cart.CartItemCard
+import com.example.markethub.screens.cart.CartViewModel
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun CheckoutScreen(
-    initialCartItems: List<CartItem> = sampleCheckoutItems()
+    viewModel: CartViewModel = hiltViewModel()
 ) {
+    val cartItems by viewModel.cartItems.collectAsState()
     val address = remember { mutableStateOf("") }
     val paymentType = remember { mutableStateOf("Cash on Delivery") }
-    var cartItemsState by remember { mutableStateOf(initialCartItems) } // Use state to track cart items
-    val totalPrice = cartItemsState.sumOf { it.price * it.quantity }
+    val totalPrice = cartItems.sumOf { it.price * it.quantity }
     val navController = LocalNavController.current
     var showDialog by remember { mutableStateOf(false) }
     var isSuccess by remember { mutableStateOf(true) }
@@ -59,6 +40,7 @@ fun CheckoutScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
+        // Top Bar with Back Button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,6 +62,7 @@ fun CheckoutScreen(
             )
         }
 
+        // Cart Items List
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,20 +70,19 @@ fun CheckoutScreen(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(cartItemsState.size) { index ->
+            items(cartItems.size) { index ->
                 CartItemCard(
-                    cartItem = cartItemsState[index],
+                    cartItem = cartItems[index],
                     onQuantityChange = { newQuantity ->
-                        cartItemsState = cartItemsState.toMutableList().apply {
-                            this[index] = this[index].copy(quantity = newQuantity)
-                        }
+                        viewModel.updateQuantity(cartItems[index].id, newQuantity)
                     },
                     onRemoveItem = {
-                        cartItemsState = cartItemsState.toMutableList().apply { removeAt(index) }
+                        viewModel.removeItem(cartItems[index].id)
                     }
                 )
             }
 
+            // Delivery Address Field
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -114,6 +96,7 @@ fun CheckoutScreen(
                 )
             }
 
+            // Payment Method Selector
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -128,6 +111,7 @@ fun CheckoutScreen(
             }
         }
 
+        // Bottom Price Section with Total and Place Order Button
         Surface(
             tonalElevation = 8.dp,
             modifier = Modifier
@@ -169,6 +153,7 @@ fun CheckoutScreen(
         }
     }
 
+    // Show Result Dialog
     if (showDialog) {
         CheckoutResultDialog(
             isSuccess = isSuccess,
@@ -180,7 +165,7 @@ fun CheckoutScreen(
 
 @Composable
 fun AddressField(value: String, onValueChange: (String) -> Unit) {
-    androidx.compose.material3.OutlinedTextField(
+    OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = "Enter Address") },
@@ -225,40 +210,6 @@ fun PaymentTypeSelector(selectedType: String, onTypeSelected: (String) -> Unit) 
             Text(text = "Online Payment", modifier = Modifier.padding(start = 8.dp))
         }
     }
-}
-
-@Composable
-fun sampleCheckoutItems(): List<CartItem> {
-    return listOf(
-        CartItem(
-            id = 1,
-            name = "Essentials Men's Short-Sleeve T-Shirt",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 2,
-            price = 18.0
-        ),
-        CartItem(
-            id = 2,
-            name = "Comfort Fit Denim Jeans",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 30.0
-        ),
-        CartItem(
-            id = 3,
-            name = "Slim Fit Polo Shirt",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 3,
-            price = 22.0
-        ),
-        CartItem(
-            id = 4,
-            name = "Casual Leather Jacket",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 65.0
-        )
-    )
 }
 
 @Preview

@@ -33,13 +33,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.markethub.domain.models.CartItem
+import com.example.markethub.domain.models.Product
+import com.example.markethub.screens.cart.CartViewModel
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun BottomPriceSection(
     price: String,
-    onAddToCartClick: () -> Unit,
-    modifier: Modifier = Modifier
+    product: Product,
+    modifier: Modifier = Modifier,
+    cartViewModel: CartViewModel = hiltViewModel()
 ) {
     var quantity by remember { mutableIntStateOf(1) }
 
@@ -105,7 +110,16 @@ fun BottomPriceSection(
                 }
 
                 Button(
-                    onClick = onAddToCartClick,
+                    onClick = {
+                        val item = CartItem(
+                            id = product.id,
+                            name = product.title,
+                            imageUrl = product.image,
+                            quantity = quantity,
+                            price = product.price
+                        )
+                        cartViewModel.addItem(item)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF233142)),
                     shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
                     modifier = Modifier

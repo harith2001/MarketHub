@@ -19,48 +19,48 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.markethub.R
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun ImageSection() {
-    // Sample images (replace with real product images)
-    val images = listOf(
-        R.drawable.ic_placeholder,
-        R.drawable.ic_placeholder_2
-    )
+fun ImageSection(
+    images: List<String> // Accept a list of image URLs as parameters
+) {
+    // Handle case where no images are provided
+    if (images.isEmpty()) return
 
     // State to track the currently displayed image
-    val selectedImage = remember { mutableIntStateOf(images[0]) }
+    val selectedImage = remember { mutableIntStateOf(0) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 2.dp),
-        contentAlignment = Alignment.Center // Center align the whole section
+        contentAlignment = Alignment.Center
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            // Thumbnail Column
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                images.forEach { imageRes ->
-                    ThumbnailImage(
-                        imageRes = imageRes,
-                        isSelected = imageRes == selectedImage.intValue,
-                        onClick = { selectedImage.intValue = imageRes }
-                    )
+            // Thumbnail Column - Display only if multiple images exist
+            if (images.size > 1) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    images.forEachIndexed { index, imageUrl ->
+                        ThumbnailImage(
+                            imageUrl = imageUrl,
+                            isSelected = index == selectedImage.intValue,
+                            onClick = { selectedImage.intValue = index }
+                        )
+                    }
                 }
             }
 
             // Main Image Display
             Image(
-                painter = painterResource(id = selectedImage.intValue),
+                painter = rememberAsyncImagePainter(model = images[selectedImage.intValue]), // Use Coil to load network image
                 contentDescription = "Selected Product Image",
                 modifier = Modifier
                     .size(280.dp)
@@ -73,15 +73,15 @@ fun ImageSection() {
 }
 
 @Composable
-fun ThumbnailImage(imageRes: Int, isSelected: Boolean, onClick: () -> Unit) {
+fun ThumbnailImage(imageUrl: String, isSelected: Boolean, onClick: () -> Unit) {
     Image(
-        painter = painterResource(id = imageRes),
+        painter = rememberAsyncImagePainter(model = imageUrl), // Use Coil for thumbnail image loading
         contentDescription = "Thumbnail Image",
         modifier = Modifier
             .size(60.dp)
             .clip(RoundedCornerShape(8.dp))
             .border(
-                width = if (isSelected) 1.dp else 1.dp,
+                width = if (isSelected) 2.dp else 1.dp, // Change width for selected border
                 color = if (isSelected) Color(0xFF00C569) else Color.Transparent,
                 shape = RoundedCornerShape(8.dp)
             )

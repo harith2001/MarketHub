@@ -137,14 +137,14 @@ fun ProfileScreen() {
                     { input -> if (input.any { it.isDigit() }) "Name should not contain numbers" else null },
                     { input -> if (input.any { !it.isLetter() }) "Name should contain only letters" else null }
                 ),
-                value = "",
+                value = "Yashodini Soysa",
                 onValueChange = {}
             )
             ValidatedTextFieldComponent(
                 label = "Email",
                 isRequired = true,
                 validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
-                value = "",
+                value = "yashodini@gmail.com",
                 onValueChange = {}
             )
 

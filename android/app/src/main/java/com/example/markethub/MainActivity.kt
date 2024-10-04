@@ -18,14 +18,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.navArgument
 import com.example.markethub.screens.cart.CartScreen
 import com.example.markethub.screens.checkout.CheckoutScreen
 import com.example.markethub.screens.favorites.MyFavoritesScreen
 import com.example.markethub.screens.orders.OrderDetailsScreen
+import dagger.hilt.android.AndroidEntryPoint
 
-// Define a CompositionLocal to provide the NavController globally
 val LocalNavController = compositionLocalOf<NavController> { error("No NavController found!") }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +58,6 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
             OnboardingScreen(navController = navController, context = context)
         }
 
-        // Home Screen Route
-        composable("Home") {
-            Home()
-        }
-
         // Sign In Screen Route
         composable("SignIn") {
             SignInScreen(
@@ -77,9 +74,18 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
             )
         }
 
+        // Home Screen Route
+        composable("Home") {
+            Home()
+        }
+
         // Product Detail Screen Route
-        composable("ProductDetailScreen") {
-            ProductDetailScreen()
+        composable(
+            route = "ProductDetailScreen/{productId}",
+            arguments = listOf(navArgument("productId") { defaultValue = "0" })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull() ?: 0
+            ProductDetailScreen(productId = productId)
         }
 
         // Cart Screen Route

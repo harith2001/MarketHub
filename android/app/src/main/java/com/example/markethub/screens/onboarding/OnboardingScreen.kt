@@ -61,8 +61,8 @@ fun OnboardingScreen(navController: NavHostController, context: MainActivity) {
 
     val descriptions = listOf(
         "Explore a curated selection of products, handpicked by our team, and experience seamless shopping in one trusted platform.",
-        "From the latest trends to daily essentials, find everything you need in our carefully curated collection, directly from MarketHub.",
-        "Join us today and enjoy a premium shopping experience with products added exclusively by MarketHub. Shop with confidence!"
+        "Discover a wide range of products tailored to your needs. Enjoy easy browsing, secure purchases, and a seamless shopping experience all in one place.",
+        "Join us today and enjoy a premium shopping experience. Explore a world of choices and shop with confidence!"
     )
     val pagerState = rememberPagerState(
         pageCount = animations.size
@@ -234,6 +234,6 @@ fun IndicatorSingleDot(isSelected: Boolean) {
 private fun onBoardingIsFinished(context: MainActivity) {
     val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
-    editor.putBoolean("isFinished", false) // Change this to true
+    editor.putBoolean("isFinished", false) 
     editor.apply()
 }

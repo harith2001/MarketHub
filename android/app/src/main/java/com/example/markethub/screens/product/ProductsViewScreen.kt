@@ -71,6 +71,7 @@ fun ProductsViewScreen(
         ) {
             items(products.size) { index ->
                 ProductCard(
+                    productId = index,
                     image = products[index].imageRes,
                     category = products[index].category,
                     name = products[index].name,
@@ -78,7 +79,6 @@ fun ProductsViewScreen(
                     reviews = products[index].reviews,
                     price = products[index].price,
                     onFavoriteClick = {
-                        // Handle add to favorites action
                     }
                 )
             }

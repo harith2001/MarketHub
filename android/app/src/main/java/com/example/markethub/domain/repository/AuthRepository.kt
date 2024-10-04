@@ -9,4 +9,8 @@ class AuthRepository(private val apiService: ApiService) {
     suspend fun signUp(signUpRequest: SignUpRequest): Response<SignUpResponse> {
         return apiService.signUp(signUpRequest)
     }
+
+    suspend fun signIn(signUpRequest: SignUpRequest): Response<SignUpResponse> {
+        return apiService.signIn(signUpRequest)
+    }
 }
