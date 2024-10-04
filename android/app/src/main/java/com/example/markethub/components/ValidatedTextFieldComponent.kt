@@ -9,9 +9,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,19 +22,20 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ValidatedTextFieldComponent(
     label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
     isRequired: Boolean = true,
     validationRules: List<(String) -> String?> = listOf(),
     errorColor: Color = Color.Red
 ) {
-    var textValue by remember { mutableStateOf(TextFieldValue("")) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column {
         OutlinedTextField(
-            value = textValue,
+            value = value,
             onValueChange = { newValue ->
-                textValue = newValue
-                errorMessage = validateInput(newValue.text, isRequired, validationRules)
+                onValueChange(newValue)
+                errorMessage = validateInput(newValue, isRequired, validationRules)
             },
             label = { Text(text = label) },
             modifier = Modifier
@@ -63,7 +64,6 @@ fun ValidatedTextFieldComponent(
         }
     }
 }
-
 
 private fun validateInput(
     input: String,

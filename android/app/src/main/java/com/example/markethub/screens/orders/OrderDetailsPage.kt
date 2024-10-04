@@ -309,6 +309,8 @@ fun RateOrderDialog(
                 ValidatedTextFieldComponent(
                     label = "Comment",
                     isRequired = false,
+                    value = "",
+                    onValueChange = {}
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

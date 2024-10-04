@@ -72,7 +72,7 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         // Sign Up Screen Route
         composable("SignUp") {
             SignUpScreen(
-                onSignUpClick = { navController.navigate("Home") },
+                onSignUpClick = { navController.navigate("SignIn") },
                 onSignInClick = { navController.navigate("SignIn") }
             )
         }
