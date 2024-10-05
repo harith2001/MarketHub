@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button } from 'react-bootstrap';
+import Header from '../components/Header';
 
 const VendorOrders = () => {
   const [orders, setOrders] = useState([
     {
       id: 1,
       customer: 'John Doe',
-      date: '2024-09-15',
+      date: '05-10-2024',
       status: 'Processing',
       total: 150.0,
-      vendorProducts: [{ product: 'Product A', status: 'Processing' }],
+      vendorProducts: [{ product: 'Asus Laptop', quantity: '1' }],
       isMultiVendor: false,
     },
     {
       id: 2,
       customer: 'Jane Smith',
-      date: '2024-09-14',
-      status: 'Partially Delivered',
+      date: '05-10-2024',
+      status: 'Partially',
       total: 200.0,
       vendorProducts: [
         { product: 'Product B', status: 'Shipped' },
@@ -44,7 +45,7 @@ const VendorOrders = () => {
         return 25;
       case 'Shipped':
         return 50;
-      case 'Partially Delivered':
+      case 'Partially':
         return 75;
       case 'Delivered':
         return 100;
@@ -66,17 +67,17 @@ const VendorOrders = () => {
   };
 
   return (
-    <div className="mt-4 mx-4">
-      <h2>Manage Orders</h2>
-      <Table striped bordered hover>
+    <div style={{ marginLeft: '200px', padding: '20px' }}>
+      <Header title="Orders"></Header>
+      <Table striped hover responsive>
         <thead>
           <tr>
             <th>Order ID</th>
             <th>Customer</th>
             <th>Date</th>
-            <th style={{ width: '12%' }}>Status</th>
-            <th>Total Amount ($)</th>
-            <th style={{ width: '25%' }}>Progress & Action</th>
+            <th style={{ width: '15%' }}>Status</th>
+            <th style={{ width: '12%' }}>Total Amount ($)</th>
+            <th style={{ width: '30%' }}>Progress</th>
           </tr>
         </thead>
         <tbody>
@@ -88,22 +89,40 @@ const VendorOrders = () => {
               <td>{order.customer}</td>
               <td>{order.date}</td>
               <td>
-                {order.status}{' '}
-                {order.isMultiVendor && <Badge bg="info">Multi-Vendor</Badge>}
+                <Button
+                            style={{
+                              backgroundColor:
+                                order.status === 'Delivered' ? '#d4edda' :
+                                order.status === 'Processing' ? '#fff3cd' :
+                          order.status === 'Shipped' ? '#d1ecf1' : 
+                                order.status === 'Partially' ? '#e5d1f1' : '#fff3cd',
+                              color:
+                                order.status === 'Delivered' ? '#155724' :
+                                order.status === 'Processing' ? '#856404' :
+                                    order.status === 'Shipped' ? '#0c5460' :
+                                    order.status === 'Partially' ? '#7a18b5' : '#fff3cd',
+                              border: 'none',
+                              borderRadius: '20px',
+                              width: '120px',
+                            }}
+                          >
+                            {order.status}
+                          </Button>
+                {order.isMultiVendor && <Badge bg="info" className='ms-4'>Multi-Vendor</Badge>}
               </td>
               <td>{order.total}</td>
               <td>
                 {/* Progress Bar */}
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px'}}>
                   <ProgressBar
                     now={getProgress(order.status)}
                     label={`${getProgress(order.status)}%`}
-                    variant="success opacity-75"
-                    className="me-2 flex-grow-1"
+                    style={{backgroundColor: "066cdb", width: "60%" }}
+                    className="flex-grow-1"
                   />
                   {/* Dropdown Button */}
                   <Dropdown>
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                    <Dropdown.Toggle id="dropdown-basic" style={{backgroundColor: "#066cdb"}} className='btn-sm'>
                       Status
                     </Dropdown.Toggle>
 
@@ -115,7 +134,7 @@ const VendorOrders = () => {
                         Shipped
                       </Dropdown.Item>
                       {order.isMultiVendor && (
-                        <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Partially Delivered')}>
+                        <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Partially')}>
                           Partially Delivered
                         </Dropdown.Item>
                       )}
@@ -131,26 +150,25 @@ const VendorOrders = () => {
         </tbody>
       </Table>
 
-      <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
+      <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end" style={{width: "250px"}}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Order #{selectedOrder?.id} Details</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           {selectedOrder?.isMultiVendor ? (
             <>
-              <h5>Multi-Vendor Products for this Vendor</h5>
+            <Offcanvas.Title>Order #{selectedOrder?.id} <Badge bg="info">Multi-Vendor</Badge></Offcanvas.Title>
               {selectedOrder.vendorProducts.map((product, index) => (
                 <div key={index}>
-                  <strong>{product.product}:</strong> {product.status}
+                  <strong>{product.product}:</strong> {product.quantity}
                 </div>
               ))}
             </>
           ) : (
             <>
-              <h5>Products for this Order</h5>
+              <Offcanvas.Title>Order #{selectedOrder?.id} </Offcanvas.Title>
               {selectedOrder?.vendorProducts.map((product, index) => (
                 <div key={index}>
-                  <strong>{product.product}:</strong> {product.status}
+                  <strong>{product.product}:</strong>
                 </div>
               ))}
             </>

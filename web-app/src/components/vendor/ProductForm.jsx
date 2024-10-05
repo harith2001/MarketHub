@@ -9,6 +9,11 @@ const ProductForm = ({ onSave }) => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [status, setStatus] = useState(true);
+  const [productImage, setProductImage] = useState(null); // State for image file
+
+  const handleImageChange = (e) => {
+    setProductImage(e.target.files[0]); // Store the uploaded file
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -114,6 +119,17 @@ const ProductForm = ({ onSave }) => {
               />
             </Form.Group>
 
+            {/* Image Upload */}
+            <Form.Group controlId="formProductImage" className="mt-3">
+              <Form.Label>Product Image</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                required
+              />
+            </Form.Group>
+
             {/* Stock */}
             <Form.Group controlId="formStock" className="mt-3">
               <Form.Label>Stock Quantity</Form.Label>
@@ -152,10 +168,10 @@ const ProductForm = ({ onSave }) => {
 
             <Row className="mt-4">
               <Col className="d-flex flex-row-reverse gap-4">
-                <Button variant="primary" type="submit" className="btn-md">
+                <Button variant="primary" type="submit" className="btn-md" style={{width: "100px"}}>
                   Save
                 </Button>
-                <Button variant="outline-primary" className="btn-md">
+                <Button variant="outline-primary" className="btn-md" style={{width: "100px"}}>
                   Cancel
                 </Button>
               </Col>

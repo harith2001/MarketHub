@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
+import { Container, Row, Col, Table, Button, Badge } from "react-bootstrap";
 import ProductForm from "../components/vendor/ProductForm";
+import Header from "../components/Header";
 
 const Products = () => {
   const [products, setProducts] = useState([
@@ -20,7 +21,7 @@ const Products = () => {
       description: "Sweet and tangy oranges",
       price: 1.8,
       stock: 50,
-      status: true,
+      status: false,
     },
     {
       id: "103",
@@ -89,11 +90,11 @@ const Products = () => {
     setEditingProduct(null); // Reset form after save
   };
   return (
-    <Container className="mt-5">
+    <Container style={{ marginLeft: '200px', padding: '20px' }}>
+      <Header title="Products"></Header>
       <Row className="mb-5">
         <Col>
           <div className="p-4 border rounded">
-            <h2>Products List</h2>
             <div
               style={{
                 maxHeight: "200px", // table container height
@@ -122,18 +123,28 @@ const Products = () => {
                       <td>{product.description}</td>
                       <td>{product.price}</td>
                       <td>{product.stock}</td>
-                      <td>{product.status ? "Active" : "Inactive"}</td>
+                      <td>{product.status === 'Active' ? (
+                        <Badge bg="success">Active</Badge>
+                      ) : (
+                        <Badge bg="secondary">Inactive</Badge>
+                      )}</td>
                       <td>
                         <Button
-                          variant="warning"
                           className="me-2"
                           onClick={() => handleEdit(product)}
+                          style={{
+                            backgroundColor: '#066cdb',
+                            width: "100px",
+                          }}
                         >
                           Edit
                         </Button>
                         <Button
                           variant="danger"
                           onClick={() => handleDelete(product.id)}
+                          style={{
+                            width: "100px",
+                          }}
                         >
                           Delete
                         </Button>
@@ -151,7 +162,7 @@ const Products = () => {
       <Row>
         <Col>
           <div className="p-4 border rounded">
-            <h2>{editingProduct ? "Edit Product" : "Create a New Product"}</h2>
+            <h4>{editingProduct ? "Edit Product" : "Create a New Product"}</h4>
             <ProductForm
               onSave={handleSaveProduct}
               editingProduct={editingProduct}
