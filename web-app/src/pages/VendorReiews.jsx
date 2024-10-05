@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Tab, Tabs, Form, Button } from 'react-bootstrap';
+import Header from '../components/Header';
 
 const VendorReviews = () => {
     const [unreadReviews, setUnreadReviews] = useState([]);
@@ -26,8 +27,8 @@ const VendorReviews = () => {
     };
     
   return (
-    <Container className="mt-5">
-          <h2>Reviews and Ratings</h2>
+    <Container style={{ marginLeft: '200px', padding: '20px' }}>
+      <Header title="Reviews and Ratings"></Header>
       <Tabs activeKey={activeTab}
         onSelect={(k) => setActiveTab(k)} id="reviews-tabs" className="mb-3">
         
