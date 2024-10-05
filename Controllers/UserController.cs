@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MarketHub.Repositories;
 using MarketHub.Models.Entities;
 using MarketHub.Models;
+//using MarketHub.Models.DTO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
@@ -74,12 +75,56 @@ namespace MarketHub.Controllers
             return CreatedAtAction(nameof(GetUserById), new { User_ID = user.User_ID }, user);
         }
 
+        //update the IsActive status of a user - only for admin and CSR
+        [Authorize(Roles = "Admin,CSR")]
+        [HttpPut("status/{User_ID}/{status}")]
+        public async Task<IActionResult> UpdateUserStatus(string User_ID, bool status )
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
+            if (existingUser == null) return NotFound();
+
+            existingUser.IsActive = status;
+
+            await _userRepository.UpdateUserStatusAsync(User_ID, status);
+            return Ok(existingUser);
+        }
+
+        // update an existing user
+        [HttpPut("{User_ID}")]
+        public async Task<IActionResult> UpdateUser(string User_ID, [FromBody] User updatedUser)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
+            if (existingUser == null) return NotFound();
+
+            await _userRepository.UpdateUserAsync(User_ID, updatedUser);
+            return Ok(existingUser);
+        }
+
+        // delete a user
+        [HttpDelete("{User_ID}")]
+        public async Task<IActionResult> DeleteUser(string User_ID)
+        {
+            var user = await _userRepository.GetUserByIdAsync(User_ID);
+            if (user == null) return NotFound();
+
+            await _userRepository.DeleteUserAsync(User_ID);
+            return NoContent();
+        }
+
+        //get vendors by name
+        [HttpGet("vendors/{name}")]
+        public async Task<IActionResult> GetVendorsByName(string name)
+        {
+            var vendors = await _userRepository.GetVendorsByNameAsync(name);
+            return Ok(vendors);
+        }
+
         //login a user
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             var user = await _userRepository.GetUserByEmailAsync(loginModel.Email);
-            if (user == null || !PasswordHasherUtil.PasswordVerification(user.Password, loginModel.Password) ||!user.IsActive)
+            if (user == null || !PasswordHasherUtil.PasswordVerification(user.Password, loginModel.Password) || !user.IsActive)
             {
                 return Unauthorized(new { message = "Invalid email or password, or inactive account" });
             }
@@ -112,48 +157,6 @@ namespace MarketHub.Controllers
         {
             await HttpContext.SignOutAsync("CookieAuth");
             return Ok(new { message = "Logout successful." });
-        }
-
-        //update the IsActive status of a user - only for admin and CSR
-        [Authorize(Roles = "Admin,CSR")]
-        [HttpPut("status/{User_ID}")]
-        public async Task<IActionResult> UpdateUserStatus(string User_ID, [FromBody] User updatedUser)
-        {
-            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
-            if (existingUser == null) return NotFound();
-
-            await _userRepository.UpdateUserAsync(User_ID, updatedUser);
-            return Ok(existingUser);
-        }
-
-        // update an existing user
-        [HttpPut("{User_ID}")]
-        public async Task<IActionResult> UpdateUser(string User_ID, [FromBody] User updatedUser)
-        {
-            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
-            if (existingUser == null) return NotFound();
-
-            await _userRepository.UpdateUserAsync(User_ID, updatedUser);
-            return Ok(existingUser);
-        }
-
-        // delete a user
-        [HttpDelete("{User_ID}")]
-        public async Task<IActionResult> DeleteUser(string User_ID)
-        {
-            var user = await _userRepository.GetUserByIdAsync(User_ID);
-            if (user == null) return NotFound();
-
-            await _userRepository.DeleteUserAsync(User_ID);
-            return NoContent();
-        }
-
-        //get vendors by name
-        [HttpGet("vendors/{name}")]
-        public async Task<IActionResult> GetVendorsByName(string name)
-        {
-            var vendors = await _userRepository.GetVendorsByNameAsync(name);
-            return Ok(vendors);
         }
 
     }
