@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge, Container, Tab, Tabs } from 'react-bootstrap';
+import Header from '../../components/Header';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -12,9 +13,9 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
       // Replace with your API call
       const fetchedUsers = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Vendor', status: 'Active' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'CSR', status: 'Inactive' },
-        { id: 3, name: 'Michael Johnson', email: 'michael@example.com', role: 'Vendor', status: 'Active' },
+        { id: 1, name: 'John Doe', email: 'john12@gmail.com', role: 'Vendor', status: 'Inactive' },
+        { id: 2, name: 'Jane Smith', email: 'jane@gmail.com', role: 'CSR', status: 'Inactive' },
+        { id: 3, name: 'Michael Johnson', email: 'michael@gmail.com', role: 'Vendor', status: 'Active' },
       ];
       setUsers(fetchedUsers);
       
@@ -48,8 +49,8 @@ const ManageUsers = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <h2>Users</h2>
+    <Container style={{ marginLeft: "200px", padding: "20px" }}>
+      <Header title="Users"></Header>
       <Tabs
         id="user-management-tabs"
         activeKey={key}
@@ -60,7 +61,7 @@ const ManageUsers = () => {
           {vendors.length === 0 ? (
             <p>No vendors found.</p>
           ) : (
-            <Table striped bordered hover responsive>
+            <Table striped hover responsive>
               <thead>
                 <tr>
                   <th>User ID</th>
@@ -86,22 +87,28 @@ const ManageUsers = () => {
                     <td>
                       {user.status === 'Active' ? (
                         <Button
-                          variant="warning"
-                          className="me-2"
+                          className="me-2 btn-warning"
+                          style={{ width: "100px"}}
                           onClick={() => handleDeactivate(user.id)}
+                          
                         >
                           Deactivate
                         </Button>
                       ) : (
                         <Button
-                          variant="success"
-                          className="me-2"
+                            className="me-2 btn-success"
+                            style={{ width: "100px"}}
                           onClick={() => handleActivate(user.id)}
+                          
                         >
                           Activate
                         </Button>
                       )}
-                      <Button variant="danger" onClick={() => handleRemove(user.id)}>
+                      <Button
+                        className="btn-danger"
+                        style={{ width: "100px"}}
+                        onClick={() => handleRemove(user.id)}
+                      >
                         Remove
                       </Button>
                     </td>
@@ -116,7 +123,7 @@ const ManageUsers = () => {
           {csrs.length === 0 ? (
             <p>No CSRs found.</p>
           ) : (
-            <Table striped bordered hover responsive>
+            <Table striped hover responsive>
               <thead>
                 <tr>
                   <th>User ID</th>
@@ -142,22 +149,26 @@ const ManageUsers = () => {
                     <td>
                       {user.status === 'Active' ? (
                         <Button
-                          variant="warning"
-                          className="me-2"
+                          className="me-2 btn-warning"
+                          style={{ width: "100px"}}
                           onClick={() => handleDeactivate(user.id)}
                         >
                           Deactivate
                         </Button>
                       ) : (
                         <Button
-                          variant="success"
-                          className="me-2"
+                            className="me-2 btn-success"
+                            style={{ width: "100px"}}
                           onClick={() => handleActivate(user.id)}
                         >
                           Activate
                         </Button>
                       )}
-                      <Button variant="danger" onClick={() => handleRemove(user.id)}>
+                      <Button
+                        className="btn-danger"
+                        style={{ width: "100px"}}
+                        onClick={() => handleRemove(user.id)}
+                      >
                         Remove
                       </Button>
                     </td>
