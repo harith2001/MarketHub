@@ -8,10 +8,7 @@ const Notification = () => {
       ]);
   return (
     <Dropdown align="end">
-      <Dropdown.Toggle variant="link" className="text-white p-0 me-3">
-        <i className="bi bi-bell-fill" style={{ fontSize: '1.5rem' }}></i>
-      </Dropdown.Toggle>
-
+        <i className="bi bi-bell-fill" style={{ fontSize: '1.5rem', color: '#a8a9aa' }}></i>
       <Dropdown.Menu>
         {notifications.length === 0 ? (
           <Dropdown.Item>No new notifications</Dropdown.Item>
