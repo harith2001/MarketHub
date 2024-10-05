@@ -10,11 +10,13 @@ namespace MarketHub.Repositories
     public class OrderRepository
     {
         private readonly IMongoCollection<Order> _orders;
+        private readonly IMongoCollection<OrderHistory> _orderHistory;
 
         public OrderRepository(IOptions<MongoDBSettings> settings, IMongoClient client)
         {
             var database = client.GetDatabase(settings.Value.DatabaseName);
             _orders = database.GetCollection<Order>("Orders");
+            _orderHistory = database.GetCollection<OrderHistory>("OrderHistory");
         }
 
         //create a new order
@@ -43,13 +45,40 @@ namespace MarketHub.Repositories
         public async Task<string> GetOrderStatusAsync(string OrderID) =>
             (await _orders.Find(order => order.OrderID == OrderID).FirstOrDefaultAsync()).Status;
 
-        //update an order
-        public async Task UpdateOrderStatusAsync(string OrderID, string Status) =>
-          await _orders.UpdateOneAsync(order => order.OrderID == OrderID,
-              Builders<Order>.Update.Set(order => order.Status, Status));
-
         //delete an order
         public async Task DeleteOrderAsync(string OrderID) =>
-            await _orders.DeleteOneAsync(order => order.OrderID == OrderID);
+         await _orders.DeleteOneAsync(order => order.OrderID == OrderID);
+
+        //update order status
+        public async Task UpdateOrderStatusAsync(string OrderID, string Status)
+        {
+            //update the order status
+            var updateResult = await _orders.UpdateOneAsync(
+                order => order.OrderID == OrderID,
+                Builders<Order>.Update.Set(order => order.Status, Status)
+            );
+
+            //if the order status is set to "Completed", create order history
+            if (Status == "Completed" && updateResult.ModifiedCount > 0)
+            {
+                // Fetch the updated order to create order history
+                var completedOrder = await _orders.Find(order => order.OrderID == OrderID).FirstOrDefaultAsync();
+
+                if (completedOrder != null)
+                {
+                    var orderHistory = new OrderHistory
+                    {
+                        OrderID = completedOrder.OrderID,
+                        CustomerId = completedOrder.CustomerId,
+                        CompletedDate = DateTime.Now,
+                        TotalPrice = completedOrder.TotalPrice,
+                        ShippingAddress = completedOrder.ShippingAddress,
+                        Items = completedOrder.Items
+                    };
+                    await _orderHistory.InsertOneAsync(orderHistory);
+                }
+            }
+        }
+
     }
 }

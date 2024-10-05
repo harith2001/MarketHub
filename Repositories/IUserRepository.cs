@@ -13,6 +13,7 @@ namespace MarketHub.Repositories
         Task CreateUserAsync(User user);
         Task UpdateUserAsync(string User_ID, User updatedUser);
         Task DeleteUserAsync(string User_ID);
+        Task UpdateUserStatusAsync(string User_ID, bool status);
         Task<List<VendorDTO>> GetVendorsByNameAsync(string name);
     }
 }

@@ -32,6 +32,10 @@ namespace MarketHub.Repositories
         public async Task CreateUserAsync(User user) =>
                         await _users.InsertOneAsync(user);
 
+        //update user status (active/inactive)
+       public async Task UpdateUserStatusAsync(string User_ID, bool status) =>
+            await _users.UpdateOneAsync(user => user.User_ID == User_ID, Builders<User>.Update.Set(user => user.IsActive, status));
+
         //update user
         public async Task UpdateUserAsync(string User_ID, User updatedUser) =>
             await _users.ReplaceOneAsync(user => user.User_ID == User_ID, updatedUser);
