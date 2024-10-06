@@ -21,7 +21,7 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
 builder.Services.AddSingleton<IMongoCollection<Notification>>(sp =>
 {
     var mongoClient = sp.GetRequiredService<IMongoClient>();
-    var database = mongoClient.GetDatabase("test"); 
+    var database = mongoClient.GetDatabase("MarketDB"); 
     return database.GetCollection<Notification>("Notification");
 });
 
