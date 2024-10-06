@@ -34,4 +34,9 @@ public class Product
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime updatedDate { get; set; }
 
+    //image
+    public byte[]? productImage { get; set; }
+
+    
+
 }
