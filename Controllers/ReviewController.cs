@@ -137,4 +137,30 @@ public class ReviewController : ControllerBase
             });
         }
     }
+
+    //get reviews by customerId
+    [HttpGet("get-by-customerId/{customerId}")]
+    public IActionResult GetReviewsByCustomerId(string customerId)
+    {
+        try
+        {
+            var reviews = _reviewCollection.Find(r => r.customerId == customerId).ToList();
+            if (reviews.Count == 0)
+            {
+                return NotFound(new
+                {
+                    Message = $"No reviews found for customerId {customerId}"
+                });
+            }
+            return Ok(reviews);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error retrieving reviews by customerId",
+                Error = ex.Message
+            });
+        }
+    }
 }

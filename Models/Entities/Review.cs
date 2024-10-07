@@ -10,6 +10,8 @@ public class Review
 
     public required string Title { get; set; }
 
+    public required string customerId { get; set; }
+
     public string? Description { get; set; }
 
     public string? OrderID { get; set; }
