@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Tabs,
   Tab,
@@ -9,35 +9,30 @@ import {
   Col,
 } from "react-bootstrap";
 import Header from "../Header";
+import { getAllReviews } from "../../api/review";
 
 const CustomerSupport = () => {
   // Initial inquiries data
-  const [inquiries, setInquiries] = useState([
-    {
-      id: 1,
-      customer: "John Doe",
-      description: "Request for a refund on order #12345",
-      date: "2024-09-12",
-    },
-    {
-      id: 2,
-      customer: "Jane Smith",
-      description: "Complaint about late delivery",
-      date: "2024-09-10",
-    },
-    {
-      id: 3,
-      customer: "Michael Brown",
-      description: "Request for product exchange on order #54321",
-      date: "2024-09-14",
-    },
-  ]);
-
+  const [inquiries, setInquiries] = useState([]);
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
   const [activeTab, setActiveTab] = useState("unresolved");
 
-  // Handle clicking on resolve button
+  useEffect(() => {
+    // Fetch all reviews when component mounts
+    const fetchInquiries = async () => {
+      try {
+        const reviews = await getAllReviews(); // call API
+        setInquiries(reviews);
+      } catch (error) {
+        console.error("Error fetching customer inquiries:", error);
+      }
+    };
+
+    fetchInquiries();
+  }, []);
+
+  // Handle resolve button
   const handleResolve = (inquiry) => {
     setSelectedInquiry(inquiry);
     setShowResolveModal(true);
@@ -87,13 +82,13 @@ const CustomerSupport = () => {
                 >
                   <Card className="bg-light">
                     <Card.Body className="d-flex flex-column">
-                      <Card.Title>{inquiry.customer}</Card.Title>
+                      <Card.Title>{inquiry.customerId}</Card.Title>
                       <Card.Text>
                         <strong>Issue:</strong> {inquiry.description}
                       </Card.Text>
                       <div className="d-flex justify-content-between align-items-center">
                       <Card.Text>
-                        <strong>Date:</strong> {inquiry.date}
+                        <strong>Date:</strong> {new Date(inquiry.createdDate).toLocaleDateString()}
                         </Card.Text>
                         <div>
                       <Button
@@ -131,12 +126,12 @@ const CustomerSupport = () => {
                 >
                   <Card className="bg-light">
                     <Card.Body>
-                      <Card.Title>{inquiry.customer}</Card.Title>
+                      <Card.Title>{inquiry.customerId}</Card.Title>
                       <Card.Text>
                         <strong>Issue:</strong> {inquiry.description}
                       </Card.Text>
                       <Card.Text>
-                        <strong>Date:</strong> {inquiry.date}
+                        <strong>Date:</strong> {new Date(inquiry.createdDate).toLocaleDateString()}
                       </Card.Text>
                     </Card.Body>
                   </Card>
@@ -153,7 +148,7 @@ const CustomerSupport = () => {
         </Modal.Header>
         <Modal.Body>
           Are you sure you want to mark the inquiry from{" "}
-          {selectedInquiry?.customer} as resolved?
+          {selectedInquiry?.customerId} as resolved?
         </Modal.Body>
         <Modal.Footer>
           <Button

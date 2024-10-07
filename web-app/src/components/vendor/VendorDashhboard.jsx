@@ -4,6 +4,7 @@ import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Title } from 'chart.js';
 import Header from '../../components/Header';
 import { getAllOrders } from '../../api/order';
+import { getAllActiveProducts } from '../../api/product';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Title);
 
@@ -25,9 +26,12 @@ const VendorDashhboard = ({ vendorId }) => {
   const fetchVendorOrders = async () => {
     try {
       const orders = await getAllOrders(); // Fetch all orders
+      const products = await getAllActiveProducts(); // fetch all products
+
       const vendorOrders = orders.filter(order =>
         order.items.some(item => item.vendorId === vendorId)
       );
+      const vendorProducts = products.filter(product => product.vendorId === vendorId);
 
       // Calculate the totals for cards
       const pending = vendorOrders.filter(order => order.status === 'Pending').length;
@@ -39,6 +43,7 @@ const VendorDashhboard = ({ vendorId }) => {
       setPendingOrders(pending);
       setCompletedOrders(completed);
       setRevenue(totalRevenue);
+      setTotalProducts(vendorProducts.length);
 
       // Set recent 5 orders
       setRecentOrders(vendorOrders.slice(0, 5));
@@ -68,7 +73,7 @@ const VendorDashhboard = ({ vendorId }) => {
     datasets: [
       {
         label: 'Sales ($)',
-        data: [100, 200, 150, 300, 400, 250, 450],
+        data: recentOrders.map(order => order.totalPrice),
         backgroundColor: 'rgba(6, 108, 219, 0.2)',
         borderColor: 'rgba(6, 108, 219, 1)',
         borderWidth: 4,
@@ -83,7 +88,7 @@ const VendorDashhboard = ({ vendorId }) => {
     datasets: [
       {
         label: 'Profit Distribution',
-        data: [100, 200, 150, 300, 400, 250, 450],
+        data: recentOrders.map(order => order.totalPrice / 1.2),
         backgroundColor: [
         'rgba(255, 99, 132, 0.6)',
         'rgba(14, 193, 93  , 0.6)',
