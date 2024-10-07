@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Dropdown,
@@ -13,135 +13,36 @@ import {
   ListGroup,
 } from "react-bootstrap";
 import Header from "../Header";
+import { getAllOrders } from "../../api/order";
 
 const Orders = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      createdTime: "2 min ago",
-      customer: "John Doe",
-      status: "Pending",
-      products: [
-        {
-          id: "A101",
-          name: "Product A",
-          image: "imageA.jpg",
-          quantity: 2,
-          discount: 5,
-          total: 90,
-        },
-        {
-          id: "B202",
-          name: "Product B",
-          image: "imageB.jpg",
-          quantity: 1,
-          discount: 0,
-          total: 50,
-        },
-      ],
-      subtotal: 140,
-      shipping: 10,
-      discount: 5,
-      total: 145,
-      note: "Please deliver quickly.",
-    },
-    {
-      id: 2,
-      createdTime: "3 min ago",
-      customer: "Jane Smith",
-      status: "Delivered",
-      products: [
-        {
-          id: "C303",
-          name: "Asus Laptop",
-          image: "imageC.jpg",
-          quantity: 1,
-          discount: 10,
-          total: 100,
-        },
-      ],
-      subtotal: 100,
-      shipping: 0,
-      discount: 10,
-      total: 90,
-      note: "",
-    },
-    {
-      id: 3,
-      createdTime: "5 min ago",
-      customer: "Rose Perera",
-      status: "Delivered",
-      products: [
-        {
-          id: "C303",
-          name: "Product C",
-          image: "imageC.jpg",
-          quantity: 1,
-          discount: 10,
-          total: 100,
-        },
-      ],
-      subtotal: 100,
-      shipping: 0,
-      discount: 10,
-      total: 90,
-      note: "",
-    },
-    {
-      id: 4,
-      createdTime: "10 min ago",
-      customer: "Anne De Silva",
-      status: "Delivered",
-      products: [
-        {
-          id: "C303",
-          name: "Product C",
-          image: "imageC.jpg",
-          quantity: 1,
-          discount: 10,
-          total: 100,
-        },
-      ],
-      subtotal: 100,
-      shipping: 0,
-      discount: 10,
-      total: 90,
-      note: "",
-    },
-    {
-      id: 5,
-      createdTime: "20 min ago",
-      customer: "Kasun Senanayake",
-      status: "Delivered",
-      products: [
-        {
-          id: "C303",
-          name: "Product C",
-          image: "imageC.jpg",
-          quantity: 1,
-          discount: 10,
-          total: 100,
-        },
-      ],
-      subtotal: 100,
-      shipping: 0,
-      discount: 10,
-      total: 90,
-      note: "",
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [showProducts, setShowProducts] = useState(null); 
+  const [showModal, setShowModal] = useState(false); 
+  const [cancelledOrder, setCancelledOrder] = useState(null); 
+  const [note, setNote] = useState(""); 
 
-  const [showProducts, setShowProducts] = useState(null); // To show products dropdown
-  const [showModal, setShowModal] = useState(false); // Modal for cancelling orders
-  const [cancelledOrder, setCancelledOrder] = useState(null); // Order being cancelled
-  const [note, setNote] = useState(""); // Note for cancelled order
+  // Fetch all orders from API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const fetchedOrders = await getAllOrders(); // Use the actual API call
+        console.log("all orders", fetchedOrders)
+        setOrders(fetchedOrders); // Set the fetched data
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   // Sidebar Overview Data
   const overview = {
-    todayOrders: 5,
-    pendingOrders: 2,
-    deliveredOrders: 2,
-    cancelledOrders: 1,
+    todayOrders: orders.length,
+    pendingOrders: orders.filter((order) => order.status === "Pending").length,
+    deliveredOrders: orders.filter((order) => order.status === "Completed").length,
+    cancelledOrders: orders.filter((order) => order.status === "Cancelled").length,
   };
 
   // Handle status change
@@ -151,7 +52,7 @@ const Orders = () => {
       setShowModal(true);
     } else {
       setOrders(
-        orders.map((o) => (o.id === order.id ? { ...o, status: newStatus } : o))
+        orders.map((o) => (o.orderId === order.orderId ? { ...o, status: newStatus } : o))
       );
     }
   };
@@ -160,7 +61,7 @@ const Orders = () => {
   const handleConfirmCancel = () => {
     setOrders(
       orders.map((o) =>
-        o.id === cancelledOrder.id ? { ...o, status: "Cancelled", note } : o
+        o.orderId === cancelledOrder.orderId ? { ...o, status: "Cancelled", note } : o
       )
     );
     setShowModal(false);
@@ -235,11 +136,11 @@ const Orders = () => {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <React.Fragment key={order.id}>
+              <React.Fragment key={order.orderID}>
                 <tr>
-                  <td>{order.id}</td>
+                  <td>{order.orderID}</td>
                   <td>{order.createdTime}</td>
-                  <td>{order.customer}</td>
+                  <td>{order.customerId}</td>
                   <td>
                     <Dropdown>
                       <Dropdown.Toggle
@@ -274,9 +175,9 @@ const Orders = () => {
                   <td>
                     <Button
                       style={{ background: 'none', border: 'none', padding: 0 }}
-                      onClick={() => handleShowProducts(order.id)}
+                      onClick={() => handleShowProducts(order.orderID)}
                     >
-                      {showProducts === order.id ? (
+                      {showProducts === order.orderID ? (
                         <i style={{color: '#a8a9aa'}} className="bi bi-caret-up-square-fill"></i>
                       ) : (
                         <i style={{color: '#a8a9aa'}} className="bi bi-caret-down-square-fill"></i>
@@ -284,7 +185,7 @@ const Orders = () => {
                     </Button>
                   </td>
                 </tr>
-                {showProducts === order.id && (
+                {showProducts === order.orderID && (
                   <tr>
                     <td colSpan="5">
                       <Table className="table-borderless">
@@ -299,8 +200,8 @@ const Orders = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {order.products.map((product) => (
-                            <tr key={product.id}>
+                          {order.items.map((product) => (
+                            <tr key={product.productId}>
                               <td>
                                 <img
                                   src={product.image}
@@ -308,8 +209,8 @@ const Orders = () => {
                                   style={{ width: "50px" }}
                                 />
                               </td>
-                              <td>{product.id}</td>
-                              <td>{product.name}</td>
+                              <td>{product.productId}</td>
+                              <td>{product.productName}</td>
                               <td>{product.quantity}</td>
                               <td>{product.discount}%</td>
                               <td>${product.total}</td>
@@ -334,7 +235,7 @@ const Orders = () => {
                           <tr className="fw-bold">
                             <td colSpan="4"></td>
                             <td>Total</td>
-                            <td>${order.total}</td>
+                            <td>${order.totalPrice}</td>
                           </tr>
                           {order.note && (
                             <tr>

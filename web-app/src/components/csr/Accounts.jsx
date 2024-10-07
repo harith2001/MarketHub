@@ -1,138 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Tabs, Tab, Modal } from "react-bootstrap";
 import Header from "../Header";
+import { getUsers, updateUserStatus, deleteUser } from "../../api/user";
 
 const Accounts = () => {
-  const [pendingAccounts, setPendingAccounts] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@gmail.com",
-      requestDate: "05-10-2024",
-      status: "Pending Activation",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@gmail.com",
-      requestDate: "05-10-2024",
-      status: "Pending Activation",
-    },
-  ]);
-
-  const [approvedAccounts, setApprovedAccounts] = useState([
-    {
-      id: 3,
-      name: "Alex Brown",
-      email: "alex@gmail.com",
-      requestDate: "05-10-2024",
-      status: "Approved",
-    },
-  ]);
-
-  const [deactivatedAccounts, setDeactivatedAccounts] = useState([
-    {
-      id: 4,
-      name: "Michael Johnson",
-      email: "michael@gmail.com",
-      requestDate: "05-10-2024",
-      status: "Deactivated",
-    },
-  ]);
-
-  const [showModal, setShowModal] = useState(false); // Modal for confirmation
-  const [modalAction, setModalAction] = useState(null); // Action type for the modal
+  const [approvedAccounts, setApprovedAccounts] = useState([]);
+  const [deactivatedAccounts, setDeactivatedAccounts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [action, setAction] = useState(null); 
   const [selectedAccount, setSelectedAccount] = useState(null);
+
+  useEffect(() => {
+    fetchUsers(); // Fetch users when component mounts
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const users = await getUsers(); // Fetch all users from API
+      const customers = users.filter(user => user.role === "Customer"); // Filter customers
+
+      // Categorize users into approved and deactivated
+      const approved = customers.filter(user => user.isActive);
+      const deactivated = customers.filter(user => !user.isActive);
+
+      setApprovedAccounts(approved);
+      setDeactivatedAccounts(deactivated);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  // Handle Deactivate, Reactivate, Delete
+  const handleConfirmAction = async () => {
+    try {
+      if (action === "Deactivate") {
+        await updateUserStatus(selectedAccount.user_ID, false); // Deactivate user
+        setApprovedAccounts(
+          approvedAccounts.filter((account) => account.user_ID !== selectedAccount.user_ID)
+        );
+        setDeactivatedAccounts([...deactivatedAccounts, { ...selectedAccount, isActive: false }]);
+      } else if (action === "Reactivate") {
+        await updateUserStatus(selectedAccount.user_ID, true); // Reactivate user
+        setDeactivatedAccounts(
+          deactivatedAccounts.filter(
+            (account) => account.user_ID !== selectedAccount.user_ID
+          )
+        );
+        setApprovedAccounts([...approvedAccounts, { ...selectedAccount, isActive: true }]);
+      } else if (action === "Delete") {
+        await deleteUser(selectedAccount.user_ID); // Delete user
+        setApprovedAccounts(
+          approvedAccounts.filter((account) => account.user_ID !== selectedAccount.user_ID)
+        );
+      }
+
+      setShowModal(false);
+    } catch (error) {
+      console.error(`Error during ${action}:`, error);
+    }
+  };
 
   // Open confirmation modal
   const handleAction = (action, account) => {
-    setModalAction(action);
+    setAction(action);
     setSelectedAccount(account);
     setShowModal(true);
-  };
-
-  // Confirm action from modal
-  const handleConfirmAction = () => {
-    if (modalAction === "Deactivate") {
-      // Move user from Approved to Deactivated
-      setApprovedAccounts(
-        approvedAccounts.filter((account) => account.id !== selectedAccount.id)
-      );
-      setDeactivatedAccounts([...deactivatedAccounts, selectedAccount]);
-    } else if (modalAction === "Delete") {
-      // Remove user from Approved
-      setApprovedAccounts(
-        approvedAccounts.filter((account) => account.id !== selectedAccount.id)
-      );
-    } else if (modalAction === "Reactivate") {
-      // Move user from Deactivated to Approved
-      setDeactivatedAccounts(
-        deactivatedAccounts.filter(
-          (account) => account.id !== selectedAccount.id
-        )
-      );
-      setApprovedAccounts([...approvedAccounts, selectedAccount]);
-    }
-
-    setShowModal(false);
-  };
-
-  // Approve user from pending accounts
-  const handleApprove = (id) => {
-    const accountToApprove = pendingAccounts.find(
-      (account) => account.id === id
-    );
-    setPendingAccounts(pendingAccounts.filter((account) => account.id !== id));
-    setApprovedAccounts([
-      ...approvedAccounts,
-      { ...accountToApprove, status: "Approved" },
-    ]);
   };
 
   return (
       <div style={{ marginLeft: "200px", padding: "20px" }}>
           <Header title="Accounts"></Header>
-      <Tabs defaultActiveKey="requests" className="mb-4">
-        {/* Pending Requests Tab */}
-        <Tab eventKey="requests" title="Requests">
-              {/* Pending Accounts Table */}
-              {pendingAccounts.length === 0 ? (
-                <p>No pending account requests found.</p>
-              ) : (
-                <Table striped hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Customer Name</th>
-                      <th>Email</th>
-                      <th>Request Date</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingAccounts.map((account) => (
-                      <tr key={account.id}>
-                        <td>{account.name}</td>
-                        <td>{account.email}</td>
-                        <td>{account.requestDate}</td>
-                        <td>
-                          <Button
-                            variant="success"
-                            style={{width: "100px"}}
-                            size="sm"
-                            onClick={() => handleApprove(account.id)}
-                          >
-                            Approve
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-        </Tab>
+      <Tabs defaultActiveKey="approved" className="mb-4">
 
         {/* Approved Accounts Tab */}
-        <Tab eventKey="approved" title="Approved">
+        <Tab eventKey="approved" title={`Approved (${approvedAccounts.length})`}>
               {/* Approved Accounts Table */}
               {approvedAccounts.length === 0 ? (
                 <p>No approved accounts found.</p>
@@ -148,7 +89,7 @@ const Accounts = () => {
                   </thead>
                   <tbody>
                     {approvedAccounts.map((account) => (
-                      <tr key={account.id}>
+                      <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
                         <td>{account.requestDate}</td>
@@ -179,7 +120,7 @@ const Accounts = () => {
         </Tab>
 
         {/* Deactivated Accounts Tab */}
-        <Tab eventKey="deactivated" title="Deactivated">
+        <Tab eventKey="deactivated" title={`Deactivated (${deactivatedAccounts.length})`}>
               {/* Deactivated Accounts Table */}
               {deactivatedAccounts.length === 0 ? (
                 <p>No deactivated accounts found.</p>
@@ -195,7 +136,7 @@ const Accounts = () => {
                   </thead>
                   <tbody>
                     {deactivatedAccounts.map((account) => (
-                      <tr key={account.id}>
+                      <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
                         <td>{account.requestDate}</td>
@@ -217,13 +158,13 @@ const Accounts = () => {
         </Tab>
       </Tabs>
 
-      {/* Modal for confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      {/* Modal confirmation */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} className="mt-5">
         <Modal.Header closeButton>
-          <Modal.Title>Confirm {modalAction}</Modal.Title>
+          <Modal.Title>Confirm {action}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to {modalAction} {selectedAccount?.name}?
+          Are you sure you want to {action} {selectedAccount?.name}?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>

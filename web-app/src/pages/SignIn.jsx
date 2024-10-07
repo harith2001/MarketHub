@@ -1,18 +1,26 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/user";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    //API request to log the user in
-    console.log({ email, password });
-    //redirect the user
-    navigate("/");
+    try {
+      const userData = { email, password };
+      const response = await loginUser(userData);
+      console.log("Login Successful: ", response);
+      navigate("/");
+    } catch (error) {
+      console.log("Logging in with:", { email, password });
+      console.error("Login failed:", error);
+      setErrorMessage("Invalid email or password. Please try again.");
+    }
   };
 
   return (
@@ -60,13 +68,13 @@ const Signin = () => {
           className="d-flex flex-column align-items-center mx-5 justify-content-center bg-success p-2 text-dark bg-opacity-25"
         >
           <h3 className="text-center mb-4">New Here?</h3>
-          <p>Create an account to get started with our services.</p>
+          <p>Request to get started with a new account.</p>
           <Button
             variant="success"
             className="mt-3 btn-block"
-            onClick={() => navigate("/sign-up")}
+            onClick={() => navigate("/signup-request")}
           >
-            Create New Account
+            Request New Account
           </Button>
         </Col>
       </Row>

@@ -1,94 +1,76 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { createUser } from '../api/user';
 
 const SignupRequestForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [role, setRole] = useState('Vendor'); // Default role
-  const [companyName, setCompanyName] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
-  const [experience, setExperience] = useState('');
-  const [additionalInfo, setAdditionalInfo] = useState('');
+  const [role, setRole] = useState('Vendor'); 
+  const [phoneNum, setPhoneNum] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); 
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(''); 
+    setSuccessMessage(''); 
 
-    // Create the account request data to send to the backend
-    const requestData = {
-      name,
-      email,
-      phone_number: phoneNumber,
-      role,
-      company_name: role === 'Vendor' ? companyName : null, // Only for Vendors
-      business_address: role === 'Vendor' ? businessAddress : null, // Only for Vendors
-      experience: role === 'CSR' ? experience : null, // Only for CSRs
-      additional_info: additionalInfo,
-      requested_at: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    console.log('Request Data:', requestData);
-
-    // Send requestData to the backend (replace with your API call)
-    // Example: axios.post('/api/pending_requests', requestData)
-
-    // Clear the form after submission
-    setName('');
-    setEmail('');
-    setPhoneNumber('');
-    setRole('Vendor');
-    setCompanyName('');
-    setBusinessAddress('');
-    setExperience('');
-    setAdditionalInfo('');
+    try {
+      const userData = { name, email, role, isActive: false };
+      
+      const response = await createUser(userData);
+      console.log("User created successfully:", response);
+      setSuccessMessage("Your request has been submitted successfully!");
+      setName('');
+      setEmail('');
+      setRole('Vendor');
+    } catch (error) {
+      console.error("Error creating user:", error);
+      setErrorMessage("There was an error submitting your request. Please try again.");
+    }
   };
 
   return (
-    <Container className="mt-5">
-      <h2>Request an Account</h2>
+    <div>
+      <div className="position-fixed top-0 w-100 p-3 text-center text-white" style={{ zIndex: 1000, backgroundColor: '#066cdb'}}>
+        <h1>MarketHub</h1>
+      </div>
+      <Container className="position-absolute top-50 start-50 translate-middle w-50" style={{border: '2px solid #066cdb', borderRadius: '10px', padding: '20px', backgroundColor: '#f8f9fa' }}>
+      <Row className="w-100 justify-content-center align-items-center">
+        <Col md={6} className="border-end shadow-sm p-4 rounded needs-validation">
+      <h4 className='mb-4'>Request an Account</h4>
       <Form onSubmit={handleSubmit}>
-        {/* Name */}
-        <Form.Group controlId="formName" className="mt-3">
-          <Form.Label>Full Name</Form.Label>
+        <Form.Group controlId="formName">
           <Form.Control
             type="text"
-            placeholder="Enter your full name"
+            placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </Form.Group>
-
-        {/* Email */}
         <Form.Group controlId="formEmail" className="mt-3">
-          <Form.Label>Email Address</Form.Label>
           <Form.Control
             type="email"
-            placeholder="Enter your email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+            </Form.Group>
+        <Form.Group controlId="formPhhoneNum" className="mt-3">
+          <Form.Control
+            type="text"
+            placeholder="Phone Number"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
         </Form.Group>
-
-        {/* Phone Number */}
-        <Form.Group controlId="formPhoneNumber" className="mt-3">
-          <Form.Label>Phone Number</Form.Label>
-          <Form.Control
-            type="tel"
-            placeholder="Enter your phone number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-          />
-        </Form.Group>
-
-        {/* Role Selection */}
         <Form.Group controlId="formRole" className="mt-3">
-          <Form.Label>Select Role</Form.Label>
           <Form.Control
-            as="select"
+                as="select"
+                placeholder="Role"
             value={role}
             onChange={(e) => setRole(e.target.value)}
             required
@@ -96,67 +78,29 @@ const SignupRequestForm = () => {
             <option value="Vendor">Vendor</option>
             <option value="CSR">Customer Service Representative (CSR)</option>
           </Form.Control>
-        </Form.Group>
+              </Form.Group>
+              <div class="d-grid gap-2">
 
-        {/* Vendor-specific Fields */}
-        {role === 'Vendor' && (
-          <>
-            <Form.Group controlId="formCompanyName" className="mt-3">
-              <Form.Label>Company Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter your company name"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                required={role === 'Vendor'}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="formBusinessAddress" className="mt-3">
-              <Form.Label>Business Address</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter your business address"
-                value={businessAddress}
-                onChange={(e) => setBusinessAddress(e.target.value)}
-                required={role === 'Vendor'}
-              />
-            </Form.Group>
-          </>
-        )}
-
-        {/* CSR-specific Fields */}
-        {role === 'CSR' && (
-          <Form.Group controlId="formExperience" className="mt-3">
-            <Form.Label>Experience (Optional)</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Describe your experience or qualifications"
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-            />
-          </Form.Group>
-        )}
-
-        {/* Additional Info */}
-        <Form.Group controlId="formAdditionalInfo" className="mt-3">
-          <Form.Label>Additional Information (Optional)</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            placeholder="Provide any additional information"
-            value={additionalInfo}
-            onChange={(e) => setAdditionalInfo(e.target.value)}
-          />
-        </Form.Group>
-
-        {/* Submit Button */}
         <Button variant="primary" type="submit" className="mt-3">
           Send Request
         </Button>
-      </Form>
-    </Container>
+              </div>
+          </Form>
+        </Col>
+
+        <Col md={6} className="d-none d-md-block">
+          <img 
+            src="/assets/images/carousel/image-6.jpg" 
+            alt="Signup illustration" 
+              className="img-fluid rounded" 
+              style={{ maxWidth: '100%', maxHeight: '400px', marginLeft: '70px' }}
+          />
+        </Col>
+         </Row>
+      </Container>
+    </div>
+
+     
   );
 };
 
