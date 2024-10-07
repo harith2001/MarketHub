@@ -33,4 +33,10 @@ public class NotificationService
         var filter = Builders<Notification>.Filter.Eq(n => n.TargetUserId, userId);
         return _notificationCollection.Find(filter).ToList();
     }
+
+    //get-all notifications
+    public List<Notification> GetAllNotifications()
+    {
+        return _notificationCollection.Find(notification => true).ToList();
+    }
 }
