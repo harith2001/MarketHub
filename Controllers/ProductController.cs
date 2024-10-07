@@ -86,6 +86,8 @@ public class ProductController : ControllerBase
                 });
             }
 
+        
+
             return Ok(product);
         }
         catch (Exception ex)
@@ -251,27 +253,123 @@ public class ProductController : ControllerBase
         }
     }
 
-    //create a new product
-    [HttpPost("add-new-product")]
-    public IActionResult AddNewProduct([FromBody] Product newProduct)
+    [HttpGet("get-product-image/{productId}")]
+    public IActionResult GetProductImage(string productId)
     {
         try
-        {   
-            //check for productId duplication
-            var existingProduct = _productCollection.Find(p => p.productId == newProduct.productId).FirstOrDefault(); 
-            
-            if(existingProduct != null)
+        {
+            // Find the product by productId
+            var product = _productCollection.Find(p => p.productId == productId).FirstOrDefault();
+
+            if (product == null || product.productImage == null)
             {
-                return StatusCode(400 ,new
+                return NotFound(new
                 {
-                    Message = $"Product with ID {newProduct.productId} already exists",
+                    Message = $"Product with ID {productId} not found or image not available."
                 });
             }
 
-            newProduct.createdDate = DateTime.Now;
-            newProduct.updatedDate = DateTime.Now;
-            newProduct.isActive = true;
-            newProduct.restockRequired = false;
+            // Return the image as a file
+            return File(product.productImage, "image/jpeg"); 
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error retrieving product image",
+                Error = ex.Message
+            });
+        }
+    }
+
+
+    //create a new product
+    //[HttpPost("add-new-product")]
+    //public IActionResult AddNewProduct([FromBody] Product newProduct)
+    //{
+    //    try
+    //    {   
+    //        //check for productId duplication
+    //        var existingProduct = _productCollection.Find(p => p.productId == newProduct.productId).FirstOrDefault(); 
+
+    //        if(existingProduct != null)
+    //        {
+    //            return StatusCode(400 ,new
+    //            {
+    //                Message = $"Product with ID {newProduct.productId} already exists",
+    //            });
+    //        }
+
+    //        newProduct.createdDate = DateTime.Now;
+    //        newProduct.updatedDate = DateTime.Now;
+    //        newProduct.isActive = true;
+    //        newProduct.restockRequired = false;
+    //        _productCollection.InsertOne(newProduct);
+
+    //        return Ok(new
+    //        {
+    //            Message = "Successfully added a new product",
+    //            Product = newProduct
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, new
+    //        {
+    //            Message = "Error adding a new  product",
+    //            Error = ex.Message
+    //        });
+    //    }
+    //}
+
+    [HttpPost("add-new-product")]
+    [Consumes("multipart/form-data")] // Specifies that the request consumes multipart/form-data
+    public IActionResult AddNewProduct(
+    [FromForm] IFormFile? image,
+    [FromForm] string productId,
+    [FromForm] string productName,
+    [FromForm] string productType,
+    [FromForm] string vendorId,
+    [FromForm] int? quantity)
+    {
+        try
+        {
+            // Check for productId duplication
+            var existingProduct = _productCollection.Find(p => p.productId == productId).FirstOrDefault();
+
+            if (existingProduct != null)
+            {
+                return StatusCode(400, new
+                {
+                    Message = $"Product with ID {productId} already exists",
+                });
+            }
+
+            // Create the new product object
+            var newProduct = new Product
+            {
+                productId = productId,
+                productName = productName,
+                productType = productType,
+                vendorId = vendorId,
+                quantity = quantity,
+                createdDate = DateTime.Now,
+                updatedDate = DateTime.Now,
+                isActive = true,
+                restockRequired = false
+            };
+
+            // Handle the image if provided
+            if (image != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    image.CopyTo(ms);
+                    newProduct.productImage = ms.ToArray();
+                }
+            }
+
+            // Insert the new product into MongoDB
             _productCollection.InsertOne(newProduct);
 
             return Ok(new
@@ -284,7 +382,7 @@ public class ProductController : ControllerBase
         {
             return StatusCode(500, new
             {
-                Message = "Error adding a new  product",
+                Message = "Error adding a new product",
                 Error = ex.Message
             });
         }
