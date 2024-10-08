@@ -1,0 +1,37 @@
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.suo
+.vscode/
+.vs/
+*.userosscache
+*.sln.docstates
+
+# Ignore logs and database
+*.log
+*.ldf
+*.mdf
+
+# Ignore NuGet packages
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Ignore compiled files
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# Ignore sensitive configuration files
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+.env
+
+# Ignore IDE folders
+.idea/
