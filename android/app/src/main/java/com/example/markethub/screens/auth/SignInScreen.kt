@@ -54,10 +54,12 @@ fun SignInScreen(
                 ValidatedTextFieldComponent(
                     label = "Email Address",
                     isRequired = true,
-                    validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null }
+                    validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
+                    value = "",
+                    onValueChange = {}
                 )
 
-                PasswordField(disableValidation = true)
+                PasswordField(disableValidation = true, value = "", onValueChange = {})
             }
 
             Column {

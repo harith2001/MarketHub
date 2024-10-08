@@ -22,8 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -42,13 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.markethub.LocalNavController
 import com.example.markethub.R
+import com.example.markethub.domain.models.FavoriteItem
 import com.example.markethub.screens.PreviewWrapper
-import com.example.markethub.screens.cart.CartItem
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun MyFavoritesScreen(
-    favoriteItems: List<CartItem> = sampleFavoriteItems()
+    favoriteItems: List<FavoriteItem> = sampleFavoriteItems()
 ) {
     val favoritesList = remember { mutableStateListOf(*favoriteItems.toTypedArray()) }
     val navController = LocalNavController.current
@@ -135,7 +133,7 @@ fun EmptyFavoritesView() {
 }
 
 @Composable
-fun FavoriteItemCard(item: CartItem, onRemoveClick: () -> Unit, onClick: () -> Unit) {
+fun FavoriteItemCard(item: FavoriteItem, onRemoveClick: () -> Unit, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -146,7 +144,7 @@ fun FavoriteItemCard(item: CartItem, onRemoveClick: () -> Unit, onClick: () -> U
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            painter = painterResource(id = item.imageRes),
+            painter = painterResource(id = item.image),
             contentDescription = item.name,
             modifier = Modifier
                 .size(64.dp)
@@ -187,12 +185,10 @@ fun FavoriteItemCard(item: CartItem, onRemoveClick: () -> Unit, onClick: () -> U
 }
 
 @Composable
-fun sampleFavoriteItems(): List<CartItem> {
+fun sampleFavoriteItems(): List<FavoriteItem> {
     return listOf(
-        CartItem(id = 1, name = "Casual Leather Jacket", imageRes = R.drawable.ic_placeholder, quantity = 1, price = 65.0),
-        CartItem(id = 2, name = "Comfort Fit Denim Jeans", imageRes = R.drawable.ic_placeholder, quantity = 1, price = 50.0),
-        CartItem(id = 3, name = "Classic Watch", imageRes = R.drawable.ic_placeholder, quantity = 1, price = 120.0),
-        CartItem(id = 4, name = "Sports Shoes", imageRes = R.drawable.ic_placeholder, quantity = 1, price = 75.0)
+        FavoriteItem(id = 1, name = "Makeup Kit", image = R.drawable.ic_placeholder, price = 65.0),
+        FavoriteItem(id = 2, name = "Head Phone", image = R.drawable.ic_placeholder_2, price = 50.0)
     )
 }
 

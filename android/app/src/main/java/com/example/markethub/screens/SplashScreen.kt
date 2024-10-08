@@ -42,7 +42,7 @@ fun SplashScreen(navController: NavHostController, context: MainActivity) {
 
         if (onBoardingIsFinished(context = context)) {
             navController.popBackStack()
-            navController.navigate("Home")
+            navController.navigate("SignIn")
         } else {
             navController.popBackStack()
             navController.navigate("Onboarding")

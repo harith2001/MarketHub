@@ -29,12 +29,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun ProductCard(
+    productId: Int,
     image: String,
     category: String,
     name: String,
@@ -57,12 +59,12 @@ fun ProductCard(
             contentAlignment = Alignment.TopEnd
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_placeholder),
+                painter = rememberAsyncImagePainter(model = image),
                 contentDescription = name,
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable(onClick = {
-                        navController.navigate("ProductDetailScreen")
+                        navController.navigate("ProductDetailScreen/$productId")
                     }),
             )
             IconButton(

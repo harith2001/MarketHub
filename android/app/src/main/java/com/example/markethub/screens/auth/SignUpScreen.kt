@@ -1,5 +1,6 @@
 package com.example.markethub.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +36,7 @@ import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun SignUpScreen(onSignUpClick: () -> Unit = {}, onSignInClick: () -> Unit = {}) {
+    var context = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -58,20 +61,30 @@ fun SignUpScreen(onSignUpClick: () -> Unit = {}, onSignInClick: () -> Unit = {})
                         { input -> if (input.length < 2) "Name should be at least 2 characters" else null },
                         { input -> if (input.any { it.isDigit() }) "Name should not contain numbers" else null },
                         { input -> if (input.any { !it.isLetter() }) "Name should contain only letters" else null }
-                    )
+                    ),
+                    value = "",
+                    onValueChange = {}
                 )
 
                 ValidatedTextFieldComponent(
                     label = "Email Address",
                     isRequired = true,
-                    validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null }
+                    validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
+                    value = "",
+                    onValueChange = {}
                 )
 
-                PasswordField()
+                PasswordField(value = "", onValueChange = {})
             }
             Column {
                 Button(
-                    onClick = onSignUpClick,
+                    onClick = {
+                        //Success message
+                        Toast.makeText(context, "Registered Successfully, Please Sign In to continue", Toast.LENGTH_SHORT).show()
+                        //Error message
+                        //Toast.makeText(context, "Registration Failed, Please try again", Toast.LENGTH_SHORT).show()
+                        onSignUpClick()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),

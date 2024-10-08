@@ -15,9 +15,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PasswordField(
     label: String = "Password",
+    value: String,
+    onValueChange: (String) -> Unit,
     isRequired: Boolean = true,
     minLength: Int = 6,
     validationRules: List<(String) -> String?> = listOf(
@@ -41,16 +43,15 @@ fun PasswordField(
     errorColor: Color = Color.Red,
     disableValidation: Boolean = false
 ) {
-    var passwordValue by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),) {
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp)) {
         OutlinedTextField(
-            value = passwordValue,
+            value = value,
             onValueChange = { newValue ->
-                passwordValue = newValue
+                onValueChange(newValue) // Notify the parent of the new value
                 errorMessage = if (disableValidation) null else validatePasswordInput(
                     newValue,
                     isRequired,
@@ -59,22 +60,18 @@ fun PasswordField(
                 isError = errorMessage != null
             },
             label = { Text(text = label) },
-            visualTransformation = if (passwordVisibility) VisualTransformation.None else
-                PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val image =
-                    if (passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+                val image = if (passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                 IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                     Icon(
                         imageVector = image,
-                        contentDescription = if (passwordVisibility) "Hide password" else
-                            "Show password"
+                        contentDescription = if (passwordVisibility) "Hide password" else "Show password"
                     )
                 }
             },
             isError = isError,
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (isError) errorColor else MaterialTheme.colorScheme.primary,

@@ -136,12 +136,16 @@ fun ProfileScreen() {
                     { input -> if (input.length < 2) "Name should be at least 2 characters" else null },
                     { input -> if (input.any { it.isDigit() }) "Name should not contain numbers" else null },
                     { input -> if (input.any { !it.isLetter() }) "Name should contain only letters" else null }
-                )
+                ),
+                value = "Yashodini Soysa",
+                onValueChange = {}
             )
             ValidatedTextFieldComponent(
                 label = "Email",
                 isRequired = true,
-                validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null }
+                validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
+                value = "yashodini@gmail.com",
+                onValueChange = {}
             )
 
             Button(
@@ -159,17 +163,23 @@ fun ProfileScreen() {
                 label = "Existing Password",
                 isRequired = true,
                 minLength = 6,
-                disableValidation = true
+                disableValidation = true,
+                value = "",
+                onValueChange = {}
             )
             PasswordField(
                 label = "New Password",
                 isRequired = true,
-                minLength = 6
+                minLength = 6,
+                value = "",
+                onValueChange = {}
             )
             PasswordField(
                 label = "Confirm Password",
                 isRequired = true,
-                minLength = 6
+                minLength = 6,
+                value = "",
+                onValueChange = {}
             )
             Button(
                 onClick = { /* Change Password Logic */ },

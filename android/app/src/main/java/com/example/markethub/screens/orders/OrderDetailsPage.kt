@@ -48,8 +48,15 @@ import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.components.ValidatedTextFieldComponent
 import com.example.markethub.screens.PreviewWrapper
-import com.example.markethub.screens.cart.CartItem
 import com.example.markethub.ui.theme.Primary
+
+class CartItem(
+    val id: Int,
+    val name: String,
+    val imageRes: Int,
+    val quantity: Int,
+    val price: Double
+)
 
 @Composable
 fun OrderDetailsScreen(
@@ -309,6 +316,8 @@ fun RateOrderDialog(
                 ValidatedTextFieldComponent(
                     label = "Comment",
                     isRequired = false,
+                    value = "",
+                    onValueChange = {}
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

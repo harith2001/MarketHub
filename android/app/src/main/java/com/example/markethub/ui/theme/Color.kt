@@ -14,7 +14,7 @@ val Blue = Color(0xFF3C88E4)
 val BlueVariant = Color(0xFF1A5BAA)
 val Yellow = Color(0xFFE6AB68)
 
-val Primary = Color(0xFFFEA853)
+val Primary = Color(0xFF066CDB)
 val Secondary = Color(0xFF9DCEFF)
 val TextColor = Color(0xFF1D1617)
 val AccentColor = Color(0xFFC58BF2)

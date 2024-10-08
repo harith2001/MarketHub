@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".MarketHubApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,32 +15,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MarketHub"
         tools:targetApi="31">
-        <activity
-            android:name=".OnBoardingActivity"
-            android:exported="false"
-            android:label="@string/title_activity_on_boarding"
-            android:theme="@style/Theme.MarketHub" />
-        <activity
-            android:name=".GetStartedActivity"
-            android:exported="false"
-            android:label="@string/title_activity_get_started"
-            android:theme="@style/Theme.MarketHub" />
-        <activity
-            android:name=".SplashScreenActivity"
-            android:exported="false"
-            android:label="@string/title_activity_splash_screen"
-            android:theme="@style/Theme.MarketHub" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MarketHub">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+    <!-- Main Activity -->
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.MarketHub">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+</application>
 
-</manifest>
+    </manifest>
