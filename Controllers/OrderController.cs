@@ -23,26 +23,46 @@ namespace MarketHub.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
-            await _orderRepository.CreateOrderAsync(order);
-            return Ok(new { message = "Order placed successfully", orderId = order.Id });
+            try {
+                await _orderRepository.CreateOrderAsync(order);
+                return Ok(new { message = "Order placed successfully", orderId = order.Id });
+            }
+            catch
+            {
+                return BadRequest(new { message = "Order not placed" });
+            }
         }
 
         // get all orders for a customer
         [HttpGet("customer/{CustomerId}")]
         public async Task<IActionResult> GetOrdersByCustomerId(string CustomerId)
         {
-            var orders = await _orderRepository.GetOrdersByCustomerIdAsync(CustomerId);
-            return Ok(orders);
+            try
+            {
+                var orders = await _orderRepository.GetOrdersByCustomerIdAsync(CustomerId);
+                return Ok(orders);
+            }
+            catch
+            {
+                return BadRequest(new { message = "No orders found" });
+            }
         }
 
         //get all orders
         [HttpGet("AllOrders")]
         public async Task<IActionResult> GetAllOrders()
         {
-            var orders = await _orderRepository.GetAllOrdersAsync();
-            return Ok(orders);
-        }
+            try
+            {
+                var orders = await _orderRepository.GetAllOrdersAsync();
+                return Ok(orders);
+            }
+            catch
+            {
+                return BadRequest(new { message = "No orders found" });
+            }
 
+        }
 
         // get order by ID
         [HttpGet("{OrderID}")]
@@ -76,8 +96,15 @@ namespace MarketHub.Controllers
         [HttpDelete("{OrderID}")]
         public async Task<IActionResult> DeleteOrder(string OrderID)
         {
-            await _orderRepository.DeleteOrderAsync(OrderID);
-            return Ok(new { message = "Order deleted successfully" });
+            try
+            {
+                await _orderRepository.DeleteOrderAsync(OrderID);
+                return Ok(new { message = "Order deleted successfully" });
+            }
+            catch
+            {
+                return BadRequest(new { message = "Order not found" });
+            }
         }
 
     }

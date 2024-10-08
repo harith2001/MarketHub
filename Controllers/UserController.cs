@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using MarketHub.Repositories;
 using MarketHub.Models.Entities;
 using MarketHub.Models;
-//using MarketHub.Models.DTO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
@@ -26,7 +25,7 @@ namespace MarketHub.Controllers
         // get all users 
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
-        {
+        {  
             var users = await _userRepository.GetAllUsersAsync();
             return Ok(users);
         }
@@ -50,6 +49,22 @@ namespace MarketHub.Controllers
             return Ok(user);
         }
 
+        //get all deactivated users
+        [HttpGet("deactivated")]
+        public async Task<IActionResult> GetDeactivatedUsers()
+        {
+            var users = await _userRepository.GetDeactivatedUsersAsync();
+            return Ok(users);
+        }
+
+        //get all deactivated customers
+        [HttpGet("deactivated/customers")]
+        public async Task<IActionResult> GetDeactivatedCustomers()
+        {
+            var users = await _userRepository.GetDeactivatedCustomersAsync();
+            return Ok(users);
+        }
+
         //access denied
         [HttpGet("accessdenied")]
         public IActionResult AccessDenied()
@@ -61,18 +76,25 @@ namespace MarketHub.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNewUser([FromBody] User user)
         {
-            // Check if role is valid
-            var validRoles = new List<string> { "Admin", "Vendor", "CSR" ,"Customer" };
-            if (!validRoles.Contains(user.Role))
+            try
             {
-                return BadRequest(new { message = "Invalid user role." });
+                //check if role is valid
+                var validRoles = new List<string> { "Admin", "Vendor", "CSR", "Customer" };
+                if (!validRoles.Contains(user.Role))
+                {
+                    return BadRequest(new { message = "Invalid user role." });
+                }
+
+                //hash the password
+                user.Password = PasswordHasherUtil.HashPassword(user.Password);
+
+                await _userRepository.CreateUserAsync(user);
+                return CreatedAtAction(nameof(GetUserById), new { User_ID = user.User_ID }, user);
             }
-
-            //hash the password
-            user.Password = PasswordHasherUtil.HashPassword(user.Password);
-
-            await _userRepository.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { User_ID = user.User_ID }, user);
+            catch
+            {
+                return BadRequest(new { message = "User Not Created" });
+            }
         }
 
         //update the IsActive status of a user - only for admin and CSR
