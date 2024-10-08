@@ -21,8 +21,15 @@ namespace MarketHub.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateVendorRating([FromBody] VendorRating vendorRating)
         {
-            await _vendorRatingRepository.CreateVendorRatingAsync(vendorRating);
-            return Ok(new { message = "Vendor rating created successfully" });
+            try
+            {
+                await _vendorRatingRepository.CreateVendorRatingAsync(vendorRating);
+                return Ok(new { message = "Vendor rating created successfully" });
+            }
+            catch
+            {
+                return BadRequest(new { message = "Failed to create vendor rating" });
+            }
         }
 
         // get all vendor ratings for a vendor

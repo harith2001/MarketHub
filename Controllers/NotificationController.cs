@@ -47,4 +47,19 @@ public class NotificationController : ControllerBase
             return StatusCode(500, new { Message = "Error fetching notifications", Error = ex.Message });
         }
     }
+
+    // Get all notifications
+    [HttpGet("get-all")]
+    public IActionResult GetAllNotifications()
+    {
+        try
+        {
+            var notifications = _notificationService.GetAllNotifications();
+            return Ok(notifications);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "Error fetching all notifications", Error = ex.Message });
+        }
+    }
 }

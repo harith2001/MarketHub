@@ -22,7 +22,9 @@ namespace MarketHub.Models.Entities
 
 		public string Status { get; set; } = "Pending";
 
-		public DateTime OrderDate { get; set; } = DateTime.Now;
+		public string note { get; set; }
+
+        public DateTime OrderDate { get; set; } = DateTime.Now;
 
 		public DateTime? ShippedDate { get; set; }
 

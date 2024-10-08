@@ -15,8 +15,6 @@ namespace MarketHub.Models.Entities
 
         public string VendorName { get; set; }
 
-        public string VendorEmail { get; set; }
-
         public string CustomerName { get; set; }
 
         public string Rating { get; set; } // 1-5

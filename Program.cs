@@ -59,7 +59,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 //swagger url 
-var swaggerUrl = $"http://localhost:5000/swagger/index.html";
+var swaggerUrl = $"http://localhost:5003/swagger/index.html";
 Console.WriteLine($"Swagger UI is available at: {swaggerUrl}");
 
 app.Run();
