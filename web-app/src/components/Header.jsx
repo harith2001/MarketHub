@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
-import { InputGroup, FormControl, Button, Nav, Row, Col } from 'react-bootstrap';
+import { InputGroup, FormControl, Button, Nav, Row, Col, Dropdown } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Notification from './vendor/Notification'; // Adjust path if necessary
+import Notification from './vendor/Notification'; 
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../api/user';
 
 const Header = ({ title }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  // handle user logout
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // Call logout API
+      navigate('/'); // Redirect to first page
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
   return (
       <div className="d-flex justify-content-between py-3">
@@ -42,14 +55,20 @@ const Header = ({ title }) => {
           <Notification />
         </div>
 
-        <Nav.Link className="d-flex align-items-center justify-content-center" style={{
+        <Dropdown align="end">
+
+        <Dropdown.Toggle as={Nav.Link} className="d-flex align-items-center justify-content-center" style={{
           border: '1px solid #ced4da', 
           padding: '2px 6px', 
           borderRadius: '5px',
           color: '#a8a9aa'
         }}>
           <i className="bi bi-person-circle" style={{ fontSize: '1.5rem' }}></i>
-        </Nav.Link>
+        </Dropdown.Toggle>
+         <Dropdown.Menu>
+            <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
     </div>
   );

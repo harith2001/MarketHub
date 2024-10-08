@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
+import { addNewProduct } from "../../api/product";
 
 const ProductForm = ({ onSave }) => {
   const [productId, setProductId] = useState("");
@@ -9,28 +10,35 @@ const ProductForm = ({ onSave }) => {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [status, setStatus] = useState(true);
-  const [productImage, setProductImage] = useState(null); // State for image file
+  const [productImage, setProductImage] = useState(null); 
 
   const handleImageChange = (e) => {
-    setProductImage(e.target.files[0]); // Store the uploaded file
+    setProductImage(e.target.files[0]); 
   };
 
-  const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // product object to be sent to API
-    const productData = {
-      id: productId,
-      name: productName,
-      category: category,
-      description: description,
-      price: parseFloat(price),
-      stock: parseInt(stock, 10),
-      status: status,
-    };
+    // FormData object to create a product
+    const formData = new FormData();
+    formData.append("id", productId);
+    formData.append("name", productName);
+    formData.append("category", category);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("stock", stock);
+    formData.append("status", status ? 'Active' : 'Inactive');
+    formData.append("productImage", productImage); 
 
-    // prop to pass the product data 
-    onSave(productData);
+    try {
+      const response = await addNewProduct(formData); // call API
+      console.log("Product added successfully:", response);
+      
+      // Call onSave prop to reset the form after a successful save 
+      onSave(response);
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
   };
 
   return (
@@ -38,7 +46,6 @@ const ProductForm = ({ onSave }) => {
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>
-            {/* Product ID */}
             <Form.Group controlId="formProductId" className="mt-3">
               <Form.Label>Product ID</Form.Label>
               <Form.Control
@@ -49,8 +56,6 @@ const ProductForm = ({ onSave }) => {
                 required
               />
             </Form.Group>
-
-            {/* Product Name */}
             <Form.Group controlId="formProductName" className="mt-3">
               <Form.Label>Product Name</Form.Label>
               <Form.Control
@@ -61,8 +66,6 @@ const ProductForm = ({ onSave }) => {
                 required
               />
             </Form.Group>
-
-            {/* Category */}
             <Form.Group controlId="formCategory" className="mt-3">
               <Form.Label>Category</Form.Label>
               <div className="position-relative">
@@ -90,8 +93,6 @@ const ProductForm = ({ onSave }) => {
                 ></i>
               </div>
             </Form.Group>
-
-            {/* Price */}
             <Form.Group controlId="formPrice" className="mt-3">
               <Form.Label>Price (Rs.)</Form.Label>
               <Form.Control
@@ -106,7 +107,6 @@ const ProductForm = ({ onSave }) => {
           </Col>
 
           <Col md={6}>
-            {/* Description */}
             <Form.Group controlId="formDescription" className="mt-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
@@ -118,8 +118,6 @@ const ProductForm = ({ onSave }) => {
                 required
               />
             </Form.Group>
-
-            {/* Image Upload */}
             <Form.Group controlId="formProductImage" className="mt-3">
               <Form.Label>Product Image</Form.Label>
               <Form.Control
@@ -129,8 +127,6 @@ const ProductForm = ({ onSave }) => {
                 required
               />
             </Form.Group>
-
-            {/* Stock */}
             <Form.Group controlId="formStock" className="mt-3">
               <Form.Label>Stock Quantity</Form.Label>
               <Form.Control
@@ -141,8 +137,6 @@ const ProductForm = ({ onSave }) => {
                 required
               />
             </Form.Group>
-
-            {/* Status */}
             <Form.Group controlId="formStatus" className="mt-3">
               <Form.Label>Status</Form.Label>
               <div className="d-flex">
