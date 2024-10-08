@@ -1,23 +1,50 @@
 import React, { useState } from 'react'
 import { Dropdown } from 'react-bootstrap';
+import { getStockStatus } from '../../api/product';
 
-const Notification = () => {
-    const [notifications, setNotifications] = useState([
-        { id: 1, message: 'Order #1234 is awaiting shipment.' },
-        { id: 2, message: 'You have a new message from Admin.' },
-      ]);
+const Notification = ({ vendorId }) => {
+  const [stockStatus, setStockStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStockStatus = async () => {
+      try {
+        const stockData = await getStockStatus(vendorId); // get stock
+        setStockStatus(stockData);
+      } catch (error) {
+        console.error("Error fetching stock status:", error);
+      } finally {
+        setLoading(false); 
+      }
+    };
+
+    fetchStockStatus();
+  }, [vendorId]);
+
   return (
     <Dropdown align="end">
         <i className="bi bi-bell-fill" style={{ fontSize: '1.5rem', color: '#a8a9aa' }}></i>
       <Dropdown.Menu>
-        {notifications.length === 0 ? (
-          <Dropdown.Item>No new notifications</Dropdown.Item>
+        {loading ? (
+          <Dropdown.Item>Loading stock status...</Dropdown.Item>
+        ) : stockStatus && stockStatus.length > 0 ? (
+          stockStatus.map((product) => {
+            let stockMessage = 'Out of Stock';
+
+            if (product.stock > 10) {
+              stockMessage = 'In Stock'; // message for normal stock
+            } else if (product.stock > 0 && product.stock <= 10) {
+              stockMessage = 'Low Stock'; // message for low stock
+            }
+
+            return (
+              <Dropdown.Item key={product.productId}>
+                Product ID: {product.productId} - Stock Status: {stockMessage}
+              </Dropdown.Item>
+            );
+          })
         ) : (
-          notifications.map((notification) => (
-            <Dropdown.Item key={notification.id}>
-              {notification.message}
-            </Dropdown.Item>
-          ))
+          <Dropdown.Item>No stock status available</Dropdown.Item>
         )}
       </Dropdown.Menu>
     </Dropdown>

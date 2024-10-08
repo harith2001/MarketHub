@@ -78,3 +78,15 @@ export const deleteProduct = async (productId) => {
     throw error;
   }
 };
+
+// Get stock status by vendor ID
+export const getStockStatus = async (vendorId) => {
+  try {
+    const response = await axios.get(`${API_URL}/get-stock-status/${vendorId}`);
+    return response.data; 
+  } catch (error) {
+    console.error('Error when fetching stock status:', error);
+    throw error; 
+  }
+};
+
