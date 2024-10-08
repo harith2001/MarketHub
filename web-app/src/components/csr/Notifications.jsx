@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Tabs,
   Tab,
@@ -12,40 +12,37 @@ import {
   Offcanvas,
 } from "react-bootstrap";
 import Header from "../Header";
+import { getAllNotifications } from "../../api/notification";
+import { updateOrderStatus } from "../../api/order";
 
 const Notifications = () => {
-  // Sample notifications data
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      orderId: "#12345",
-      customer: "John Doe",
-      type: "Order Cancellation",
-      date: "2024-09-14",
-      status: "Cancelled",
-    },
-    {
-      id: 2,
-      orderId: "#12545",
-      customer: "Jane Smith",
-      type: "Order Delivered",
-      date: "2024-09-15",
-      status: "Delivered",
-    },
-    {
-      id: 3,
-      orderId: "#73345",
-      customer: "Michael Brown",
-      type: "Order Cancellation",
-      date: "2024-09-16",
-      status: "Cancelled",
-    },
-  ]);
-
+  const [notifications, setNotifications] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [activeTab, setActiveTab] = useState("cancelled"); // Track active tab
-  const [showSidebar, setShowSidebar] = useState(false); // Sidebar visibility
+  const [activeTab, setActiveTab] = useState("cancelled"); 
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const notifiData = await getAllNotifications(); // fetch all notifications from API
+        setNotifications(notifiData);
+      } catch (error) {
+        console.error("Error fetching all notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []); 
+
+  // Filter order cancelled notifications
+  const cancelledNotifications = notifications.filter(
+    (notification) => notification.type === "Order Cancellation"
+  );
+
+  // Filter order delivered notifications
+  const deliveredNotifications = notifications.filter(
+    (notification) => notification.type === "Order Delivered"
+  );
 
   // Handle clicking on cancel button
   const handleCancelOrder = (notification) => {
@@ -54,19 +51,24 @@ const Notifications = () => {
   };
 
   // Confirm cancellation action
-  const confirmCancelOrder = () => {
-    // Logic to cancel the order
-    setShowCancelModal(false);
-    setSelectedNotification(null);
-  };
+  const confirmCancelOrder = async () => {
+    try {
+      await updateOrderStatus(selectedNotification.orderId, "Cancelled"); // update order status as cancelled
 
-  // Filter cancelled and delivered notifications
-  const cancelledNotifications = notifications.filter(
-    (notification) => notification.status === "Cancelled"
-  );
-  const deliveredNotifications = notifications.filter(
-    (notification) => notification.status === "Delivered"
-  );
+      setNotifications(
+        notifications.map((notification) =>
+          notification.id === selectedNotification.id
+            ? { ...notification, status: "Cancelled" }
+            : notification
+        )
+      );
+      
+      setShowCancelModal(false);
+      setSelectedNotification(null);
+    } catch (error) {
+      console.error("Error occured when cancelling the order:", error);
+    }
+  };
 
   // Handle clearing a notification
   const handleClearNotification = (id) => {
@@ -103,10 +105,12 @@ const Notifications = () => {
                         <Card.Text>
                           <strong>Type:</strong> {notification.type}
                         </Card.Text>
-                        {/* Flex layout for date and buttons */}
+                        <Card.Text>
+                          <strong>Description:</strong> {notification.content}
+                        </Card.Text>
                         <div className="d-flex justify-content-between align-items-center">
                           <Card.Text>
-                            <strong>Date:</strong> {notification.date}
+                            <strong>Date:</strong> {new Date(notification.createdDate).toLocaleDateString()}
                           </Card.Text>
                           <div>
                             <Button
@@ -155,10 +159,12 @@ const Notifications = () => {
                         <Card.Text>
                           <strong>Type:</strong> {notification.type}
                         </Card.Text>
-                        {/* Flex layout for date and buttons */}
+                        <Card.Text>
+                          <strong>Description:</strong> {notification.content}
+                        </Card.Text>
                         <div className="d-flex justify-content-between align-items-center">
                           <Card.Text>
-                            <strong>Date:</strong> {notification.date}
+                            <strong>Date:</strong> {new Date(notification.createdDate).toLocaleDateString()}
                           </Card.Text>
                           <div>
                             <Button

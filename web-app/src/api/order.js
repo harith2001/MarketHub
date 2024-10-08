@@ -39,9 +39,9 @@ export const getAllOrders = async () => {
 export const updateOrderStatus = async (orderId, status) => {
   try {
     const response = await axios.put(`${API_URL}/${orderId}/${status}`);
-    return response.data; // Return the response data (e.g., updated order)
+    return response.data; 
   } catch (error) {
     console.error('Error updating order status:', error);
-    throw error; // Rethrow the error for handling in the calling function
+    throw error; 
   }
 }
