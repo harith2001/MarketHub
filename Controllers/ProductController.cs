@@ -13,7 +13,7 @@ public class ProductController : ControllerBase
     public ProductController(IMongoClient mongoClient, NotificationService notificationService)
     {
         _mongoClient = mongoClient;
-        _database = _mongoClient.GetDatabase("test");
+        _database = _mongoClient.GetDatabase("MarketDB");
         _productCollection = _database.GetCollection<Product>("products");
         _notificationService = notificationService;
     }

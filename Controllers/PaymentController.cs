@@ -23,12 +23,19 @@ namespace MarketHub.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreatePayment([FromBody] Payment payment)
         {
-            await _paymentRepository.CreatePaymentAsync(payment);
-            return Ok(new { message = "Payment created successfully", paymentId = payment.Id });
+            try
+            {
+                await _paymentRepository.CreatePaymentAsync(payment);
+                return Ok(new { message = "Payment created successfully", paymentId = payment.Id });
+            }
+            catch
+            {
+                return BadRequest(new { message = "Payment not created" });
+            }
         }
 
-        // get payment details by ID
-        [HttpGet("{paymentId}")]
+            // get payment details by ID
+            [HttpGet("{paymentId}")]
         public async Task<IActionResult> GetPaymentById(string paymentId)
         {
             var payment = await _paymentRepository.GetPaymentByIdAsync(paymentId);
@@ -60,7 +67,7 @@ namespace MarketHub.Controllers
             return Ok(payment);
         }
 
-        //get all payments - Admin only
+        //get all payments
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPayments()
         {
@@ -69,6 +76,7 @@ namespace MarketHub.Controllers
         }
 
         //delete a payment - Admin only
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{paymentId}")]
         public async Task<IActionResult> DeletePayment(string paymentId)
         {

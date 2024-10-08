@@ -11,7 +11,7 @@ public class ReviewController : ControllerBase
 
     public ReviewController(IMongoClient mongoClient)
     {
-        var database = mongoClient.GetDatabase("test");
+        var database = mongoClient.GetDatabase("MarketDB");
         _reviewCollection = database.GetCollection<Review>("reviews");
     }
 

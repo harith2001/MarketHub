@@ -28,6 +28,14 @@ namespace MarketHub.Repositories
         public async Task<User> GetUserByIdAsync(string User_ID) =>
              await _users.Find(user => user.User_ID == User_ID).FirstOrDefaultAsync();
 
+        //get all deactivated users (isActive = false)
+        public async Task<List<User>> GetDeactivatedUsersAsync() =>
+            await _users.Find(user => user.IsActive == false).ToListAsync();
+
+        //get all deactivated customers (isActive = false)
+        public async Task<List<User>> GetDeactivatedCustomersAsync() =>
+            await _users.Find(user => user.IsActive == false && user.Role == "Customer").ToListAsync();
+
         //create new user / register
         public async Task CreateUserAsync(User user) =>
                         await _users.InsertOneAsync(user);
