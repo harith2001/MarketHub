@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/Notification';
 
-// Create notification
+// create notification
 export const createNotification = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/create`, data);
@@ -13,7 +13,7 @@ export const createNotification = async (data) => {
   }
 };
 
-// Get notifications by user ID
+// get notifications by user ID
 export const getNotificationsByUserId = async (userId) => {
   try {
     const response = await axios.get(`${API_URL}/get-for-user/${userId}`);
@@ -23,3 +23,14 @@ export const getNotificationsByUserId = async (userId) => {
     throw error;
   }
 };
+
+// get all notifications
+export const getAllNotifications = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/get-all`);
+    return response.data;
+  } catch (error) {
+    console.error('Error occured when fetching all notifications:', error);
+    throw error;
+  }
+}
