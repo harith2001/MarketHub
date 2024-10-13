@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using MongoDB.Bson;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -502,5 +504,57 @@ public class ProductController : ControllerBase
             }
         }
     }
+
+    //search a product
+    [HttpGet("search-products")]
+    public IActionResult SearchProducts([FromQuery] string? productId, [FromQuery] string? productName, [FromQuery] string? productType, [FromQuery] string? vendorId)
+    {
+        try
+        {
+            var filterBuilder = Builders<Product>.Filter;
+            var filter = filterBuilder.Empty;
+
+            if (!string.IsNullOrEmpty(productId))
+            {
+                filter &= filterBuilder.Eq(p => p.productId, productId);
+            }
+
+            if (!string.IsNullOrEmpty(productName))
+            {
+                filter &= filterBuilder.Regex(p => p.productName, new BsonRegularExpression(productName, "i"));
+            }
+
+            if (!string.IsNullOrEmpty(productType))
+            {
+                filter &= filterBuilder.Eq(p => p.productType, productType);
+            }
+
+            if (!string.IsNullOrEmpty(vendorId))
+            {
+                filter &= filterBuilder.Eq(p => p.vendorId, vendorId);
+            }
+
+            var products = _productCollection.Find(filter).ToList();
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new
+                {
+                    Message = "No products found matching the search criteria."
+                });
+            }
+
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error searching for products",
+                Error = ex.Message
+            });
+        }
+    }
+
 
 }
