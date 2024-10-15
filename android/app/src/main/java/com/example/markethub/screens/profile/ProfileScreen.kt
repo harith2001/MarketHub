@@ -1,5 +1,6 @@
 package com.example.markethub.screens.profile
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -45,10 +46,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.components.PasswordField
 import com.example.markethub.components.ValidatedTextFieldComponent
 import com.example.markethub.extensions.isValidEmail
+import com.example.markethub.screens.auth.saveSignInState
 import com.example.markethub.ui.theme.Primary
 
 @Composable
@@ -69,6 +73,8 @@ fun ProfileScreen() {
             }
         }
     }
+
+    val navController = LocalNavController.current
 
     Surface(
         modifier = Modifier
@@ -191,6 +197,15 @@ fun ProfileScreen() {
             }
 
             HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
+            //logout button
+            Button(
+                onClick = { logout(navController, context) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = CircleShape
+            ) {
+                Text(text = "Logout", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
             Button(
                 onClick = { /* Deactivate Account Logic */ },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -201,6 +216,11 @@ fun ProfileScreen() {
             }
         }
     }
+}
+
+fun logout(navController: NavController, context: Context) {
+    saveSignInState(context, false)
+    navController.navigate("SignIn")
 }
 
 @Preview(showBackground = true)

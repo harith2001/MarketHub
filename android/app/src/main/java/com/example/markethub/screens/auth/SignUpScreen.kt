@@ -17,6 +17,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,17 +31,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.markethub.R
 import com.example.markethub.components.HeadingTextComponent
 import com.example.markethub.components.NormalTextComponent
 import com.example.markethub.components.PasswordField
 import com.example.markethub.components.ValidatedTextFieldComponent
 import com.example.markethub.extensions.isValidEmail
+import com.example.markethub.presentation.screens.auth.SignUpViewModel
 import com.example.markethub.ui.theme.Primary
 
 @Composable
-fun SignUpScreen(onSignUpClick: () -> Unit = {}, onSignInClick: () -> Unit = {}) {
-    var context = LocalContext.current
+fun SignUpScreen(
+    viewModel: SignUpViewModel = hiltViewModel(),
+    onSignUpClick: () -> Unit = {},
+    onSignInClick: () -> Unit = {}
+) {
+    val context = LocalContext.current
+
+    var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("Customer") }
+
+    val signUpResponse by viewModel.signUpResponse.collectAsStateWithLifecycle()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -62,28 +82,24 @@ fun SignUpScreen(onSignUpClick: () -> Unit = {}, onSignInClick: () -> Unit = {})
                         { input -> if (input.any { it.isDigit() }) "Name should not contain numbers" else null },
                         { input -> if (input.any { !it.isLetter() }) "Name should contain only letters" else null }
                     ),
-                    value = "",
-                    onValueChange = {}
+                    value = name,
+                    onValueChange = { name = it }
                 )
 
                 ValidatedTextFieldComponent(
                     label = "Email Address",
                     isRequired = true,
                     validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
-                    value = "",
-                    onValueChange = {}
+                    value = email,
+                    onValueChange = { email = it }
                 )
 
-                PasswordField(value = "", onValueChange = {})
+                PasswordField(value = password, onValueChange = { password = it })
             }
             Column {
                 Button(
                     onClick = {
-                        //Success message
-                        Toast.makeText(context, "Registered Successfully, Please Sign In to continue", Toast.LENGTH_SHORT).show()
-                        //Error message
-                        //Toast.makeText(context, "Registration Failed, Please try again", Toast.LENGTH_SHORT).show()
-                        onSignUpClick()
+                        viewModel.signUp(name, email, password, role)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -96,6 +112,22 @@ fun SignUpScreen(onSignUpClick: () -> Unit = {}, onSignInClick: () -> Unit = {})
                 ) {
                     Text(text = "Register", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
+
+                LaunchedEffect(signUpResponse) {
+                    signUpResponse?.let { response ->
+                        if (response.isSuccessful) {
+                            Toast.makeText(context, "Registered Successfully, Please Sign In to continue", Toast.LENGTH_SHORT).show()
+                            onSignUpClick()
+                        } else {
+                            Toast.makeText(context, "Registration Failed, Please try again", Toast.LENGTH_SHORT).show()
+                            response.errorBody()?.string()?.let { errorContent ->
+                                println(errorContent)
+                            }
+                        }
+                        viewModel.resetSignUpResponse()
+                    }
+                }
+
                 Row(
                     modifier = Modifier
                         .padding(vertical = 16.dp)
