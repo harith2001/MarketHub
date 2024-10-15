@@ -332,7 +332,10 @@ public class ProductController : ControllerBase
     [FromForm] string productName,
     [FromForm] string productType,
     [FromForm] string vendorId,
-    [FromForm] int? quantity)
+    [FromForm] string productDescription,
+    [FromForm] int? lowerMargin,
+    [FromForm] int? quantity,
+    [FromForm] decimal price)
     {
         try
         {
@@ -355,10 +358,13 @@ public class ProductController : ControllerBase
                 productType = productType,
                 vendorId = vendorId,
                 quantity = quantity,
+                productDescription = productDescription,
+                lowerMargin = lowerMargin,
                 createdDate = DateTime.Now,
                 updatedDate = DateTime.Now,
                 isActive = true,
-                restockRequired = false
+                restockRequired = false,
+                price = price
             };
 
             // Handle the image if provided
@@ -440,6 +446,11 @@ public class ProductController : ControllerBase
                 {
                     existingProduct.restockRequired = false;
                 }
+            }
+
+            if (updatedProduct.price != 0) 
+            {
+                existingProduct.price = updatedProduct.price;
             }
 
             //update the lastUpdate date
