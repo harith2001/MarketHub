@@ -130,7 +130,7 @@ namespace MarketHub.Controllers
             if (user == null) return NotFound();
 
             await _userRepository.DeleteUserAsync(User_ID);
-            return NoContent();
+            return Ok(new { message = "User deleted." });
         }
 
         //get vendors by name
