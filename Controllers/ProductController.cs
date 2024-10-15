@@ -15,7 +15,7 @@ public class ProductController : ControllerBase
     public ProductController(IMongoClient mongoClient, NotificationService notificationService)
     {
         _mongoClient = mongoClient;
-        _database = _mongoClient.GetDatabase("test");
+        _database = _mongoClient.GetDatabase("MarketDB");
         _productCollection = _database.GetCollection<Product>("products");
         _notificationService = notificationService;
     }
@@ -332,6 +332,8 @@ public class ProductController : ControllerBase
     [FromForm] string productName,
     [FromForm] string productType,
     [FromForm] string vendorId,
+    [FromForm] string productDescription,
+    [FromForm] int? lowerMargin,
     [FromForm] int? quantity,
     [FromForm] decimal price)
     {
@@ -356,6 +358,8 @@ public class ProductController : ControllerBase
                 productType = productType,
                 vendorId = vendorId,
                 quantity = quantity,
+                productDescription = productDescription,
+                lowerMargin = lowerMargin,
                 createdDate = DateTime.Now,
                 updatedDate = DateTime.Now,
                 isActive = true,

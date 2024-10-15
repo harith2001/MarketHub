@@ -23,7 +23,9 @@ public class NotificationController : ControllerBase
                 notification.Title,
                 notification.Content,
                 notification.Type,
-                notification.TargetUserId);
+                notification.TargetUserId,
+                notification.OrderId
+                );
 
             return Ok(new { Message = "Notification created successfully" });
         }

@@ -20,4 +20,6 @@ public class Notification
     public required string Type { get; set; }
 
     public required string TargetUserId { get; set; }
+
+    public string? OrderId { get; set; }
 }

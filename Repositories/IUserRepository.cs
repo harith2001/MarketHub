@@ -8,6 +8,8 @@ namespace MarketHub.Repositories
     public interface IUserRepository
     {
         Task<List<User>> GetAllUsersAsync();
+        Task<List<User>> GetDeactivatedUsersAsync();
+        Task<List<User>> GetDeactivatedCustomersAsync();
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByIdAsync(string User_ID);
         Task CreateUserAsync(User user);
