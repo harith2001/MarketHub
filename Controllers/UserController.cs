@@ -15,9 +15,9 @@ namespace MarketHub.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserRepository _userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(UserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -130,7 +130,7 @@ namespace MarketHub.Controllers
             if (user == null) return NotFound();
 
             await _userRepository.DeleteUserAsync(User_ID);
-            return NoContent();
+            return Ok(new { message = "User deleted." });
         }
 
         //get vendors by name
