@@ -15,9 +15,9 @@ namespace MarketHub.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserRepository _userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(UserRepository userRepository)
         {
             _userRepository = userRepository;
         }
