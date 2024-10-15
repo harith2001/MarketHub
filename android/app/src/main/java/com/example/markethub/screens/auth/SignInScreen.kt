@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -37,9 +36,11 @@ import com.example.markethub.components.HeadingTextComponent
 import com.example.markethub.components.NormalTextComponent
 import com.example.markethub.components.PasswordField
 import com.example.markethub.components.ValidatedTextFieldComponent
+import com.example.markethub.data.network.SimpleCookieJar
 import com.example.markethub.extensions.isValidEmail
 import com.example.markethub.presentation.screens.auth.SignInViewModel
 import com.example.markethub.ui.theme.Primary
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Composable
 fun SignInScreen(

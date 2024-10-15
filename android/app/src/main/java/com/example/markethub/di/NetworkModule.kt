@@ -1,12 +1,15 @@
 package com.example.markethub.di
 
 import com.example.markethub.data.network.ApiService
+import com.example.markethub.data.network.SimpleCookieJar
 import com.example.markethub.domain.repository.AuthRepository
 import com.example.markethub.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -14,12 +17,31 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    private val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BASIC
+    }
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideCookieJar(): SimpleCookieJar {
+        return SimpleCookieJar()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(cookieJar: SimpleCookieJar): OkHttpClient {
+        return OkHttpClient.Builder()
+            .cookieJar(cookieJar)
+            .addInterceptor(logging)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl("http://10.0.2.2:5003/api/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

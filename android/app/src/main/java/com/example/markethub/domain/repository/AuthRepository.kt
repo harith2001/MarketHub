@@ -9,12 +9,10 @@ import retrofit2.Response
 
 class AuthRepository(private val apiService: ApiService) {
     suspend fun signUp(signUpRequest: SignUpRequest): Response<SignUpResponse> {
-        println("email: ${signUpRequest.email}, password: ${signUpRequest.password}")
         return apiService.signUp(signUpRequest)
     }
 
     suspend fun signIn(signInRequest: SignInRequest): Response<SignInResponse> {
-        println("email: ${signInRequest.email}, password: ${signInRequest.password}")
         return apiService.signIn(signInRequest)
     }
 }
