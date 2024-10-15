@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Carousel, Form, Button, Card, Row, Col, Container } from 'react-bootstrap';
 import { loginUser, getUserByEmail } from '../api/user';
 
-const FirstPage = ({ setUserRole }) => {
+const FirstPage = ({ setUserRole, setVendorId }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); 
@@ -21,6 +21,7 @@ const FirstPage = ({ setUserRole }) => {
         console.log("Fetched User: ", user);
 
       const userRole = user?.role; 
+      const vendorID = user?.user_ID;
         setUserRole(userRole);
         console.log("user role: ", userRole)
         
@@ -28,6 +29,7 @@ const FirstPage = ({ setUserRole }) => {
             navigate("/admin/dashboard");
         }
         else if (userRole === "Vendor") {
+          setVendorId(vendorID);
             navigate("/vendor/dashboard");
         }
         else if (userRole === "CSR") {

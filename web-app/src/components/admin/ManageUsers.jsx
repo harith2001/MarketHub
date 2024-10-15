@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge, Container, Tab, Tabs } from 'react-bootstrap';
+import { Table, Button, Badge, Container, Tab, Tabs, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { getUsers, updateUserStatus, deleteUser } from '../../api/user';
 
@@ -9,6 +9,9 @@ const ManageUsers = () => {
   const [csrs, setCsrs] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [key, setKey] = useState('vendors'); 
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   // Fetch all users and separate Vendors and CSRs and Customers
   useEffect(() => {
@@ -34,11 +37,17 @@ const ManageUsers = () => {
 
   const handleDeactivate = async (userId) => {
     try {
-      await updateUserStatus(userId, false); // Call the function to deactivate
+      console.log("deactivating user:", userId);
+      await updateUserStatus(userId, "false"); // Call the function to deactivate
       const updatedUsers = users.map(user =>
-        user.user_ID === userId ? { ...user, isActive: false } : user
+        user.user_ID === userId ? { ...user, isActive: "false" } : user
       );
       setUsers(updatedUsers);
+
+      // toast messages
+      setToastMessage('User deactivated successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to deactivate user:', error);
     }
@@ -46,11 +55,17 @@ const ManageUsers = () => {
 
   const handleActivate = async (userId) => {
     try {
-      await updateUserStatus(userId, true); // Call the function to activate
+      console.log("Activating user:", userId);
+      await updateUserStatus(userId, "true"); // Call the function to activate
       const updatedUsers = users.map(user =>
-        user.user_ID === userId ? { ...user, isActive: true } : user
+        user.user_ID === userId ? { ...user, isActive: "true" } : user
       );
       setUsers(updatedUsers);
+
+      // toast messages
+      setToastMessage('User activated successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to activate user:', error);
     }
@@ -61,6 +76,11 @@ const ManageUsers = () => {
       await deleteUser(userId); // Call the function to delete the user
       const updatedUsers = users.filter(user => user.user_ID !== userId);
       setUsers(updatedUsers); // Update the local state to remove the user
+
+      // toast message
+      setToastMessage('User removed successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to remove user:', error);
     }
@@ -257,6 +277,16 @@ const ManageUsers = () => {
           )}
         </Tab>
       </Tabs>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'danger'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Success' : 'Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </Container>
   );
 };

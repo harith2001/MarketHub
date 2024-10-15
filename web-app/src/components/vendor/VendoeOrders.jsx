@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button } from 'react-bootstrap';
+import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../Header';
 import { getAllOrders, updateOrderStatus } from '../../api/order';
 
@@ -8,6 +8,9 @@ const VendorOrders = ({ vendorId }) => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   // Fetch all orders from API
   useEffect(() => {
@@ -45,8 +48,14 @@ const VendorOrders = ({ vendorId }) => {
           order.orderID === orderId ? { ...order, status: newStatus } : order
         )
       );
+      setToastMessage(`Order status changed to ${newStatus}`);
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Error updating order status:', error);
+      setToastMessage('Failed to change order status.');
+      setToastType('danger');
+      setShowToast(true);
     }
   };
 
@@ -192,6 +201,16 @@ const VendorOrders = ({ vendorId }) => {
           )}
         </Offcanvas.Body>
       </Offcanvas>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'danger'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Success' : 'Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };

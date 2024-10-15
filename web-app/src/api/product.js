@@ -90,3 +90,15 @@ export const getStockStatus = async (vendorId) => {
   }
 };
 
+// / Get low stock products by vendor ID
+export const getLowStockProducts = async (vendorId) => {
+  try {
+    const response = await axios.get(`${API_URL}/get-lowStock-products/${vendorId}`);
+    return response.data; 
+  } catch (error) {
+    console.error('Error when fetching low stock products:', error);
+    throw error; 
+  }
+};
+
+

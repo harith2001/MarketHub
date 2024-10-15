@@ -163,7 +163,7 @@ const CsrDashboard = () => {
                   {filteredOrders.map((order) => (
                     <tr key={order.orderID}>
                       <td>{order.orderID}</td>
-                      <td>{order.customer}</td>
+                      <td>{order.customerID}</td>
                       <td>
                         <Badge
                           bg={order.status === "Delivered" ? "success" : "info"}

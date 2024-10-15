@@ -9,6 +9,7 @@ const ProductForm = ({ onSave, editingProduct }) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [lowerMargin, setLowerMargin] = useState("");
   const [status, setStatus] = useState(true);
   const [productImage, setProductImage] = useState(null); 
 
@@ -20,6 +21,7 @@ const ProductForm = ({ onSave, editingProduct }) => {
       setDescription(editingProduct.productDescription); // Use description from editingProduct
       setPrice(editingProduct.price); // Use price from editingProduct
       setStock(editingProduct.quantity); // Use stock from editingProduct
+      setLowerMargin(editingProduct.lowerMargin);
       setStatus(editingProduct.isActive); // Use status from editingProduct
     } else {
       // Reset fields if no product is being edited
@@ -29,6 +31,7 @@ const ProductForm = ({ onSave, editingProduct }) => {
       setDescription("");
       setPrice("");
       setStock("");
+      setLowerMargin("");
       setStatus(true);
       setProductImage(null);
     }
@@ -49,6 +52,7 @@ const ProductForm = ({ onSave, editingProduct }) => {
     formData.append("description", description);
     formData.append("price", price);
     formData.append("stock", stock);
+    formData.append("lowerMargin", lowerMargin);
     formData.append("status", status ? 'Active' : 'Inactive');
     formData.append("productImage", productImage); 
 
@@ -133,6 +137,15 @@ const ProductForm = ({ onSave, editingProduct }) => {
                 required
               />
             </Form.Group>
+            <Form.Group controlId="formProductImage" className="mt-3">
+              <Form.Label>Product Image</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                required
+              />
+            </Form.Group>
           </Col>
 
           <Col md={6}>
@@ -147,15 +160,6 @@ const ProductForm = ({ onSave, editingProduct }) => {
                 required
               />
             </Form.Group>
-            <Form.Group controlId="formProductImage" className="mt-3">
-              <Form.Label>Product Image</Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                required
-              />
-            </Form.Group>
             <Form.Group controlId="formStock" className="mt-3">
               <Form.Label>Stock Quantity</Form.Label>
               <Form.Control
@@ -163,6 +167,16 @@ const ProductForm = ({ onSave, editingProduct }) => {
                 placeholder="Enter stock quantity"
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group controlId="formStock" className="mt-3">
+              <Form.Label>Low Stock Margin</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Enter low stock margin"
+                value={lowerMargin}
+                onChange={(e) => setLowerMargin(e.target.value)}
                 required
               />
             </Form.Group>

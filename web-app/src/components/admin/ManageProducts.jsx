@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge, Container, Modal, Form } from 'react-bootstrap';
+import { Table, Button, Badge, Container, Modal, Form, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { getAllProducts, updateProduct, deleteProduct } from '../../api/product';
 
@@ -7,6 +7,9 @@ const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null); 
   const [showEditModal, setShowEditModal] = useState(false); 
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   // Fetch all products
   useEffect(() => {
@@ -30,6 +33,11 @@ const ManageProducts = () => {
         product.productId === productId ? { ...product, isActive: updatedProduct.isActive } : product
       );
       setProducts(updatedProducts);
+
+      //toast messages
+      setToastMessage(updatedProduct.isActive ? 'Product activated successfully!' : 'Product deactivated successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to update product status:', error);
     }
@@ -41,6 +49,11 @@ const ManageProducts = () => {
       await deleteProduct(productId); // Call the function to delete the product
       const updatedProducts = products.filter(product => product.productId !== productId);
       setProducts(updatedProducts); // Update the state to remove the product
+
+      // toast message
+      setToastMessage('Product removed successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to remove product:', error);
     }
@@ -61,6 +74,11 @@ const ManageProducts = () => {
       );
       setProducts(updatedProducts);
       setShowEditModal(false);
+
+      // toast message
+      setToastMessage('Product updated successfully!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Failed to save product edits:', error);
     }
@@ -199,6 +217,16 @@ const ManageProducts = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'danger'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Success' : 'Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </Container>
   );
 };

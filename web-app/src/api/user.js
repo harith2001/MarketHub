@@ -59,9 +59,12 @@ export const updateUser = async (userId, data) => {
 
 // Update user by status
 export const updateUserStatus = async (userId, isActive) => {
-  const status = isActive ? 'activate' : 'deactivate';
   try {
-    const response = await axios.put(`${API_URL}/status/${userId}/${status}`);
+    const response = await axios.put(`${API_URL}/status/${userId}/${isActive}`, null, {
+      headers: {
+        'Content-Type': 'application/json', // Ensure proper content type
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating user status:', error);
@@ -83,7 +86,9 @@ export const deleteUser = async (userId) => {
 // User login
 export const loginUser = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, data);
+    const response = await axios.post(`${API_URL}/login`, data,{
+      withCredentials: true
+    });
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Card, Tabs, Tab, Modal } from "react-bootstrap";
+import { Table, Button, Card, Tabs, Tab, Modal, Toast, ToastContainer } from "react-bootstrap";
 import Header from "../Header";
 import { getUsers, updateUserStatus, deleteUser } from "../../api/user";
 
@@ -9,6 +9,9 @@ const Accounts = () => {
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState(null); 
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   useEffect(() => {
     fetchUsers(); // Fetch users when component mounts
@@ -39,6 +42,7 @@ const Accounts = () => {
           approvedAccounts.filter((account) => account.user_ID !== selectedAccount.user_ID)
         );
         setDeactivatedAccounts([...deactivatedAccounts, { ...selectedAccount, isActive: false }]);
+        setToastMessage('User deactivated successfully!');
       } else if (action === "Reactivate") {
         await updateUserStatus(selectedAccount.user_ID, true); // Reactivate user
         setDeactivatedAccounts(
@@ -47,11 +51,13 @@ const Accounts = () => {
           )
         );
         setApprovedAccounts([...approvedAccounts, { ...selectedAccount, isActive: true }]);
+        setToastMessage('User reactivated successfully!');
       } else if (action === "Delete") {
         await deleteUser(selectedAccount.user_ID); // Delete user
         setApprovedAccounts(
           approvedAccounts.filter((account) => account.user_ID !== selectedAccount.user_ID)
         );
+        setToastMessage('User deleted successfully!');
       }
 
       setShowModal(false);
@@ -69,7 +75,7 @@ const Accounts = () => {
 
   return (
       <div style={{ marginLeft: "200px", padding: "20px" }}>
-          <Header title="Accounts"></Header>
+          <Header title="User Accounts"></Header>
       <Tabs defaultActiveKey="approved" className="mb-4">
 
         {/* Approved Accounts Tab */}
@@ -83,7 +89,7 @@ const Accounts = () => {
                     <tr>
                       <th>Customer Name</th>
                       <th>Email</th>
-                      <th>Approved Date</th>
+                      <th>Creation Date</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -92,7 +98,7 @@ const Accounts = () => {
                       <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
-                        <td>{account.requestDate}</td>
+                        <td>{new Date(account.createdAt).toLocaleDateString()}</td>
                         <td>
                           <Button
                             style={{ width: "100px" }}
@@ -130,7 +136,7 @@ const Accounts = () => {
                     <tr>
                       <th>Customer Name</th>
                       <th>Email</th>
-                      <th>Deactivation Date</th>
+                      <th>Creation Date</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -139,7 +145,7 @@ const Accounts = () => {
                       <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
-                        <td>{account.requestDate}</td>
+                        <td>{new Date(account.createdAt).toLocaleDateString()}</td>
                         <td>
                           <Button
                             variant="primary"
@@ -175,6 +181,16 @@ const Accounts = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'danger'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Success' : 'Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };

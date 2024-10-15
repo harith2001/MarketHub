@@ -19,6 +19,7 @@ import FirstPage from './pages/FirstPage';
 
 function App() {
   const [userRole, setUserRole] = useState(null);
+  const [vendorId, setVendorId] = useState(null);
   return (
     <Router>
       <div className="d-flex">
@@ -26,7 +27,7 @@ function App() {
         <div className="flex-grow-1">
         <Routes>
           {/* <Route path="/" element={<Dashboard/>} /> */}
-        <Route path="/" element={<FirstPage setUserRole={setUserRole} />} />
+        <Route path="/" element={<FirstPage setUserRole={setUserRole} setVendorId={setVendorId}/>} />
         <Route path="/signup-request" element={<SignupRequestForm/>}/>
         <Route path="/vendor/products" element={<Products />} />
         <Route path="/vendor/reviews" element={<VendorReviews />} />
