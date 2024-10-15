@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import { addNewProduct } from "../../api/product";
+import { addNewProduct, updateProduct } from "../../api/product";
 
-const ProductForm = ({ onSave }) => {
+const ProductForm = ({ onSave, editingProduct }) => {
   const [productId, setProductId] = useState("");
   const [productName, setProductName] = useState("");
   const [category, setCategory] = useState("");
@@ -11,6 +11,28 @@ const ProductForm = ({ onSave }) => {
   const [stock, setStock] = useState("");
   const [status, setStatus] = useState(true);
   const [productImage, setProductImage] = useState(null); 
+
+   useEffect(() => {
+    if (editingProduct) {
+      setProductId(editingProduct.productId); // Use productId from editingProduct
+      setProductName(editingProduct.productName); // Use productName from editingProduct
+      setCategory(editingProduct.category); // Use category from editingProduct
+      setDescription(editingProduct.productDescription); // Use description from editingProduct
+      setPrice(editingProduct.price); // Use price from editingProduct
+      setStock(editingProduct.quantity); // Use stock from editingProduct
+      setStatus(editingProduct.isActive); // Use status from editingProduct
+    } else {
+      // Reset fields if no product is being edited
+      setProductId("");
+      setProductName("");
+      setCategory("");
+      setDescription("");
+      setPrice("");
+      setStock("");
+      setStatus(true);
+      setProductImage(null);
+    }
+  }, [editingProduct]); // Update when editingProduct changes
 
   const handleImageChange = (e) => {
     setProductImage(e.target.files[0]); 
@@ -31,13 +53,20 @@ const ProductForm = ({ onSave }) => {
     formData.append("productImage", productImage); 
 
     try {
-      const response = await addNewProduct(formData); // call API
-      console.log("Product added successfully:", response);
-      
-      // Call onSave prop to reset the form after a successful save 
-      onSave(response);
+      if (editingProduct) {
+        // Call update API if editing
+        const response = await updateProduct(editingProduct.id, formData);
+        console.log("Product updated successfully:", response);
+      } else {
+        // Call add new product API if not editing
+        const response = await addNewProduct(formData);
+        console.log("Product added successfully:", response);
+        // Call onSave prop to reset the form after a successful save
+        onSave(response);
+      }
+
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error adding or updating product:", error);
     }
   };
 

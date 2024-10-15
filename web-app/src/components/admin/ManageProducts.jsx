@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge, Container, Modal, Form } from 'react-bootstrap';
 import Header from '../../components/Header';
-import { getAllProducts } from '../../api/product';
+import { getAllProducts, updateProduct, deleteProduct } from '../../api/product';
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -23,19 +23,27 @@ const ManageProducts = () => {
   }, []);
 
   // Activate/Deactivate product
-  const toggleProductStatus = (productId) => {
-    const updatedProducts = products.map(product =>
-      product.id === productId
-        ? { ...product, status: product.status === 'Active' ? 'Inactive' : 'Active' }
-        : product
-    );
-    setProducts(updatedProducts);
+  const toggleProductStatus = async (productId, isActive) => {
+    try {
+      const updatedProduct = await updateProduct(productId, { isActive: !isActive }); // Update the product status
+      const updatedProducts = products.map(product =>
+        product.productId === productId ? { ...product, isActive: updatedProduct.isActive } : product
+      );
+      setProducts(updatedProducts);
+    } catch (error) {
+      console.error('Failed to update product status:', error);
+    }
   };
 
   // Handle product removal
-  const handleRemoveProduct = (productId) => {
-    const updatedProducts = products.filter(product => product.id !== productId);
-    setProducts(updatedProducts);
+  const handleRemoveProduct = async (productId) => {
+    try {
+      await deleteProduct(productId); // Call the function to delete the product
+      const updatedProducts = products.filter(product => product.productId !== productId);
+      setProducts(updatedProducts); // Update the state to remove the product
+    } catch (error) {
+      console.error('Failed to remove product:', error);
+    }
   };
 
   // Open modal to edit product details
@@ -45,12 +53,17 @@ const ManageProducts = () => {
   };
 
   // Save product edits
-  const handleSaveEdit = () => {
-    const updatedProducts = products.map(product =>
-      product.id === editingProduct.id ? editingProduct : product
-    );
-    setProducts(updatedProducts);
-    setShowEditModal(false);
+  const handleSaveEdit = async () => {
+    try {
+      const updatedProduct = await updateProduct(editingProduct.productId, editingProduct); // Call the function to update the product
+      const updatedProducts = products.map(product =>
+        product.productId === updatedProduct.productId ? updatedProduct : product
+      );
+      setProducts(updatedProducts);
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Failed to save product edits:', error);
+    }
   };
 
   // Handle input change for editing
@@ -80,13 +93,13 @@ const ManageProducts = () => {
           <tbody>
             {products.map(product => (
               <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>{product.category}</td>
+                <td>{product.productId}</td>
+                <td>{product.productName}</td>
+                <td>{product.productType}</td>
                 <td>{product.price}</td>
-                <td>{product.stock}</td>
+                <td>{product.quantity}</td>
                 <td>
-                  {product.status === 'Active' ? (
+                  {product.isActive ? (
                     <Badge bg="success">Active</Badge>
                   ) : (
                     <Badge bg="secondary">Inactive</Badge>
@@ -104,19 +117,19 @@ const ManageProducts = () => {
                       Edit
                     </Button>
                     <Button
-                    variant={product.status === 'Active' ? 'warning' : 'success'}
+                    variant={product.isActive ? 'warning' : 'success'}
                     className='me-2'
-                      onClick={() => toggleProductStatus(product.id)}
+                      onClick={() => toggleProductStatus(product.productId, product.isActive)}
                       style={{
                         width: "100px",
                       }}
                     >
-                      {product.status === 'Active' ? 'Deactivate' : 'Activate'}
+                      {product.isActive ? 'Deactivate' : 'Activate'}
                     </Button>
                     <Button
                     variant="danger"
                     className='me-2'
-                    onClick={() => handleRemoveProduct(product.id)}
+                    onClick={() => handleRemoveProduct(product.productId)}
                     style={{
                         width: "100px",
                       }}
@@ -143,7 +156,7 @@ const ManageProducts = () => {
                 <Form.Control
                   type="text"
                   name="name"
-                  value={editingProduct.name}
+                  value={editingProduct.productName}
                   onChange={handleEditChange}
                 />
               </Form.Group>
@@ -152,7 +165,7 @@ const ManageProducts = () => {
                 <Form.Control
                   type="text"
                   name="category"
-                  value={editingProduct.category}
+                  value={editingProduct.productType}
                   onChange={handleEditChange}
                 />
               </Form.Group>
@@ -170,7 +183,7 @@ const ManageProducts = () => {
                 <Form.Control
                   type="number"
                   name="stock"
-                  value={editingProduct.stock}
+                  value={editingProduct.quantity}
                   onChange={handleEditChange}
                 />
               </Form.Group>

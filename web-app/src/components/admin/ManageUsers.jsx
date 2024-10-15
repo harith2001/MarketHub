@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge, Container, Tab, Tabs } from 'react-bootstrap';
 import Header from '../../components/Header';
-import { getUsers } from '../../api/user';
+import { getUsers, updateUserStatus, deleteUser } from '../../api/user';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [csrs, setCsrs] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [key, setKey] = useState('vendors'); 
 
   // Fetch all users and separate Vendors and CSRs and Customers
@@ -16,11 +17,13 @@ const ManageUsers = () => {
         const fetchedUsers = await getUsers();
         setUsers(fetchedUsers);
         
-        // Separate vendors and CSRs
+        // Separate vendors CSRs Customers
         const vendorList = fetchedUsers.filter(user => user.role === 'Vendor');
         const csrList = fetchedUsers.filter(user => user.role === 'CSR');
+        const customerList = fetchedUsers.filter(user => user.role === 'Customer');
         setVendors(vendorList);
         setCsrs(csrList);
+        setCustomers(customerList);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -29,23 +32,38 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleDeactivate = (userId) => {
-    const updatedUsers = users.map(user =>
-      user.user_ID === userId ? { ...user, isActive: false } : user
-    );
-    setUsers(updatedUsers);
+  const handleDeactivate = async (userId) => {
+    try {
+      await updateUserStatus(userId, false); // Call the function to deactivate
+      const updatedUsers = users.map(user =>
+        user.user_ID === userId ? { ...user, isActive: false } : user
+      );
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Failed to deactivate user:', error);
+    }
   };
 
-  const handleActivate = (userId) => {
-    const updatedUsers = users.map(user =>
-      user.user_ID === userId ? { ...user, isActive: true } : user
-    );
-    setUsers(updatedUsers);
+  const handleActivate = async (userId) => {
+    try {
+      await updateUserStatus(userId, true); // Call the function to activate
+      const updatedUsers = users.map(user =>
+        user.user_ID === userId ? { ...user, isActive: true } : user
+      );
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Failed to activate user:', error);
+    }
   };
 
-  const handleRemove = (userId) => {
-    const updatedUsers = users.filter(user => user.user_ID !== userId);
-    setUsers(updatedUsers);
+  const handleRemove = async (userId) => {
+    try {
+      await deleteUser(userId); // Call the function to delete the user
+      const updatedUsers = users.filter(user => user.user_ID !== userId);
+      setUsers(updatedUsers); // Update the local state to remove the user
+    } catch (error) {
+      console.error('Failed to remove user:', error);
+    }
   };
 
   return (
@@ -89,7 +107,7 @@ const ManageUsers = () => {
                         <Button
                           className="me-2 btn-warning"
                           style={{ width: "100px"}}
-                          onClick={() => handleDeactivate(user.id)}
+                          onClick={() => handleDeactivate(user.user_ID)}
                           
                         >
                           Deactivate
@@ -98,7 +116,7 @@ const ManageUsers = () => {
                         <Button
                             className="me-2 btn-success"
                             style={{ width: "100px"}}
-                          onClick={() => handleActivate(user.id)}
+                          onClick={() => handleActivate(user.user_ID)}
                           
                         >
                           Activate
@@ -107,7 +125,7 @@ const ManageUsers = () => {
                       <Button
                         className="btn-danger"
                         style={{ width: "100px"}}
-                        onClick={() => handleRemove(user.id)}
+                        onClick={() => handleRemove(user.user_ID)}
                       >
                         Remove
                       </Button>
@@ -135,6 +153,66 @@ const ManageUsers = () => {
               </thead>
               <tbody>
                 {csrs.map(user => (
+                  <tr key={user.user_ID}>
+                    <td>{user.user_ID}</td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>
+                      {user.status === 'Active' ? (
+                        <Badge bg="success">Active</Badge>
+                      ) : (
+                        <Badge bg="secondary">Inactive</Badge>
+                      )}
+                    </td>
+                    <td>
+                      {user.status === 'Active' ? (
+                        <Button
+                          className="me-2 btn-warning"
+                          style={{ width: "100px"}}
+                          onClick={() => handleDeactivate(user.id)}
+                        >
+                          Deactivate
+                        </Button>
+                      ) : (
+                        <Button
+                            className="me-2 btn-success"
+                            style={{ width: "100px"}}
+                          onClick={() => handleActivate(user.id)}
+                        >
+                          Activate
+                        </Button>
+                      )}
+                      <Button
+                        className="btn-danger"
+                        style={{ width: "100px"}}
+                        onClick={() => handleRemove(user.id)}
+                      >
+                        Remove
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Tab>
+
+        <Tab eventKey="customers" title={`Customers (${customers.length})`}>
+          {csrs.length === 0 ? (
+            <p>No Customers found.</p>
+          ) : (
+            <Table striped hover responsive>
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customers.map(user => (
                   <tr key={user.user_ID}>
                     <td>{user.user_ID}</td>
                     <td>{user.name}</td>

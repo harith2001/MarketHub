@@ -4,9 +4,10 @@ import ProductForm from "./ProductForm";
 import Header from "../Header";
 import { getProductByVendorId, deleteProduct, updateProduct } from "../../api/product";
 
-const Products = ({ vendorId}) => {
+const Products = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
+  const vendorId = "VEN5909";
 
   useEffect(() => {
     fetchProducts();
@@ -79,13 +80,13 @@ const Products = ({ vendorId}) => {
                 <tbody>
                   {products.map((product) => (
                     <tr key={product.id}>
-                      <td>{product.id}</td>
-                      <td>{product.name}</td>
-                      <td>{product.category}</td>
-                      <td>{product.description}</td>
+                      <td>{product.productId}</td>
+                      <td>{product.productName}</td>
+                      <td>{product.productType}</td>
+                      <td>{product.productDescription}</td>
                       <td>{product.price}</td>
-                      <td>{product.stock}</td>
-                      <td>{product.status === 'Active' ? (
+                      <td>{product.quantity}</td>
+                      <td>{product.isActive ? (
                         <Badge bg="success">Active</Badge>
                       ) : (
                         <Badge bg="secondary">Inactive</Badge>

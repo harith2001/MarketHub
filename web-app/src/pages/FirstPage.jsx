@@ -27,11 +27,11 @@ const FirstPage = ({ setUserRole }) => {
         if (userRole === "Admin") {
             navigate("/admin/dashboard");
         }
-        else if (userRole === "Admin") {
-            navigate("/admin/dashboard");
+        else if (userRole === "Vendor") {
+            navigate("/vendor/dashboard");
         }
-        else if (userRole === "Admin") {
-            navigate("/admin/dashboard");
+        else if (userRole === "CSR") {
+            navigate("/csr/dashboard");
         }
         else{
             setErrorMessage("Invalid user role");
