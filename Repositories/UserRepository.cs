@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace MarketHub.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository
     {
         private readonly IMongoCollection<User> _users;
 

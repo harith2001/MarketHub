@@ -30,7 +30,9 @@ namespace MarketHub.Models.Entities
             set
             {
                 role = value;
+                if(string.IsNullOrEmpty(User_ID)){
                 User_ID = GenerateCustomUserId(role);
+                }
             }
         }
 
