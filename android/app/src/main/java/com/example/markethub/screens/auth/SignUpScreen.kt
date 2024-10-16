@@ -116,7 +116,7 @@ fun SignUpScreen(
                 LaunchedEffect(signUpResponse) {
                     signUpResponse?.let { response ->
                         if (response.isSuccessful) {
-                            Toast.makeText(context, "Registered Successfully, Please Sign In to continue", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Registered Request Submitted Successfully, Please wait for approval", Toast.LENGTH_SHORT).show()
                             onSignUpClick()
                         } else {
                             Toast.makeText(context, "Registration Failed, Please try again", Toast.LENGTH_SHORT).show()

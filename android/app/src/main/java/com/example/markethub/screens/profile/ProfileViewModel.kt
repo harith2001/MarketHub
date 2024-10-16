@@ -89,7 +89,7 @@ class ProfileViewModel @Inject constructor(
 
             val response = userRepository.changePassword(userId, ChangePasswordRequest(oldPassword, newPassword))
             if (response.isSuccessful) {
-                Toast.makeText(context, "Password changed successfully. Please sign in again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Password changed successfully.", Toast.LENGTH_SHORT).show()
             } else {
                 _errorMessage.value = "Failed to change password. Please try again."
             }
