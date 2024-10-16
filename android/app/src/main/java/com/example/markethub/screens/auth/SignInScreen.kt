@@ -36,7 +36,6 @@ import com.example.markethub.components.HeadingTextComponent
 import com.example.markethub.components.NormalTextComponent
 import com.example.markethub.components.PasswordField
 import com.example.markethub.components.ValidatedTextFieldComponent
-import com.example.markethub.data.network.SimpleCookieJar
 import com.example.markethub.extensions.isValidEmail
 import com.example.markethub.presentation.screens.auth.SignInViewModel
 import com.example.markethub.ui.theme.Primary

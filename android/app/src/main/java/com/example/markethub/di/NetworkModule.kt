@@ -1,7 +1,9 @@
 package com.example.markethub.di
 
+import android.app.Application
+import android.content.Context
 import com.example.markethub.data.network.ApiService
-import com.example.markethub.data.network.SimpleCookieJar
+import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.repository.AuthRepository
 import com.example.markethub.domain.repository.ProductRepository
 import dagger.Module
@@ -23,13 +25,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideCookieJar(): SimpleCookieJar {
-        return SimpleCookieJar()
+    fun provideCookieJar(application: Application): PersistentCookieJar {
+        return PersistentCookieJar(application.applicationContext)
     }
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(cookieJar: SimpleCookieJar): OkHttpClient {
+    fun provideOkHttpClient(cookieJar: PersistentCookieJar): OkHttpClient {
         return OkHttpClient.Builder()
             .cookieJar(cookieJar)
             .addInterceptor(logging)
