@@ -69,6 +69,10 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
     var userName by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
 
+    var existingPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
     // Populate fields when the user data is loaded
     LaunchedEffect(user) {
         user?.let {
@@ -188,7 +192,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
             )
 
             Button(
-                onClick = { viewModel.updateUserProfile(user?.userId ?: "", userName, userEmail) },
+                onClick = { viewModel.updateUserProfile(user?.userId ?: "", userName, userEmail, user?.isActive ?: false) },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape
@@ -203,25 +207,25 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
                 isRequired = true,
                 minLength = 6,
                 disableValidation = true,
-                value = "",
-                onValueChange = {}
+                value = existingPassword,
+                onValueChange = { existingPassword = it }
             )
             PasswordField(
                 label = "New Password",
                 isRequired = true,
                 minLength = 6,
-                value = "",
-                onValueChange = {}
+                value = newPassword,
+                onValueChange = { newPassword = it }
             )
             PasswordField(
                 label = "Confirm Password",
                 isRequired = true,
                 minLength = 6,
-                value = "",
-                onValueChange = {}
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it }
             )
             Button(
-                onClick = { /* Change Password Logic */ },
+                onClick = { viewModel.changePassword(user?.userId ?: "", existingPassword, newPassword, confirmPassword, context) },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape
@@ -240,7 +244,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
                 Text(text = "Logout", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
             Button(
-                onClick = { /* Deactivate Account Logic */ },
+                onClick = { viewModel.deactivateAccount(user?.userId ?: "", userName, userEmail, navController, context) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape

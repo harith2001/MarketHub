@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.markethub.data.local.UserLocalDataSource
+import com.example.markethub.data.models.ChangePasswordRequest
 import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.models.User
 import com.example.markethub.domain.repository.AuthRepository
@@ -45,9 +46,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateUserProfile(userId: String, name: String, email: String) {
+    fun updateUserProfile(userId: String, name: String, email: String, isActive: Boolean) {
         viewModelScope.launch {
-            val updatedUser = User(userId, name, email)
+            val updatedUser = User(userId, name, email, isActive)
             val response = userRepository.updateUser(userId, updatedUser)
             if (response.isSuccessful) {
                 userLocalDataSource.saveUser(updatedUser)
@@ -56,6 +57,41 @@ class ProfileViewModel @Inject constructor(
             } else {
                 _updateStatus.value = false
                 _errorMessage.value = "Failed to update profile. Please try again."
+            }
+        }
+    }
+
+    fun deactivateAccount(userId: String, userName: String, userEmail: String,
+                          navController: NavController, context: Context) {
+        viewModelScope.launch {
+            val updatedUser = User(userId, userName, userEmail, false)
+            val response = userRepository.updateUser(userId, updatedUser)
+            if (response.isSuccessful) {
+                userLocalDataSource.saveUser(updatedUser)
+                _user.value = updatedUser
+                saveSignInState(context, false)
+                persistentCookieJar.clearCookies()
+                navController.navigate("SignIn")
+                Toast.makeText(context, "Account deactivated successfully. We're sad to see you go!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Failed to deactivate account. Please try again.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun changePassword(userId: String, oldPassword: String, newPassword: String,
+                       confirmNewPassword: String, context: Context) {
+        viewModelScope.launch {
+            if (newPassword != confirmNewPassword) {
+                _errorMessage.value = "New password and confirm new password do not match."
+                return@launch
+            }
+
+            val response = userRepository.changePassword(userId, ChangePasswordRequest(oldPassword, newPassword))
+            if (response.isSuccessful) {
+                Toast.makeText(context, "Password changed successfully. Please sign in again.", Toast.LENGTH_SHORT).show()
+            } else {
+                _errorMessage.value = "Failed to change password. Please try again."
             }
         }
     }

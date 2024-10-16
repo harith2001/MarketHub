@@ -12,8 +12,9 @@ class UserLocalDataSource(context: Context) {
         val db = dbHelper.writableDatabase
         db.execSQL(
             "INSERT OR REPLACE INTO ${UserDbHelper.TABLE_NAME} (${UserDbHelper.COLUMN_ID}, " +
-                    "${UserDbHelper.COLUMN_NAME}, ${UserDbHelper.COLUMN_EMAIL}) VALUES (?, ?, ?)",
-            arrayOf(user.userId, user.name, user.email)
+                    "${UserDbHelper.COLUMN_NAME}, ${UserDbHelper.COLUMN_EMAIL}, ${UserDbHelper.COLUMN_IS_ACTIVE}) " +
+                    "VALUES (?, ?, ?, ?)",
+            arrayOf(user.userId, user.name, user.email, user.isActive)
         )
     }
 
@@ -26,7 +27,8 @@ class UserLocalDataSource(context: Context) {
             val id = cursor.getString(cursor.getColumnIndexOrThrow(UserDbHelper.COLUMN_ID))
             val name = cursor.getString(cursor.getColumnIndexOrThrow(UserDbHelper.COLUMN_NAME))
             val email = cursor.getString(cursor.getColumnIndexOrThrow(UserDbHelper.COLUMN_EMAIL))
-            user = User(id, name, email)
+            val isActive = cursor.getInt(cursor.getColumnIndexOrThrow(UserDbHelper.COLUMN_IS_ACTIVE)) == 1
+            user = User(id, name, email, isActive)
         }
 
         cursor.close()

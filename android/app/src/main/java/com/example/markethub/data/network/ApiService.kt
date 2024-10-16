@@ -1,5 +1,6 @@
 package com.example.markethub.data.network
 
+import com.example.markethub.data.models.ChangePasswordRequest
 import com.example.markethub.data.models.SignInRequest
 import com.example.markethub.data.models.SignUpRequest
 import com.example.markethub.domain.models.Product
@@ -26,8 +27,11 @@ interface ApiService {
     @GET("User/email/{email}")
     suspend fun getUserByEmail(@Path("email") email: String): Response<User>
 
-    @PUT("User/{id}")
+    @PUT("User/customer/{id}")
     suspend fun updateUser(@Path("id") id: String, @Body user: User): Response<User>
+
+    @PUT("User/customer/password/{id}")
+    suspend fun changePassword(@Path("id") id: String, @Body changePasswordRequest: ChangePasswordRequest): Response<Unit>
 
     @GET("products")
     suspend fun getProducts(): Response<List<Product>>

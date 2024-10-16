@@ -1,5 +1,6 @@
 package com.example.markethub.domain.repository
 
+import com.example.markethub.data.models.ChangePasswordRequest
 import com.example.markethub.domain.models.User
 import com.example.markethub.data.network.ApiService
 import retrofit2.Response
@@ -16,5 +17,9 @@ class UserRepository @Inject constructor(
 
     suspend fun updateUser(id: String, user: User): Response<User> {
         return apiService.updateUser(id, user)
+    }
+
+    suspend fun changePassword(id: String, changePasswordRequest: ChangePasswordRequest): Response<Unit> {
+        return apiService.changePassword(id, changePasswordRequest)
     }
 }
