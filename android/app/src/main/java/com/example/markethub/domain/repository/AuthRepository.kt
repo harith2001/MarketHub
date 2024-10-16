@@ -15,4 +15,8 @@ class AuthRepository(private val apiService: ApiService) {
     suspend fun signIn(signInRequest: SignInRequest): Response<SignInResponse> {
         return apiService.signIn(signInRequest)
     }
+
+    suspend fun signOut(): Response<Unit> {
+        return apiService.signOut()
+    }
 }

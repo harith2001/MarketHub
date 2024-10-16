@@ -6,6 +6,7 @@ import com.example.markethub.data.network.ApiService
 import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.repository.AuthRepository
 import com.example.markethub.domain.repository.ProductRepository
+import com.example.markethub.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,5 +65,11 @@ object NetworkModule {
     @Singleton
     fun provideProductRepository(apiService: ApiService): ProductRepository {
         return ProductRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(apiService: ApiService): UserRepository {
+        return UserRepository(apiService)
     }
 }

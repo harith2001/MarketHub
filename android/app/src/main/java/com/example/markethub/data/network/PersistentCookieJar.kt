@@ -8,7 +8,7 @@ import okhttp3.HttpUrl
 
 class PersistentCookieJar(context: Context) : CookieJar {
 
-    private val dbHelper = CookieDbHelper(context)
+    private val dbHelper = CookieDbHelper.getInstance(context)
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
         val db = dbHelper.writableDatabase
@@ -19,7 +19,6 @@ class PersistentCookieJar(context: Context) : CookieJar {
                 arrayOf(cookie.name, cookie.value, cookie.domain, cookie.path, cookie.expiresAt)
             )
         }
-        db.close()
     }
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
@@ -53,7 +52,6 @@ class PersistentCookieJar(context: Context) : CookieJar {
         }
 
         cursor.close()
-        db.close()
 
         return cookies
     }
@@ -64,12 +62,10 @@ class PersistentCookieJar(context: Context) : CookieJar {
             "DELETE FROM ${CookieDbHelper.TABLE_NAME} WHERE ${CookieDbHelper.COLUMN_EXPIRY} < ?",
             arrayOf(expiry)
         )
-        db.close()
     }
 
     fun clearCookies() {
         val db = dbHelper.writableDatabase
         db.execSQL("DELETE FROM ${CookieDbHelper.TABLE_NAME}")
-        db.close()
     }
 }
