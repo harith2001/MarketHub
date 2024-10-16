@@ -12,16 +12,14 @@ import {
 import Header from "../Header";
 import { getUsers, updateUserStatus } from "../../api/user";
 import { getAllOrders } from "../../api/order";
+import { getAllNotifications } from "../../api/notification";
+import { useSearch } from "../../SearchContext";
 
 const CsrDashboard = () => {
-  // Example state for Account Requests, Orders, and Notifications
+  const { searchTerm } = useSearch();
   const [accountRequests, setAccountRequests] = useState([]);
   const [orders, setOrders] = useState([]);
-
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "Order cancellation request from John Doe." },
-    { id: 2, message: "Inquiry from Jane Smith about her order." },
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const fetchPendingCustomers = async () => {
@@ -48,6 +46,36 @@ const CsrDashboard = () => {
     };
     fetchOrders();
   }, []);
+
+  // Fetch notifications from the API
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const fetchedNotifications = await getAllNotifications(); // Fetch all notifications
+        setNotifications(fetchedNotifications);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+   // Filter orders based on the selected date
+  const filteredOrderData = orders.filter((order) => {
+    if (!filterDate) return true;
+    return new Date(order.orderDate).toLocaleDateString() === new Date(filterDate).toLocaleDateString();
+  });
+
+  // Filter account requests based on search term
+  const filteredAccountRequests = accountRequests.filter(request =>
+    request.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    request.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Filter notifications based on search term
+  const filteredNotifications = notifications.filter(notification =>
+    notification.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleApproveAccount = async (userId) => {
     try {
@@ -88,7 +116,7 @@ const CsrDashboard = () => {
           Pending Account Requests
         </Card.Header>
         <Card.Body>
-          {accountRequests.length === 0 ? (
+          {filteredAccountRequests.length === 0 ? (
             <p>No pending account requests.</p>
           ) : (
             <Table striped bordered hover responsive>
@@ -101,7 +129,7 @@ const CsrDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {accountRequests.map((request) => (
+                {filteredAccountRequests.map((request) => (
                   <tr key={request.user_ID}>
                     <td>{request.name}</td>
                     <td>{request.email}</td>
@@ -146,7 +174,7 @@ const CsrDashboard = () => {
             ></i>
           </Card.Header>
           <Card.Body>
-            {filteredOrders.length === 0 ? (
+            {filteredOrderData.length === 0 ? (
               <p>No orders available for the selected date.</p>
             ) : (
               <Table striped bordered hover responsive>
@@ -160,7 +188,7 @@ const CsrDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.map((order) => (
+                  {filteredOrderData.map((order) => (
                     <tr key={order.orderID}>
                       <td>{order.orderID}</td>
                       <td>{order.customerID}</td>
@@ -211,13 +239,13 @@ const CsrDashboard = () => {
           Notifications
         </Card.Header>
         <Card.Body>
-          {notifications.length === 0 ? (
+          {filteredNotifications.length === 0 ? (
             <p>No notifications available.</p>
           ) : (
             <ListGroup>
-              {notifications.map((notification) => (
+              {filteredNotifications.map((notification) => (
                 <ListGroup.Item key={notification.id}>
-                  {notification.message}
+                  {notification.title}
                 </ListGroup.Item>
               ))}
             </ListGroup>

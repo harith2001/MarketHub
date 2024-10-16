@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../Header';
 import { getAllOrders, updateOrderStatus } from '../../api/order';
+import { useSearch } from '../../SearchContext';
 
 const VendorOrders = ({ vendorId }) => {
+  const { searchTerm } = useSearch();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -38,6 +40,24 @@ const VendorOrders = ({ vendorId }) => {
 
     setFilteredOrders(vendorSpecificOrders);
   }, [orders, vendorId]);
+
+  // Apply search filter based on search term
+  useEffect(() => {
+    const searchResults = orders.filter(order =>
+      order.orderID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const vendorSpecificFilteredOrders = searchResults
+      .map(order => ({
+        ...order,
+        vendorItems: order.items.filter(item => item.vendorId === vendorId),
+        isMultiVendor: new Set(order.items.map(item => item.vendorId)).size > 1,
+      }))
+      .filter(order => order.vendorItems.length > 0);
+
+    setFilteredOrders(vendorSpecificFilteredOrders);
+  }, [searchTerm, orders, vendorId]);
 
   // handle order status change
   const handleStatusChange = async (orderId, newStatus) => {

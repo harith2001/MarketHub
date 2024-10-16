@@ -14,8 +14,10 @@ import {
 } from "react-bootstrap";
 import Header from "../Header";
 import { getAllOrders } from "../../api/order";
+import { useSearch } from "../../SearchContext";
 
 const Orders = () => {
+  const { searchTerm } = useSearch();
   const [orders, setOrders] = useState([]);
   const [showProducts, setShowProducts] = useState(null); 
   const [showModal, setShowModal] = useState(false); 
@@ -56,6 +58,12 @@ const Orders = () => {
       );
     }
   };
+
+  // Filter orders based on search term
+  const filteredOrders = orders.filter(order =>
+    order.orderID.toLowerCase().includes(searchTerm.toLowerCase()) || // Match by Order ID
+    order.customerId.toLowerCase().includes(searchTerm.toLowerCase()) // Match by Customer ID
+  );
 
   // Confirm cancellation
   const handleConfirmCancel = () => {
@@ -135,7 +143,7 @@ const Orders = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <React.Fragment key={order.orderID}>
                 <tr>
                   <td>{order.orderID}</td>

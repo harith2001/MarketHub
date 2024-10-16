@@ -3,8 +3,10 @@ import { Container, Row, Col, Table, Button, Badge, Toast, ToastContainer } from
 import ProductForm from "./ProductForm";
 import Header from "../Header";
 import { getProductByVendorId, deleteProduct, updateProduct } from "../../api/product";
+import { useSearch } from "../../SearchContext";
 
 const Products = ({ vendorId }) => {
+  const { searchTerm } = useSearch();
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showToast, setShowToast] = useState(false);
@@ -66,6 +68,15 @@ const Products = ({ vendorId }) => {
     }
   };
 
+  // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productType.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+
   return (
     <Container style={{ marginLeft: '200px', padding: '20px' }}>
       <Header title="Products"></Header>
@@ -78,7 +89,7 @@ const Products = ({ vendorId }) => {
                 overflowY: "auto", // vertical scrolling
               }}
             >
-              <Table striped bordered hover responsive>
+              <Table striped hover responsive>
                 <thead>
                   <tr>
                     <th>Product ID</th>
@@ -92,7 +103,7 @@ const Products = ({ vendorId }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <tr key={product.id}>
                       <td>{product.productId}</td>
                       <td>{product.productName}</td>

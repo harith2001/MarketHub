@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge, Container, Tab, Tabs, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { getUsers, updateUserStatus, deleteUser } from '../../api/user';
+import { useSearch } from '../../SearchContext';
 
 const ManageUsers = () => {
+  const { searchTerm } = useSearch();
   const [users, setUsers] = useState([]);
   const [vendors, setVendors] = useState([]);
   const [csrs, setCsrs] = useState([]);
@@ -86,6 +88,25 @@ const ManageUsers = () => {
     }
   };
 
+  // Filter users based on search term
+  const filteredVendors = vendors.filter(user =>
+    user.user_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCsrs = csrs.filter(user =>
+    user.user_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCustomers = customers.filter(user =>
+    user.user_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Container style={{ marginLeft: "200px", padding: "20px" }}>
       <Header title="Users"></Header>
@@ -110,7 +131,7 @@ const ManageUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {vendors.map(user => (
+                {filteredVendors.map(user => (
                   <tr key={user.user_ID}>
                     <td>{user.user_ID}</td>
                     <td>{user.name}</td>
@@ -172,7 +193,7 @@ const ManageUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {csrs.map(user => (
+                {filteredCsrs.map(user => (
                   <tr key={user.user_ID}>
                     <td>{user.user_ID}</td>
                     <td>{user.name}</td>
@@ -218,7 +239,7 @@ const ManageUsers = () => {
         </Tab>
 
         <Tab eventKey="customers" title={`Customers (${customers.length})`}>
-          {csrs.length === 0 ? (
+          {customers.length === 0 ? (
             <p>No Customers found.</p>
           ) : (
             <Table striped hover responsive>
@@ -232,7 +253,7 @@ const ManageUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {customers.map(user => (
+                {filteredCustomers.map(user => (
                   <tr key={user.user_ID}>
                     <td>{user.user_ID}</td>
                     <td>{user.name}</td>

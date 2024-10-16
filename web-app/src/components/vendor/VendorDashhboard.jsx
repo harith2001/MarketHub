@@ -5,10 +5,12 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement
 import Header from '../../components/Header';
 import { getAllOrders } from '../../api/order';
 import { getAllActiveProducts } from '../../api/product';
+import { useSearch } from '../../SearchContext';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Title);
 
 const VendorDashhboard = ({ vendorId }) => {
+  const { searchTerm } = useSearch();
   const [totalProducts, setTotalProducts] = useState(0); // Example data
   const [pendingOrders, setPendingOrders] = useState(0);
   const [completedOrders, setCompletedOrders] = useState(0);
@@ -139,6 +141,12 @@ const VendorDashhboard = ({ vendorId }) => {
       },
     },
   };
+
+  // Filter the latest orders based on the search term
+  const filteredOrders = recentOrders.filter(order =>
+    order.customerId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.orderID.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const getStatusButtonStyle = (status) => {
     switch (status) {
@@ -277,7 +285,7 @@ const VendorDashhboard = ({ vendorId }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentOrders.map(order => (
+                  {filteredOrders.map(order => (
                     <tr key={order.orderID}>
                       <td>{order.orderID}</td>
                       <td>{order.customerId}</td>

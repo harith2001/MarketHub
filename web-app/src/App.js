@@ -13,21 +13,27 @@ import Notifications from "./components/csr/Notifications";
 import Sidebar from './components/csr/Sidebar';
 import AdminDashbaord from './components/admin/AdminDashbaord';
 import VendorDashhboard from './components/vendor/VendorDashhboard';
-import Header from './components/Header';
 import CsrDashboard from './components/csr/CsrDashboard';
 import FirstPage from './pages/FirstPage';
+import { UserProvider } from './UserContext';
+import { SearchProvider } from './SearchContext';
 
 function App() {
   const [userRole, setUserRole] = useState(null);
   const [vendorId, setVendorId] = useState(null);
+  const [user, setUser] = useState(null);
+
   return (
+<SearchProvider>
+<UserProvider>
+      
     <Router>
       <div className="d-flex">
         {<Sidebar userRole={userRole} />}
         <div className="flex-grow-1">
+          {/* <Header user={user} /> */}
         <Routes>
-          {/* <Route path="/" element={<Dashboard/>} /> */}
-        <Route path="/" element={<FirstPage setUserRole={setUserRole} setVendorId={setVendorId}/>} />
+        <Route path="/" element={<FirstPage setUserRole={setUserRole} setVendorId={setVendorId} user={user} setUser={setUser}/>} />
         <Route path="/signup-request" element={<SignupRequestForm/>}/>
         <Route path="/vendor/products" element={<Products />} />
         <Route path="/vendor/reviews" element={<VendorReviews />} />
@@ -45,6 +51,8 @@ function App() {
           </div>
         </div>
     </Router>
+      </UserProvider>
+      </SearchProvider>
   );
 }
 

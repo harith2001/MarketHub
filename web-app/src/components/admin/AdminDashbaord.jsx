@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 import { getAllOrders } from "../../api/order";
 import { getAllActiveProducts } from "../../api/product";
 import { getUsers } from "../../api/user";
+import { useSearch } from "../../SearchContext";
 
 // Register required chart elements
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, BarElement);
@@ -153,6 +154,11 @@ const doughnutOptions = {
         return 0;
     }
   };
+
+  // Filter the latest orders based on the search term
+  const filteredOrders = latestOrders.filter(order =>
+    order.customerId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   
   return (
         <Container style={{ marginLeft: '200px', padding: '20px' }}>
@@ -255,7 +261,7 @@ const doughnutOptions = {
                   </tr>
                 </thead>
                 <tbody>
-                  {latestOrders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <>
                       <tr key={order.orderId}>
                         <td>{order.orderId}</td>

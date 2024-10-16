@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge, Container, Modal, Form, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { getAllProducts, updateProduct, deleteProduct } from '../../api/product';
+import { useSearch } from '../../SearchContext';
 
 const ManageProducts = () => {
+  const { searchTerm } = useSearch();
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null); 
   const [showEditModal, setShowEditModal] = useState(false); 
@@ -90,6 +92,14 @@ const ManageProducts = () => {
     setEditingProduct({ ...editingProduct, [name]: value });
   };
 
+   // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.vendorId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.productType.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Container style={{ marginLeft: "200px", padding: "20px" }}>
       <Header title="Products"></Header>
@@ -99,31 +109,35 @@ const ManageProducts = () => {
         <Table striped hover responsive className="table-borderless">
           <thead>
             <tr>
-              <th>Product ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price ($)</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ padding: "10px 15px" }}>Product ID</th>
+              <th style={{ padding: "10px 15px" }}>Name</th>
+              <th style={{ padding: "10px 15px" }}>Category</th>
+              <th style={{ padding: "10px 15px" }}>Price ($)</th>
+              <th style={{ padding: "10px 15px" }}>Vendor ID</th>
+              <th style={{ padding: "10px 15px" }}>Stock</th>
+              <th style={{ padding: "10px 15px" }}>Stock Margin</th>
+              <th style={{ padding: "10px 15px" }}>Status</th>
+              <th style={{ padding: "10px 15px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {products.map(product => (
+            {filteredProducts.map(product => (
               <tr key={product.id}>
-                <td>{product.productId}</td>
-                <td>{product.productName}</td>
-                <td>{product.productType}</td>
-                <td>{product.price}</td>
-                <td>{product.quantity}</td>
-                <td>
+                <td style={{ padding: "10px 15px" }}>{product.productId}</td>
+                <td style={{ padding: "10px 15px" }}>{product.productName}</td>
+                <td style={{ padding: "10px 15px" }}>{product.productType}</td>
+                <td style={{ padding: "10px 15px" }}>{product.price}</td>
+                <td style={{ padding: "10px 15px" }}>{product.vendorId}</td>
+                <td style={{ padding: "10px 15px" }}>{product.lowerMargin}</td>
+                <td style={{ padding: "10px 15px" }}>{product.quantity}</td>
+                <td style={{ padding: "10px 15px" }}>
                   {product.isActive ? (
                     <Badge bg="success">Active</Badge>
                   ) : (
                     <Badge bg="secondary">Inactive</Badge>
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "10px 15px" }}>
                     <Button
                     className='me-2'
                     onClick={() => handleEditProduct(product)}
@@ -136,7 +150,7 @@ const ManageProducts = () => {
                     </Button>
                     <Button
                     variant={product.isActive ? 'warning' : 'success'}
-                    className='me-2'
+                    className='ms-2 me-2'
                       onClick={() => toggleProductStatus(product.productId, product.isActive)}
                       style={{
                         width: "100px",
@@ -146,7 +160,7 @@ const ManageProducts = () => {
                     </Button>
                     <Button
                     variant="danger"
-                    className='me-2'
+                    className='ms-2 me-2'
                     onClick={() => handleRemoveProduct(product.productId)}
                     style={{
                         width: "100px",

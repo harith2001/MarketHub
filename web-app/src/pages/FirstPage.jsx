@@ -3,8 +3,10 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { Carousel, Form, Button, Card, Row, Col, Container } from 'react-bootstrap';
 import { loginUser, getUserByEmail } from '../api/user';
+import { useUser } from '../UserContext';
 
 const FirstPage = ({ setUserRole, setVendorId }) => {
+  const { setUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); 
@@ -15,10 +17,11 @@ const FirstPage = ({ setUserRole, setVendorId }) => {
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
-        console.log("Login Successful: ", response);
+      console.log("Login Successful: ", response);
         
-        const user = await getUserByEmail(email);
-        console.log("Fetched User: ", user);
+      const user = await getUserByEmail(email);
+      console.log("Fetched User: ", user);
+      setUser(user);
 
       const userRole = user?.role; 
       const vendorID = user?.user_ID;

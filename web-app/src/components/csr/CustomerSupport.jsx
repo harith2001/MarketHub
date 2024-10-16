@@ -12,9 +12,10 @@ import {
 } from "react-bootstrap";
 import Header from "../Header";
 import { getAllReviews } from "../../api/review";
+import { useSearch } from "../../SearchContext";
 
 const CustomerSupport = () => {
-  // Initial inquiries data
+  const { searchTerm } = useSearch();
   const [inquiries, setInquiries] = useState([]);
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
@@ -67,6 +68,19 @@ const CustomerSupport = () => {
     (inquiry) => inquiry.status === "Resolved"
   );
 
+  // Filter inquiries based on search term
+  const filteredUnresolvedInquiries = unresolvedInquiries.filter(inquiry =>
+    inquiry.customerId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inquiry.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredResolvedInquiries = resolvedInquiries.filter(inquiry =>
+    inquiry.customerId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inquiry.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Container  style={{ marginLeft: "200px", padding: "20px" }}>
       <Header title="Customer Inquiries"></Header>
@@ -79,10 +93,10 @@ const CustomerSupport = () => {
         <Tab eventKey="unresolved" title="Unresolved Inquiries">
           {/* unresolved inquiries */}
           <div className="d-flex flex-wrap justify-content-start">
-            {unresolvedInquiries.length === 0 ? (
+            {filteredUnresolvedInquiries.length === 0 ? (
               <p>No unresolved inquiries.</p>
             ) : (
-              unresolvedInquiries.map((inquiry) => (
+              filteredUnresolvedInquiries.map((inquiry) => (
                 <Col
                   md={12}
                   key={inquiry.id}
@@ -123,10 +137,10 @@ const CustomerSupport = () => {
         <Tab eventKey="resolved" title="Resolved Inquiries">
           {/* resolved inquiries */}
           <div className="d-flex flex-wrap justify-content-start">
-            {resolvedInquiries.length === 0 ? (
+            {filteredResolvedInquiries.length === 0 ? (
               <p>No resolved inquiries yet.</p>
             ) : (
-              resolvedInquiries.map((inquiry) => (
+              filteredResolvedInquiries.map((inquiry) => (
                 <Col
                   md={12}
                   key={inquiry.id}

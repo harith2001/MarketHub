@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Card, Tabs, Tab, Modal, Toast, ToastContainer } from "react-bootstrap";
 import Header from "../Header";
 import { getUsers, updateUserStatus, deleteUser } from "../../api/user";
+import { useSearch } from "../../SearchContext";
 
 const Accounts = () => {
+  const { searchTerm } = useSearch();
   const [approvedAccounts, setApprovedAccounts] = useState([]);
   const [deactivatedAccounts, setDeactivatedAccounts] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -66,6 +68,18 @@ const Accounts = () => {
     }
   };
 
+  // Filter approved accounts based on search term
+  const filteredApprovedAccounts = approvedAccounts.filter(account =>
+    account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    account.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Filter deactivated accounts based on search term
+  const filteredDeactivatedAccounts = deactivatedAccounts.filter(account =>
+    account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    account.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Open confirmation modal
   const handleAction = (action, account) => {
     setAction(action);
@@ -81,7 +95,7 @@ const Accounts = () => {
         {/* Approved Accounts Tab */}
         <Tab eventKey="approved" title={`Approved (${approvedAccounts.length})`}>
               {/* Approved Accounts Table */}
-              {approvedAccounts.length === 0 ? (
+              {filteredApprovedAccounts.length === 0 ? (
                 <p>No approved accounts found.</p>
               ) : (
                 <Table striped hover responsive>
@@ -94,7 +108,7 @@ const Accounts = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {approvedAccounts.map((account) => (
+                    {filteredApprovedAccounts.map((account) => (
                       <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
@@ -128,7 +142,7 @@ const Accounts = () => {
         {/* Deactivated Accounts Tab */}
         <Tab eventKey="deactivated" title={`Deactivated (${deactivatedAccounts.length})`}>
               {/* Deactivated Accounts Table */}
-              {deactivatedAccounts.length === 0 ? (
+              {filteredDeactivatedAccounts.length === 0 ? (
                 <p>No deactivated accounts found.</p>
               ) : (
                 <Table striped hover responsive>
@@ -141,7 +155,7 @@ const Accounts = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {deactivatedAccounts.map((account) => (
+                    {filteredDeactivatedAccounts.map((account) => (
                       <tr key={account.user_ID}>
                         <td>{account.name}</td>
                         <td>{account.email}</td>
