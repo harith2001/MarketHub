@@ -15,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("User")
@@ -44,8 +45,8 @@ interface ApiService {
     @GET("ProductReadView/by-product-type/{category}")
     suspend fun getProductsByCategory(@Path("category") category: String): Response<List<Product>>
 
-    @GET("ProductReadView/search/{query}")
-    suspend fun searchProducts(@Path("query") query: String): Response<List<Product>>
+    @GET("ProductReadView/search")
+    suspend fun searchProducts(@Query("query") query: String): Response<List<Product>>
 
     @POST("Order/create")
     suspend fun createOrder(@Body order: OrderBasic): Response<Order>
