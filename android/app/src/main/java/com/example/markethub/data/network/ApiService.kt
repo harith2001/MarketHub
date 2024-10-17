@@ -71,6 +71,6 @@ interface ApiService {
     @POST("OrderRating/rate")
     suspend fun rateOrder(@Body orderRating: OrderRatingSubmit): Response<Unit>
 
-    @GET("OrderRating/order/{orderId}")
+    @GET("OrderRating/rate/{orderId}")
     suspend fun getOrderRatingByOrderId(@Path("orderId") orderId: String): Response<OrderRating>
 }
