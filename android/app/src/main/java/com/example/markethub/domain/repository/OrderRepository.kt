@@ -1,6 +1,7 @@
 package com.example.markethub.domain.repository
 
 import com.example.markethub.data.network.ApiService
+import com.example.markethub.domain.models.CreateOrderResponse
 import com.example.markethub.domain.models.Order
 import com.example.markethub.domain.models.OrderBasic
 import retrofit2.Response
@@ -11,7 +12,7 @@ import javax.inject.Singleton
 class OrderRepository @Inject constructor(
     private val apiService: ApiService
 ) {
-    suspend fun createOrder(order: OrderBasic): Response<Order> {
+    suspend fun createOrder(order: OrderBasic): Response<CreateOrderResponse> {
         return apiService.createOrder(order)
     }
 

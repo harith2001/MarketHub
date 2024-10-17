@@ -3,8 +3,11 @@ package com.example.markethub.data.network
 import com.example.markethub.data.models.ChangePasswordRequest
 import com.example.markethub.data.models.SignInRequest
 import com.example.markethub.data.models.SignUpRequest
+import com.example.markethub.domain.models.CreateOrderResponse
+import com.example.markethub.domain.models.CreatePaymentResponse
 import com.example.markethub.domain.models.Order
 import com.example.markethub.domain.models.OrderBasic
+import com.example.markethub.domain.models.Payment
 import com.example.markethub.domain.models.Product
 import com.example.markethub.domain.models.SignInResponse
 import com.example.markethub.domain.models.SignUpResponse
@@ -49,11 +52,17 @@ interface ApiService {
     suspend fun searchProducts(@Query("query") query: String): Response<List<Product>>
 
     @POST("Order/create")
-    suspend fun createOrder(@Body order: OrderBasic): Response<Order>
+    suspend fun createOrder(@Body order: OrderBasic): Response<CreateOrderResponse>
 
     @GET("Order/customer/{customerId}")
     suspend fun getOrdersByCustomerId(@Path("customerId") customerId: String): Response<List<Order>>
 
     @GET("Order/{orderId}")
     suspend fun getOrderById(@Path("orderId") orderId: String): Response<Order>
+
+    @PUT("Payment/create")
+    suspend fun createPayment(@Body payment: Payment): Response<CreatePaymentResponse>
+
+    @GET("Payment/order/{orderId}")
+    suspend fun getPaymentByOrderId(@Path("orderId") orderId: String): Response<Payment>
 }

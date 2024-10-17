@@ -6,6 +6,7 @@ import com.example.markethub.data.network.ApiService
 import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.repository.AuthRepository
 import com.example.markethub.domain.repository.OrderRepository
+import com.example.markethub.domain.repository.PaymentRepository
 import com.example.markethub.domain.repository.ProductRepository
 import com.example.markethub.domain.repository.UserRepository
 import dagger.Module
@@ -78,5 +79,11 @@ object NetworkModule {
     @Singleton
     fun provideOrderRepository(apiService: ApiService): OrderRepository {
         return OrderRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun providePaymentRepository(apiService: ApiService): PaymentRepository {
+        return PaymentRepository(apiService)
     }
 }

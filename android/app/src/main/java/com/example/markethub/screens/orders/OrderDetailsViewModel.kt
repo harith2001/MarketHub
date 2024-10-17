@@ -3,9 +3,11 @@ package com.example.markethub.screens.orders
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.markethub.domain.models.Order
+import com.example.markethub.domain.models.Payment
 import com.example.markethub.domain.models.Product
 import com.example.markethub.domain.models.VendorDetails
 import com.example.markethub.domain.repository.OrderRepository
+import com.example.markethub.domain.repository.PaymentRepository
 import com.example.markethub.domain.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OrderDetailsViewModel @Inject constructor(
     private val orderRepository: OrderRepository,
+    private val paymentRepository: PaymentRepository,
     private val productRepository: ProductRepository
 ) : ViewModel() {
 
@@ -24,6 +27,9 @@ class OrderDetailsViewModel @Inject constructor(
 
     private val _vendor = MutableStateFlow<VendorDetails?>(null)
     val vendor: StateFlow<VendorDetails?> = _vendor
+
+    private val _payment = MutableStateFlow<Payment?>(null)
+    val payment: StateFlow<Payment?> = _payment
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -39,6 +45,12 @@ class OrderDetailsViewModel @Inject constructor(
                         _vendor.value = productResponse.body()?.vendor
                     } else {
                         _errorMessage.value = "Failed to load product details."
+                    }
+                    val paymentResponse = paymentRepository.getPaymentByOrderId(orderId)
+                    if (paymentResponse.isSuccessful) {
+                        _payment.value = paymentResponse.body()
+                    } else {
+                        _errorMessage.value = "Failed to load payment details."
                     }
                 } else {
                     _errorMessage.value = "Failed to load order details."

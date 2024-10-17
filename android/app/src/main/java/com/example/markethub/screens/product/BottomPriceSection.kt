@@ -16,15 +16,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,6 +50,8 @@ fun BottomPriceSection(
     cartViewModel: CartViewModel = hiltViewModel()
 ) {
     var quantity by remember { mutableIntStateOf(1) }
+    var showDialog by remember { mutableStateOf(false) }
+    val vendorCheck = cartViewModel.hasDifferentVendorItems(product.vendor?.vendorId ?: "")
 
     Surface(
         tonalElevation = 8.dp,
@@ -111,15 +116,20 @@ fun BottomPriceSection(
 
                 Button(
                     onClick = {
-                        val item = CartItem(
-                            id = product.productId,
-                            name = product.productName,
-                            imageUrl = product.fullImageUrl ?: "",
-                            quantity = quantity,
-                            price = product.price,
-                            vendorId = product.vendor?.vendorId ?: ""
-                        )
-                        cartViewModel.addItem(item)
+                        if (vendorCheck) {
+                            showDialog = true
+                        } else {
+                            cartViewModel.addItem(
+                                CartItem(
+                                    id = product.productId,
+                                    name = product.productName,
+                                    imageUrl = product.fullImageUrl ?: "",
+                                    quantity = quantity,
+                                    price = product.price,
+                                    vendorId = product.vendor?.vendorId ?: ""
+                                )
+                            )
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF233142)),
                     shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
@@ -137,5 +147,35 @@ fun BottomPriceSection(
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    cartViewModel.clearCartAndAddItem(
+                        CartItem(
+                            id = product.productId,
+                            name = product.productName,
+                            imageUrl = product.fullImageUrl ?: "",
+                            quantity = quantity,
+                            price = product.price,
+                            vendorId = product.vendor?.vendorId ?: ""
+                        )
+                    )
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Clear Cart and Add New Item") },
+            text = { Text("Your cart contains items from a different vendor. If you add this item, the cart will be cleared. Do you wish to continue?") }
+        )
     }
 }

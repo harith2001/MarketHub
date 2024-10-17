@@ -160,7 +160,8 @@ fun CheckoutScreen(
                             cartItems = cartItems,
                             totalPrice = totalPrice,
                             note = note.value,
-                            shippingAddress = address.value
+                            shippingAddress = address.value,
+                            paymentMethod = paymentType.value
                         )
                         showDialog = true
                     },

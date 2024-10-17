@@ -60,6 +60,7 @@ fun OrderDetailsScreen(
 ) {
     val order by viewModel.order.collectAsState()
     val vendor by viewModel.vendor.collectAsState()
+    val payment by viewModel.payment.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
@@ -97,7 +98,7 @@ fun OrderDetailsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OrderSummarySection(
                 totalPrice = "$${order!!.totalPrice}",
-                paymentMethod = "Cash on Delivery",
+                paymentMethod = payment?.paymentMethod ?: "",
                 deliveryAddress = order!!.shippingAddress,
                 vendorName = vendor?.vendorName ?: ""
             )
