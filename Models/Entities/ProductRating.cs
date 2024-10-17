@@ -20,6 +20,8 @@ namespace MarketHub.Models.Entities
 
         public string VendorId { get; set; }
 
+        public string OrderID { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

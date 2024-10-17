@@ -15,7 +15,7 @@ namespace MarketHub.Repositories
             var database = client.GetDatabase(settings.Value.DatabaseName);
             _productRating = database.GetCollection<ProductRating>("ProductRating");
             _products = database.GetCollection<Product>("products");
-        
+
         }
 
         //create a new product rating
@@ -33,6 +33,10 @@ namespace MarketHub.Repositories
         //get all product ratings by vendor id
         public async Task<List<ProductRating>> GetProductRatingsByVendorIdAsync(string VendorId) =>
             await _productRating.Find(productRating => productRating.VendorId == VendorId).ToListAsync();
+
+        //get  product ratings by order id
+        public async Task<List<ProductRating>> GetProductRatingsByOrderIdAsync(string OrderID) =>
+             await _productRating.Find(productRating => productRating.OrderID == OrderID).ToListAsync();
 
         //get all product ratings
         public async Task<List<ProductRating>> GetAllProductRatingsAsync() =>
@@ -52,7 +56,7 @@ namespace MarketHub.Repositories
 
         //delete a product rating
         public async Task DeleteProductRatingAsync(string ProductRatingId) =>
-            await _productRating.DeleteOneAsync(productRating => productRating.productId== ProductRatingId);
+            await _productRating.DeleteOneAsync(productRating => productRating.productId == ProductRatingId);
 
     }
 }
