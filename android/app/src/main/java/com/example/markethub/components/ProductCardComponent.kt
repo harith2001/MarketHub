@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
 import com.example.markethub.ui.theme.Primary
 

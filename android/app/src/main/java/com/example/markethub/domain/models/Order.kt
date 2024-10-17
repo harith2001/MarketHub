@@ -1,6 +1,7 @@
 package com.example.markethub.domain.models
 
 data class OrderBasic(
+    val orderID: String = "",
     val customerId: String,
     val items: List<OrderItem>,
     val totalPrice: Double,

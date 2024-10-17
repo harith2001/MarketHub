@@ -41,6 +41,12 @@ interface ApiService {
     @GET("ProductReadView/by-product-id/{id}")
     suspend fun getProductById(@Path("id") id: String): Response<Product>
 
+    @GET("ProductReadView/by-product-type/{category}")
+    suspend fun getProductsByCategory(@Path("category") category: String): Response<List<Product>>
+
+    @GET("ProductReadView/search/{query}")
+    suspend fun searchProducts(@Path("query") query: String): Response<List<Product>>
+
     @POST("Order/create")
     suspend fun createOrder(@Body order: OrderBasic): Response<Order>
 

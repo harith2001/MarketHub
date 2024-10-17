@@ -23,6 +23,7 @@ import com.example.markethub.screens.cart.CartScreen
 import com.example.markethub.screens.checkout.CheckoutScreen
 import com.example.markethub.screens.favorites.MyFavoritesScreen
 import com.example.markethub.screens.orders.OrderDetailsScreen
+import com.example.markethub.screens.product.ProductsViewScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 val LocalNavController = compositionLocalOf<NavController> { error("No NavController found!") }
@@ -110,6 +111,24 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         // My Favorites Screen Route
         composable("MyFavorites") {
             MyFavoritesScreen()
+        }
+
+        // Product Filter Screen Route
+        composable(
+            route = "ProductFilter/{category}",
+            arguments = listOf(navArgument("category") { defaultValue = "All" })
+        ) { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: "All"
+            ProductsViewScreen(filterByCategory = category, searchQuery = null)
+        }
+
+        // Search Screen Route
+        composable(
+            route = "Search/{query}",
+            arguments = listOf(navArgument("query") { defaultValue = "" })
+        ) { backStackEntry ->
+            val query = backStackEntry.arguments?.getString("query") ?: ""
+            ProductsViewScreen(searchQuery = query, filterByCategory = null)
         }
     }
 }

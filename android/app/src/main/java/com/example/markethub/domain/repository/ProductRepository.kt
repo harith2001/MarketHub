@@ -14,6 +14,14 @@ class ProductRepository @Inject constructor(
         return apiService.getProducts()
     }
 
+    suspend fun getProductsByCategory(category: String): Response<List<Product>> {
+        return apiService.getProductsByCategory(category)
+    }
+
+    suspend fun searchProducts(query: String): Response<List<Product>> {
+        return apiService.searchProducts(query)
+    }
+
     suspend fun getPopularProducts(): Response<List<Product>> {
         return apiService.getProducts()
     }
