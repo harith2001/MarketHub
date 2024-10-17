@@ -1,5 +1,6 @@
 package com.example.markethub.screens.product
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +51,7 @@ fun BottomPriceSection(
     modifier: Modifier = Modifier,
     cartViewModel: CartViewModel = hiltViewModel()
 ) {
+    var context = LocalContext.current
     var quantity by remember { mutableIntStateOf(1) }
     var showDialog by remember { mutableStateOf(false) }
     val vendorCheck = cartViewModel.hasDifferentVendorItems(product.vendor?.vendorId ?: "")
@@ -129,6 +132,7 @@ fun BottomPriceSection(
                                     vendorId = product.vendor?.vendorId ?: ""
                                 )
                             )
+                            Toast.makeText(context, "Item added to cart", Toast.LENGTH_SHORT).show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF233142)),
@@ -165,6 +169,7 @@ fun BottomPriceSection(
                             vendorId = product.vendor?.vendorId ?: ""
                         )
                     )
+                    Toast.makeText(context, "Cart cleared and new item added", Toast.LENGTH_SHORT).show()
                 }) {
                     Text("Confirm")
                 }

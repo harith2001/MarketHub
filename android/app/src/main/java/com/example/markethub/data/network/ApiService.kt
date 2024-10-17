@@ -60,7 +60,7 @@ interface ApiService {
     @GET("Order/{orderId}")
     suspend fun getOrderById(@Path("orderId") orderId: String): Response<Order>
 
-    @PUT("Payment/create")
+    @POST("Payment/create")
     suspend fun createPayment(@Body payment: Payment): Response<CreatePaymentResponse>
 
     @GET("Payment/order/{orderId}")

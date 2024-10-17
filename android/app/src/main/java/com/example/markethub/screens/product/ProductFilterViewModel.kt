@@ -17,6 +17,9 @@ class ProductFilterViewModel @Inject constructor(
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> = _products
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun getProductsByCategory(category: String) {
         viewModelScope.launch {
             val response = productRepository.getProductsByCategory(category)
@@ -25,6 +28,7 @@ class ProductFilterViewModel @Inject constructor(
                     _products.value = it
                 }
             }
+            _isLoading.value = false
         }
     }
 
@@ -36,6 +40,7 @@ class ProductFilterViewModel @Inject constructor(
                     _products.value = it
                 }
             }
+            _isLoading.value = false
         }
     }
 }

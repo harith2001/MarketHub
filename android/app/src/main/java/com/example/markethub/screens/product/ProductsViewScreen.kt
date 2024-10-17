@@ -44,7 +44,7 @@ fun ProductsViewScreen(
         }
     }
 
-
+    val isLoading by viewModel.isLoading.collectAsState()
     val products by viewModel.products.collectAsState()
     val title = when {
         searchQuery != null -> "Search results for \"$searchQuery\""
@@ -55,6 +55,7 @@ fun ProductsViewScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(top = 16.dp)
             .background(Color.White)
     ) {
         Row(
@@ -78,7 +79,16 @@ fun ProductsViewScreen(
             )
         }
 
-        if (products.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Primary)
+            }
+        } else if (products.isEmpty()) {
             EmptyStateMessage(title)
         } else {
             LazyVerticalGrid(

@@ -50,7 +50,7 @@ fun ProductDetailsHeaderSection() {
                     tint = Primary
                 )
             }
-            IconButton(onClick = { /* Navigate to Cart */ }) {
+            IconButton(onClick = { navController.navigate("Cart") }) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
                     contentDescription = "Cart",

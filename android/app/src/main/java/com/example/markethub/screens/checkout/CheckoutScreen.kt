@@ -185,8 +185,8 @@ fun CheckoutScreen(
                     onDismiss = { showDialog = false },
                     onButtonClick = {
                         showDialog = false
-                        navController.popBackStack()
                         viewModel.clearOrderResponse()
+                        navController.navigate("Home")
                     }
                 )
             } else {
