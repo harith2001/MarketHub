@@ -10,6 +10,8 @@ import {
   Row,
   ListGroup,
   Offcanvas,
+  Toast,
+  ToastContainer,
 } from "react-bootstrap";
 import Header from "../Header";
 import { getAllNotifications } from "../../api/notification";
@@ -20,6 +22,9 @@ const Notifications = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [activeTab, setActiveTab] = useState("cancelled"); 
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -53,7 +58,7 @@ const Notifications = () => {
   // Confirm cancellation action
   const confirmCancelOrder = async () => {
     try {
-      await updateOrderStatus(selectedNotification.orderId, "Cancelled"); // update order status as cancelled
+      await updateOrderStatus(selectedNotification.orderId, false); // update order status as cancelled
 
       setNotifications(
         notifications.map((notification) =>
@@ -62,11 +67,16 @@ const Notifications = () => {
             : notification
         )
       );
-      
+      setShowToast(true);
+      setToastMessage("Order cancelled successfully!");
+      setToastType("success");
       setShowCancelModal(false);
       setSelectedNotification(null);
     } catch (error) {
       console.error("Error occured when cancelling the order:", error);
+      setShowToast(true);
+      setToastMessage("Failed to cancel the order.");
+      setToastType("warning");
     }
   };
 
@@ -208,6 +218,16 @@ const Notifications = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'warning'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Order Cancellation Done' : 'Order Cancellation Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </Container>
   );
 };

@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dropdown } from 'react-bootstrap';
-import { getStockStatus } from '../../api/product';
+import { getLowStockProducts } from '../../api/product';
 
 const Notification = ({ vendorId }) => {
   const [stockStatus, setStockStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStockStatus = async () => {
+    const fetchLowStockProducts = async () => {
       try {
-        const stockData = await getStockStatus(vendorId); // get stock
+        const stockData = await getLowStockProducts(vendorId); // get stock
         setStockStatus(stockData);
       } catch (error) {
         console.error("Error fetching stock status:", error);
@@ -18,7 +18,7 @@ const Notification = ({ vendorId }) => {
       }
     };
 
-    fetchStockStatus();
+    fetchLowStockProducts();
   }, [vendorId]);
 
   return (
@@ -27,19 +27,12 @@ const Notification = ({ vendorId }) => {
       <Dropdown.Menu>
         {loading ? (
           <Dropdown.Item>Loading stock status...</Dropdown.Item>
-        ) : stockStatus && stockStatus.length > 0 ? (
+        ) : stockStatus ? (
           stockStatus.map((product) => {
-            let stockMessage = 'Out of Stock';
-
-            if (product.stock > 10) {
-              stockMessage = 'In Stock'; // message for normal stock
-            } else if (product.stock > 0 && product.stock <= 10) {
-              stockMessage = 'Low Stock'; // message for low stock
-            }
-
+            let stockMessage = 'is on low stock';
             return (
               <Dropdown.Item key={product.productId}>
-                Product ID: {product.productId} - Stock Status: {stockMessage}
+                Product ID {product.productId} {stockMessage}
               </Dropdown.Item>
             );
           })

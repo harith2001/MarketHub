@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/Product';
+const API_URL = 'http://localhost:5003/api/Product';
 
 // Get all products
 export const getAllProducts = async () => {
@@ -68,6 +68,17 @@ export const updateProduct = async (productId, data) => {
   }
 };
 
+// Update product status
+export const updateProductStatus = async (productId, status) => {
+  try {
+    const response = await axios.patch(`${API_URL}/update-product-status/${productId}/${status}`);
+    return response.data; // Return the updated product data if needed
+  } catch (error) {
+    console.error('Error updating product status:', error);
+    throw error;
+  }
+};
+
 // Delete product
 export const deleteProduct = async (productId) => {
   try {
@@ -89,4 +100,16 @@ export const getStockStatus = async (vendorId) => {
     throw error; 
   }
 };
+
+// / Get low stock products by vendor ID
+export const getLowStockProducts = async (vendorId) => {
+  try {
+    const response = await axios.get(`${API_URL}/get-lowStock-products/${vendorId}`);
+    return response.data; 
+  } catch (error) {
+    console.error('Error when fetching low stock products:', error);
+    throw error; 
+  }
+};
+
 

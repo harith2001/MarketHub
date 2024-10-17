@@ -5,10 +5,15 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Notification from './vendor/Notification'; 
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../api/user';
+import UserProfile from './UserProfile';
+import { useUser } from '../UserContext';
+import { useSearch } from '../SearchContext';
 
 const Header = ({ title }) => {
+  const { user } = useUser();
+  const { searchTerm = "", setSearchTerm = () => {} } = useSearch();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState("");
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const navigate = useNavigate();
 
   // handle user logout
@@ -20,6 +25,8 @@ const Header = ({ title }) => {
       console.error("Error logging out:", error);
     }
   };
+
+  console.log("User: ", user)
 
   return (
       <div className="d-flex justify-content-between py-3">
@@ -65,10 +72,14 @@ const Header = ({ title }) => {
         }}>
           <i className="bi bi-person-circle" style={{ fontSize: '1.5rem' }}></i>
         </Dropdown.Toggle>
-         <Dropdown.Menu>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => setShowProfileModal(true)}>Profile</Dropdown.Item>
             <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+
+        {/* Profile Modal */}
+        <UserProfile user={user} show={showProfileModal} onHide={() => setShowProfileModal(false)} />
       </div>
     </div>
   );
