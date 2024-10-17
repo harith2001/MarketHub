@@ -75,5 +75,22 @@ namespace MarketHub.Repositories
             var result = await _users.Find(filter).Project(projection).ToListAsync();
             return result;
         }
+
+        //get all vendors
+        public async Task<List<VendorDTO>> GetAllVendorsAsync()
+        {
+            var filter = Builders<User>.Filter.Eq(user => user.Role, "Vendor");
+
+            var projection = Builders<User>.Projection.Expression(user => new VendorDTO
+            {
+                User_ID = user.User_ID,
+                Name = user.Name,
+                Email = user.Email,
+                IsActive = user.IsActive
+            });
+
+            var result = await _users.Find(filter).Project(projection).ToListAsync();
+            return result;
+        }
     }
 }
