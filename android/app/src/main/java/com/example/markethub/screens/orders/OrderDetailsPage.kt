@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,6 +52,10 @@ import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
 import com.example.markethub.components.ValidatedTextFieldComponent
 import com.example.markethub.domain.models.OrderItem
+import com.example.markethub.domain.models.OrderRating
+import com.example.markethub.domain.models.OrderRatingSubmit
+import com.example.markethub.domain.models.ProductRating
+import com.example.markethub.domain.models.VendorRating
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
 
@@ -58,14 +64,17 @@ fun OrderDetailsScreen(
     orderId: String,
     viewModel: OrderDetailsViewModel = hiltViewModel()
 ) {
+    val user by viewModel.user.collectAsState()
     val order by viewModel.order.collectAsState()
+    val orderRating by viewModel.orderRating.collectAsState()
     val vendor by viewModel.vendor.collectAsState()
     val payment by viewModel.payment.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(orderId) {
-        viewModel.fetchOrderDetails(orderId)
+        viewModel.fetchOrderDetails(orderId, context)
     }
 
     Column(
@@ -121,7 +130,8 @@ fun OrderDetailsScreen(
                         .clip(RoundedCornerShape(8.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary)
                 ) {
-                    Text(text = "Rate Your Order", fontSize = 16.sp, color = Color.White)
+                    Text(text = if (orderRating?.productRatings?.isEmpty() == true) "Rate Order" else "View Rating",
+                        fontSize = 16.sp, color = Color.White)
                 }
             }
         } else if (errorMessage != null) {
@@ -134,7 +144,13 @@ fun OrderDetailsScreen(
             items = order?.items ?: emptyList(),
             vendorName = vendor?.vendorName ?: "",
             onDismiss = { showDialog = false },
-            onRateOrder = { showDialog = false }
+            onRateOrder = {
+                viewModel.rateOrder(it, context)
+                showDialog = false
+                          },
+            orderRating = orderRating,
+            orderId = orderId,
+            customerName = user?.name ?: "",
         )
     }
 }
@@ -244,8 +260,19 @@ fun RateOrderDialog(
     items: List<OrderItem>,
     vendorName: String,
     onDismiss: () -> Unit,
-    onRateOrder: () -> Unit
+    onRateOrder: (OrderRatingSubmit) -> Unit,
+    orderRating: OrderRating?,
+    orderId: String,
+    customerName: String,
 ) {
+    val vendorRatingList = remember { mutableStateListOf<VendorRating>() }
+    val productRatingList = remember { mutableStateListOf<ProductRating>() }
+
+    LaunchedEffect(orderRating) {
+        orderRating?.vendorRatings?.let { vendorRatingList.addAll(it) }
+        orderRating?.productRatings?.let { productRatingList.addAll(it) }
+    }
+
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
             modifier = Modifier
@@ -271,7 +298,9 @@ fun RateOrderDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 items.forEach { item ->
-                    var itemRating by remember { mutableIntStateOf(3) }
+                    val productRating = productRatingList.find { it.productId == item.productId }
+                    val itemRatingValue = productRating?.rating?.toInt() ?: 3
+                    var itemRating by remember { mutableIntStateOf(itemRatingValue) }
 
                     Row(
                         modifier = Modifier
@@ -298,20 +327,48 @@ fun RateOrderDialog(
                             Text(item.productName, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                             Spacer(modifier = Modifier.height(4.dp))
 
-                            RatingBar(rating = itemRating, onRatingChange = { itemRating = it })
+                            RatingBar(
+                                rating = itemRating,
+                                onRatingChange = {
+                                    itemRating = it
+                                    val productRatingObj = productRatingList.find { it.productId == item.productId }
+                                    if (productRating != null) {
+                                        productRatingList.remove(productRatingObj)
+                                    }
+                                    productRatingList.add(
+                                        ProductRating(
+                                            productId = item.productId,
+                                            customerName = customerName,
+                                            rating = it.toString(),
+                                            comment = "",
+                                            vendorId = item.vendorId,
+                                            orderID = orderId
+                                        )
+                                    )
+                                },
+                                disabled = orderRating?.productRatings?.find { it.productId == item.productId } != null
+                            )
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                var vendorRating by remember { mutableIntStateOf(4) }
+                var vendorRatingObj = orderRating?.vendorRatings?.find { it.vendorName == vendorName }
+                val vendorRatingValue = vendorRatingObj?.rating?.toInt() ?: 3
+                var vendorRating by remember { mutableIntStateOf(vendorRatingValue) }
+                var comment by remember { mutableStateOf(vendorRatingObj?.comment ?: "") }
+                
                 Text(
                     "Rate the Vendor: $vendorName",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                RatingBar(rating = vendorRating, onRatingChange = { vendorRating = it })
+                RatingBar(
+                    rating = vendorRating,
+                    onRatingChange = { vendorRating = it },
+                    disabled = orderRating?.vendorRatings?.find { it.vendorName == vendorName } != null
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -319,23 +376,38 @@ fun RateOrderDialog(
                 ValidatedTextFieldComponent(
                     label = "Comment",
                     isRequired = false,
-                    value = "",
-                    onValueChange = {}
+                    value = comment,
+                    onValueChange = { comment = it }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-                        onRateOrder()
+                        val existingVendorRating = vendorRatingList.find { it.vendorName == vendorName }
+                        if (vendorRatingObj != null) {
+                            vendorRatingList.remove(existingVendorRating)
+                        }
+                        vendorRatingList.add(
+                            VendorRating(
+                                vendorId = items[0].vendorId,
+                                vendorName = vendorName,
+                                customerName = customerName,
+                                rating = vendorRating.toString(),
+                                comment = comment,
+                                orderID = orderId
+                            )
+                        )
+                        onRateOrder(OrderRatingSubmit(vendorRatingList[0], productRatingList))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    enabled = orderRating == null
                 ) {
-                    Text("Submit", color = Color.White)
+                    Text(if (orderRating == null) "Rate Order" else "Already Rated", color = Color.White)
                 }
 
                 Button(
@@ -357,7 +429,8 @@ fun RateOrderDialog(
 fun RatingBar(
     rating: Int,
     onRatingChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    disabled: Boolean = false
 ) {
     Row(modifier = modifier) {
         for (i in 1..5) {
@@ -368,7 +441,7 @@ fun RatingBar(
                 contentDescription = "Star $i",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { onRatingChange(i) },
+                    .clickable(enabled = !disabled) { onRatingChange(i) },
                 tint = Color(0xFFFFD700)
             )
         }

@@ -76,7 +76,6 @@ fun ProductDetailScreen(
                         productName = productDetail!!.productName,
                         rating = productDetail!!.rating.rate.toString(),
                         reviews = productDetail!!.rating.count.toString(),
-                        sold = "1.2k",
                         inStock = productDetail!!.quantity!! > 0,
                         description = productDetail!!.productDescription ?: ""
                     )

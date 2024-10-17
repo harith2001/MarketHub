@@ -7,6 +7,8 @@ import com.example.markethub.domain.models.CreateOrderResponse
 import com.example.markethub.domain.models.CreatePaymentResponse
 import com.example.markethub.domain.models.Order
 import com.example.markethub.domain.models.OrderBasic
+import com.example.markethub.domain.models.OrderRating
+import com.example.markethub.domain.models.OrderRatingSubmit
 import com.example.markethub.domain.models.Payment
 import com.example.markethub.domain.models.Product
 import com.example.markethub.domain.models.SignInResponse
@@ -65,4 +67,10 @@ interface ApiService {
 
     @GET("Payment/order/{orderId}")
     suspend fun getPaymentByOrderId(@Path("orderId") orderId: String): Response<Payment>
+
+    @POST("OrderRating/rate")
+    suspend fun rateOrder(@Body orderRating: OrderRatingSubmit): Response<Unit>
+
+    @GET("OrderRating/order/{orderId}")
+    suspend fun getOrderRatingByOrderId(@Path("orderId") orderId: String): Response<OrderRating>
 }

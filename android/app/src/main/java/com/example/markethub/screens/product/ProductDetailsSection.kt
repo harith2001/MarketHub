@@ -28,7 +28,6 @@ fun ProductDetailsSection(
     productName: String,
     rating: String,
     reviews: String,
-    sold: String,
     inStock: Boolean,
     description: String
 ) {
@@ -88,12 +87,6 @@ fun ProductDetailsSection(
 
             Text(
                 text = "$reviews Reviews",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-
-            Text(
-                text = "$sold Sold",
                 fontSize = 14.sp,
                 color = Color.Gray
             )

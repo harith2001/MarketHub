@@ -22,6 +22,7 @@ class ProductFilterViewModel @Inject constructor(
 
     fun getProductsByCategory(category: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             val response = productRepository.getProductsByCategory(category)
             if (response.isSuccessful) {
                 response.body()?.let {
@@ -34,6 +35,7 @@ class ProductFilterViewModel @Inject constructor(
 
     fun searchProducts(query: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             val response = productRepository.searchProducts(query)
             if (response.isSuccessful) {
                 response.body()?.let {
