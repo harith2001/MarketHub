@@ -19,6 +19,8 @@ namespace MarketHub.Models.Entities
 
         public string Comment { get; set; }
 
+        public string OrderID { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

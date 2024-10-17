@@ -27,6 +27,10 @@ namespace MarketHub.Repositories
         public async Task<List<VendorRating>> GetVendorRatingsByVendorNameAsync(string VendorName) =>
             await _vendorRating.Find(vendorRating => vendorRating.VendorName == VendorName).ToListAsync();
 
+        //get vendor ratings by order id
+        public async Task<List<VendorRating>> GetVendorRatingsByOrderIdAsync(string OrderID) =>
+            await _vendorRating.Find(vendorRating => vendorRating.OrderID == OrderID).ToListAsync();
+
         //get all vendor ratings
         public async Task<List<VendorRating>> GetAllVendorRatingsAsync() =>
             await _vendorRating.Find(vendorRating => true).ToListAsync();
