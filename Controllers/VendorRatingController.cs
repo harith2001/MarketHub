@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MarketHub.Repositories;
 using MarketHub.Models.Entities;
-using MarketHub.Models;
-using System.Threading.Tasks;
 
 namespace MarketHub.Controllers
 {

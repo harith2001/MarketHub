@@ -396,6 +396,46 @@ public class ProductController : ControllerBase
         }
     }
 
+    //update product status 
+    [HttpPatch("update-product-status/{productId}/{status}")]
+    public IActionResult UpdateProductStatus(String productId, bool status)
+    {
+        try
+        {
+            var existingProduct = _productCollection.Find(p => p.productId == productId).FirstOrDefault();
+
+            if (existingProduct == null)
+            {
+                return NotFound(new
+                {
+                    Message = $"Product with productId {productId} not found."
+                });
+            }
+
+            existingProduct.isActive = status;
+
+            //update the lastUpdate date
+            existingProduct.updatedDate = DateTime.Now;
+
+            //save updated details
+            _productCollection.ReplaceOne(p => p.productId == productId, existingProduct);
+
+            return Ok(new
+            {
+                Message = "Product status updated successfully",
+                Product = existingProduct
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error updating product status",
+                Error = ex.Message
+            });
+        }
+    }
+
     //update a product
     [HttpPatch("update-product/{productId}")]
     public IActionResult UpdateProduct(String productId , [FromBody] Product updatedProduct)

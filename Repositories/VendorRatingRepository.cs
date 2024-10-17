@@ -2,8 +2,6 @@ using MongoDB.Driver;
 using MarketHub.Models.Entities;
 using MarketHub.Models;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MarketHub.Repositories
 {
