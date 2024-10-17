@@ -3,6 +3,8 @@ package com.example.markethub.data.network
 import com.example.markethub.data.models.ChangePasswordRequest
 import com.example.markethub.data.models.SignInRequest
 import com.example.markethub.data.models.SignUpRequest
+import com.example.markethub.domain.models.Order
+import com.example.markethub.domain.models.OrderBasic
 import com.example.markethub.domain.models.Product
 import com.example.markethub.domain.models.SignInResponse
 import com.example.markethub.domain.models.SignUpResponse
@@ -38,4 +40,13 @@ interface ApiService {
 
     @GET("ProductReadView/by-product-id/{id}")
     suspend fun getProductById(@Path("id") id: String): Response<Product>
+
+    @POST("Order/create")
+    suspend fun createOrder(@Body order: OrderBasic): Response<Order>
+
+    @GET("Order/customer/{customerId}")
+    suspend fun getOrdersByCustomerId(@Path("customerId") customerId: String): Response<List<Order>>
+
+    @GET("Order/{orderId}")
+    suspend fun getOrderById(@Path("orderId") orderId: String): Response<Order>
 }

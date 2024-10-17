@@ -99,8 +99,12 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         }
 
         // Order Details Screen Route
-        composable("OrderDetails") {
-            OrderDetailsScreen()
+        composable(
+            route = "OrderDetails/{orderId}",
+            arguments = listOf(navArgument("orderId") { defaultValue = "0" })
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: "0"
+            OrderDetailsScreen(orderId = orderId)
         }
 
         // My Favorites Screen Route

@@ -21,45 +21,40 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
+import com.example.markethub.domain.models.Order
+import com.example.markethub.domain.models.OrderItem
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
-
-data class Order(
-    val orderId: String,
-    val orderDate: String,
-    val totalItems: Int,
-    val totalPrice: Double,
-    val status: String,
-    val items: List<OrderItem>
-)
-
-data class OrderItem(
-    val name: String,
-    val quantity: Int,
-    val price: Double,
-    val imageRes: Int
-)
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun OrdersScreen(
-    orders: List<Order> = sampleOrders()
+    orderViewModel: OrderViewModel = hiltViewModel()
 ) {
+    val orders by orderViewModel.orders.collectAsState()
+    val loading by orderViewModel.loading.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,10 +74,18 @@ fun OrdersScreen(
             )
         }
 
-        if (orders.isEmpty()) {
+        if (loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Primary)
+            }
+        } else if (orders.isEmpty()) {
             EmptyOrdersView()
         } else {
-            // Orders List
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -154,12 +157,15 @@ fun OrderCard(order: Order) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Order ID: ${order.orderId}",
+                    text = "Order ID: ${order.orderID}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
+                val parsedDate = OffsetDateTime.parse(order.orderDate)
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                val formattedDate = parsedDate.format(formatter)
                 Text(
-                    text = order.orderDate,
+                    text = formattedDate,
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -175,7 +181,7 @@ fun OrderCard(order: Order) {
                 StatusBadge(status = order.status)
 
                 Text(
-                    text = "$${"%.2f".format(order.totalPrice)}",
+                    text = "Rs.${"%.2f".format(order.totalPrice)}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Primary
@@ -193,7 +199,7 @@ fun OrderCard(order: Order) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
-                onClick = { navController.navigate("OrderDetails") },
+                onClick = { navController.navigate("OrderDetails/${order.orderID}") },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -236,8 +242,8 @@ fun OrderItemRow(item: OrderItem) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Image(
-            painter = painterResource(id = item.imageRes),
-            contentDescription = item.name,
+            painter = rememberAsyncImagePainter(model = "${BuildConfig.BASE_URL}Product/get-product-image/${item.productId}"),
+            contentDescription = item.productName,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -246,47 +252,19 @@ fun OrderItemRow(item: OrderItem) {
         )
 
         Column {
-            Text(text = item.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text = item.productName, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             Text(text = "Quantity: ${item.quantity}", color = Color.Gray, fontSize = 12.sp)
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "$${"%.2f".format(item.price)}",
+            text = "Rs.${"%.2f".format(item.price)}",
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
             color = Primary
         )
     }
-}
-
-@Composable
-fun sampleOrders(): List<Order> {
-    return listOf(
-        Order(
-            orderId = "123456",
-            orderDate = "25th Sep, 2024",
-            totalItems = 3,
-            totalPrice = 95.0,
-            status = "Delivered",
-            items = listOf(
-                OrderItem("Casual Shirt", 1, 30.0, R.drawable.ic_placeholder),
-                OrderItem("Jeans", 2, 65.0, R.drawable.ic_placeholder)
-            )
-        ),
-        Order(
-            orderId = "654321",
-            orderDate = "28th Sep, 2024",
-            totalItems = 2,
-            totalPrice = 55.0,
-            status = "Shipped",
-            items = listOf(
-                OrderItem("T-Shirt", 1, 25.0, R.drawable.ic_placeholder),
-                OrderItem("Sneakers", 1, 30.0, R.drawable.ic_placeholder)
-            )
-        )
-    )
 }
 
 @Preview(showBackground = true)

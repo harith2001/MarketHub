@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,6 +26,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,39 +38,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
 import com.example.markethub.components.ValidatedTextFieldComponent
+import com.example.markethub.domain.models.OrderItem
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
 
-class CartItem(
-    val id: Int,
-    val name: String,
-    val imageRes: Int,
-    val quantity: Int,
-    val price: Double
-)
-
 @Composable
 fun OrderDetailsScreen(
-    orderId: String = "123456",
-    orderDate: String = "25th Sep, 2024",
-    orderStatus: String = "Delivered",
-    vendorName: String = "Best Fashion Store",
-    totalPrice: String = "$95.00",
-    paymentMethod: String = "Cash on Delivery",
-    deliveryAddress: String = "123 Main Street, New York, USA",
-    items: List<CartItem> = sampleOrderItems()
+    orderId: String,
+    viewModel: OrderDetailsViewModel = hiltViewModel()
 ) {
+    val order by viewModel.order.collectAsState()
+    val vendor by viewModel.vendor.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(orderId) {
+        viewModel.fetchOrderDetails(orderId)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,43 +92,48 @@ fun OrderDetailsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OrderDetailsHeader(orderId, orderDate, orderStatus)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OrderSummarySection(totalPrice, paymentMethod, deliveryAddress, vendorName)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Items", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(items.size) { index ->
-                OrderItemCard(items[index])
+        if (order != null) {
+            OrderDetailsHeader(orderId, order!!.orderDate, order!!.status)
+            Spacer(modifier = Modifier.height(16.dp))
+            OrderSummarySection(
+                totalPrice = "$${order!!.totalPrice}",
+                paymentMethod = "Cash on Delivery",
+                deliveryAddress = order!!.shippingAddress,
+                vendorName = vendor?.vendorName ?: ""
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Items", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(order!!.items.size) { index ->
+                    OrderItemCard(order!!.items[index])
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (orderStatus == "Delivered") {
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = Primary)
-            ) {
-                Text(text = "Rate Your Order", fontSize = 16.sp, color = Color.White)
+            if (order!!.status == "Delivered") {
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                ) {
+                    Text(text = "Rate Your Order", fontSize = 16.sp, color = Color.White)
+                }
             }
+        } else if (errorMessage != null) {
+            Text(text = errorMessage!!, color = Color.Red)
         }
     }
 
     if (showDialog) {
         RateOrderDialog(
-            items = items,
-            vendorName = vendorName,
+            items = order?.items ?: emptyList(),
+            vendorName = vendor?.vendorName ?: "",
             onDismiss = { showDialog = false },
-            onRateOrder = { /* Submit rating logic */ showDialog = false }
+            onRateOrder = { showDialog = false }
         )
     }
 }
@@ -200,7 +202,7 @@ fun OrderSummarySection(
 }
 
 @Composable
-fun OrderItemCard(item: CartItem) {
+fun OrderItemCard(item: OrderItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -209,8 +211,8 @@ fun OrderItemCard(item: CartItem) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = item.imageRes),
-            contentDescription = item.name,
+            painter = rememberAsyncImagePainter(model = "${BuildConfig.BASE_URL}Product/get-product-image/${item.productId}"),
+            contentDescription = item.productName,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -221,7 +223,7 @@ fun OrderItemCard(item: CartItem) {
         Spacer(modifier = Modifier.width(16.dp))
 
         Column {
-            Text(item.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(item.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text("Quantity: ${item.quantity}", fontSize = 14.sp, color = Color.Gray)
         }
 
@@ -238,7 +240,7 @@ fun OrderItemCard(item: CartItem) {
 
 @Composable
 fun RateOrderDialog(
-    items: List<CartItem>,
+    items: List<OrderItem>,
     vendorName: String,
     onDismiss: () -> Unit,
     onRateOrder: () -> Unit
@@ -278,8 +280,8 @@ fun RateOrderDialog(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = item.imageRes),
-                            contentDescription = item.name,
+                            painter = rememberAsyncImagePainter(model = "${BuildConfig.BASE_URL}Product/get-product-image/${item.productId}"),
+                            contentDescription = item.productName,
                             modifier = Modifier
                                 .size(60.dp)
                                 .clip(RoundedCornerShape(8.dp))
@@ -292,7 +294,7 @@ fun RateOrderDialog(
                         Column(
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text(item.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                            Text(item.productName, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                             Spacer(modifier = Modifier.height(4.dp))
 
                             RatingBar(rating = itemRating, onRatingChange = { itemRating = it })
@@ -372,44 +374,10 @@ fun RatingBar(
     }
 }
 
-
-fun sampleOrderItems(): List<CartItem> {
-    return listOf(
-        CartItem(
-            id = 1,
-            name = "Casual Shirt",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 30.0
-        ),
-        CartItem(
-            id = 2,
-            name = "Jeans",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 2,
-            price = 65.0
-        ),
-        CartItem(
-            id = 3,
-            name = "Sneakers",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 50.0
-        ),
-        CartItem(
-            id = 4,
-            name = "Sunglasses",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 25.0
-        )
-    )
-}
-
 @Preview
 @Composable
 fun OrderDetailsScreenPreview() {
     PreviewWrapper {
-        OrderDetailsScreen()
+        OrderDetailsScreen(orderId = "0")
     }
 }

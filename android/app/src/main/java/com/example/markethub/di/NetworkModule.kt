@@ -5,6 +5,7 @@ import com.example.markethub.BuildConfig
 import com.example.markethub.data.network.ApiService
 import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.repository.AuthRepository
+import com.example.markethub.domain.repository.OrderRepository
 import com.example.markethub.domain.repository.ProductRepository
 import com.example.markethub.domain.repository.UserRepository
 import dagger.Module
@@ -21,7 +22,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BASIC
+        level = HttpLoggingInterceptor.Level.BODY
     }
 
     @Provides
@@ -71,5 +72,11 @@ object NetworkModule {
     @Singleton
     fun provideUserRepository(apiService: ApiService): UserRepository {
         return UserRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOrderRepository(apiService: ApiService): OrderRepository {
+        return OrderRepository(apiService)
     }
 }
