@@ -18,7 +18,7 @@ class ProductDetailViewModel @Inject constructor(
     private val _productDetail = MutableStateFlow<Product?>(null)
     val productDetail: StateFlow<Product?> = _productDetail
 
-    fun fetchProductById(productId: Int) {
+    fun fetchProductById(productId: String) {
         viewModelScope.launch {
             val response = productRepository.getProductById(productId)
             if (response.isSuccessful) {

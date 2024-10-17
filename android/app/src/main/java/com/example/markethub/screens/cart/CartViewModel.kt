@@ -46,7 +46,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun updateQuantity(productId: Int, newQuantity: Int) {
+    fun updateQuantity(productId: String, newQuantity: Int) {
         viewModelScope.launch {
             val updatedCart = _cartItems.value.map {
                 if (it.id == productId) it.copy(quantity = newQuantity) else it
@@ -57,7 +57,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    fun removeItem(productId: Int) {
+    fun removeItem(productId: String) {
         viewModelScope.launch {
             val updatedCart = _cartItems.value.filter { it.id != productId }
 

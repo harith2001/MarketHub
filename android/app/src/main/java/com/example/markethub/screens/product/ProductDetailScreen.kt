@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,27 +21,15 @@ import com.example.markethub.screens.PreviewWrapper
 
 @Composable
 fun ProductDetailScreen(
-    productId: Int,
+    productId: String,
     viewModel: ProductDetailViewModel = hiltViewModel(),
 ) {
-    // Observe the product details state
-    val productDetail by viewModel.productDetail.collectAsState()
-
-    // Fetch product details when the screen is first loaded
-    LaunchedEffect(productId) {
-        viewModel.fetchProductById(productId)
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        if (productDetail == null) {
-            // Show a loading indicator while fetching the product details
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        } else {
-            // Show the product details once loaded
+    if (productId == "0") {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -49,26 +38,56 @@ fun ProductDetailScreen(
                 // Header Section
                 ProductDetailsHeaderSection()
 
-                // Image Section
-                ImageSection(images = listOf(productDetail!!.image))
+                // Not Found Section
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Product Not Found", color = Color.Gray)
+                }
+            }
+        }
+    } else {
+        val productDetail by viewModel.productDetail.collectAsState()
 
-                // Product Details Section
-                ProductDetailsSection(
-                    vendorName = "MarketHub",
-                    productName = productDetail!!.title,
-                    rating = productDetail!!.rating.rate.toString(),
-                    reviews = productDetail!!.rating.count.toString(),
-                    sold = "1.2k",
-                    inStock = true,
-                    description = productDetail!!.description
+        LaunchedEffect(productId) {
+            viewModel.fetchProductById(productId)
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
+            if (productDetail == null) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp)
+                ) {
+                    ProductDetailsHeaderSection()
+
+                    ImageSection(images = listOf(productDetail!!.fullImageUrl ?: ""))
+
+                    ProductDetailsSection(
+                        vendorName = productDetail!!.vendor?.vendorName ?: "",
+                        productName = productDetail!!.productName,
+                        rating = productDetail!!.rating.rate.toString(),
+                        reviews = productDetail!!.rating.count.toString(),
+                        sold = "1.2k",
+                        inStock = productDetail!!.quantity!! > 0,
+                        description = productDetail!!.productDescription ?: ""
+                    )
+                }
+
+                BottomPriceSection(
+                    price = "Rs.${productDetail!!.price}",
+                    product = productDetail!!,
+                    modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
-
-            BottomPriceSection(
-                price = "$${productDetail!!.price}",
-                product = productDetail!!,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
         }
     }
 }
@@ -77,6 +96,6 @@ fun ProductDetailScreen(
 @Composable
 fun ProductDetailScreenPreview() {
     PreviewWrapper {
-        ProductDetailScreen(productId = 1) // Use a sample product ID for preview
+        ProductDetailScreen(productId = "0")
     }
 }

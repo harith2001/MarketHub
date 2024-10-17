@@ -112,9 +112,9 @@ fun BottomPriceSection(
                 Button(
                     onClick = {
                         val item = CartItem(
-                            id = product.id,
-                            name = product.title,
-                            imageUrl = product.image,
+                            id = product.productId,
+                            name = product.productName,
+                            imageUrl = product.fullImageUrl ?: "",
                             quantity = quantity,
                             price = product.price
                         )

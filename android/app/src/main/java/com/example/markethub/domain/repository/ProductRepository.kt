@@ -26,7 +26,7 @@ class ProductRepository @Inject constructor(
         return apiService.getProducts()
     }
 
-    suspend fun getProductById(id: Int): Response<Product> {
+    suspend fun getProductById(id: String): Response<Product> {
         return apiService.getProductById(id)
     }
 }

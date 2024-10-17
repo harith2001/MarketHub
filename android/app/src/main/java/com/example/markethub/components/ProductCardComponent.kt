@@ -25,18 +25,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun ProductCard(
-    productId: Int,
+    productId: String,
     image: String,
     category: String,
     name: String,

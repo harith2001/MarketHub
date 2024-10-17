@@ -84,7 +84,7 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
             route = "ProductDetailScreen/{productId}",
             arguments = listOf(navArgument("productId") { defaultValue = "0" })
         ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull() ?: 0
+            val productId = backStackEntry.arguments?.getString("productId") ?: "0"
             ProductDetailScreen(productId = productId)
         }
 

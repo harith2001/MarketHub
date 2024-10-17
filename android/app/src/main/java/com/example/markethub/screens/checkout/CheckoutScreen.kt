@@ -129,7 +129,7 @@ fun CheckoutScreen(
                 Column {
                     Text(text = "Total Price", color = Color.Gray, fontSize = 14.sp)
                     Text(
-                        text = "$${"%.2f".format(totalPrice)}",
+                        text = "Rs.${"%.2f".format(totalPrice)}",
                         fontSize = 24.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         color = Primary

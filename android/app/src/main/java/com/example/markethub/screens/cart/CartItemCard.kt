@@ -66,7 +66,7 @@ fun CartItemCard(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "$${"%.2f".format(cartItem.price)}",
+                text = "Rs.${"%.2f".format(cartItem.price)}",
                 fontSize = 14.sp,
                 color = Primary,
                 fontWeight = FontWeight.SemiBold,

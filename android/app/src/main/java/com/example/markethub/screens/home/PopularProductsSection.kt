@@ -44,13 +44,13 @@ fun PopularProductsSection(
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             items(products) { product ->
                 ProductCard(
-                    productId = product.id,
-                    image = product.image,
-                    category = formatCategory(product.category),
-                    name = truncateText(product.title, maxLength = 20),
+                    productId = product.productId,
+                    image = product.fullImageUrl ?: "",
+                    category = formatCategory(product.productType),
+                    name = truncateText(product.productName, maxLength = 20),
                     rating = product.rating.rate.toString(),
                     reviews = product.rating.count.toString(),
-                    price = "$${product.price}",
+                    price = "Rs.${product.price}",
                     onFavoriteClick = { /* Handle favorite click */ }
                 )
             }

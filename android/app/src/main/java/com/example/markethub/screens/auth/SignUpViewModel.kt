@@ -22,7 +22,7 @@ class SignUpViewModel @Inject constructor(
 
     fun signUp(name: String, email: String, password: String, role: String) {
         viewModelScope.launch {
-            val signUpRequest = SignUpRequest(name, email, password, role, true)
+            val signUpRequest = SignUpRequest(name, email, password, role, false)
             _signUpResponse.value = authRepository.signUp(signUpRequest)
         }
     }

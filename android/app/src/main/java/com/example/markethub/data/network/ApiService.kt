@@ -33,9 +33,9 @@ interface ApiService {
     @PUT("User/customer/password/{id}")
     suspend fun changePassword(@Path("id") id: String, @Body changePasswordRequest: ChangePasswordRequest): Response<Unit>
 
-    @GET("products")
+    @GET("ProductReadView")
     suspend fun getProducts(): Response<List<Product>>
 
-    @GET("products/{id}")
-    suspend fun getProductById(@Path("id") id: Int): Response<Product>
+    @GET("ProductReadView/by-product-id/{id}")
+    suspend fun getProductById(@Path("id") id: String): Response<Product>
 }

@@ -71,7 +71,7 @@ fun ProductsViewScreen(
         ) {
             items(products.size) { index ->
                 ProductCard(
-                    productId = index,
+                    productId = index.toString(),
                     image = products[index].imageRes,
                     category = products[index].category,
                     name = products[index].name,

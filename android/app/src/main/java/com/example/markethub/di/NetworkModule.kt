@@ -1,7 +1,7 @@
 package com.example.markethub.di
 
 import android.app.Application
-import android.content.Context
+import com.example.markethub.BuildConfig
 import com.example.markethub.data.network.ApiService
 import com.example.markethub.data.network.PersistentCookieJar
 import com.example.markethub.domain.repository.AuthRepository
@@ -43,7 +43,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:5003/api/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
