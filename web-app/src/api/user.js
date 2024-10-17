@@ -59,12 +59,12 @@ export const updateUser = async (userId, data) => {
 
 // Update user by status
 export const updateUserStatus = async (userId, isActive) => {
+  const status = isActive ? 'true' : 'false';
   try {
-    const response = await axios.put(`${API_URL}/status/${userId}/${isActive}`, null, {
-      headers: {
-        'Content-Type': 'application/json', // Ensure proper content type
-      },
-    });
+    const response = await axios.put(`${API_URL}/status/${userId}/${status}`,
+      {},
+      { withCredentials: true }
+    );
     return response.data;
   } catch (error) {
     console.error('Error updating user status:', error);

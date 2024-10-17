@@ -5,10 +5,10 @@ import { addNewProduct, updateProduct } from "../../api/product";
 const ProductForm = ({ onSave, editingProduct }) => {
   const [productId, setProductId] = useState("");
   const [productName, setProductName] = useState("");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
+  const [productType, setProductType] = useState("");
+  const [productDescription, setProductDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [lowerMargin, setLowerMargin] = useState("");
   const [status, setStatus] = useState(true);
   const [productImage, setProductImage] = useState(null); 
@@ -17,20 +17,20 @@ const ProductForm = ({ onSave, editingProduct }) => {
     if (editingProduct) {
       setProductId(editingProduct.productId); // Use productId from editingProduct
       setProductName(editingProduct.productName); // Use productName from editingProduct
-      setCategory(editingProduct.category); // Use category from editingProduct
-      setDescription(editingProduct.productDescription); // Use description from editingProduct
+      setProductType(editingProduct.category); // Use category from editingProduct
+      setProductDescription(editingProduct.productDescription); // Use description from editingProduct
       setPrice(editingProduct.price); // Use price from editingProduct
-      setStock(editingProduct.quantity); // Use stock from editingProduct
+      setQuantity(editingProduct.quantity); // Use stock from editingProduct
       setLowerMargin(editingProduct.lowerMargin);
       setStatus(editingProduct.isActive); // Use status from editingProduct
     } else {
       // Reset fields if no product is being edited
       setProductId("");
       setProductName("");
-      setCategory("");
-      setDescription("");
+      setProductType("");
+      setProductDescription("");
       setPrice("");
-      setStock("");
+      setQuantity("");
       setLowerMargin("");
       setStatus(true);
       setProductImage(null);
@@ -48,10 +48,10 @@ const ProductForm = ({ onSave, editingProduct }) => {
     const formData = new FormData();
     formData.append("id", productId);
     formData.append("name", productName);
-    formData.append("category", category);
-    formData.append("description", description);
+    formData.append("category", productType);
+    formData.append("description", productDescription);
     formData.append("price", price);
-    formData.append("stock", stock);
+    formData.append("stock", quantity);
     formData.append("lowerMargin", lowerMargin);
     formData.append("status", status ? 'Active' : 'Inactive');
     formData.append("productImage", productImage); 
@@ -104,8 +104,8 @@ const ProductForm = ({ onSave, editingProduct }) => {
               <div className="position-relative">
                 <Form.Control
                   as="select"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
                   required
                 >
                   <option value="">Select Category</option>
@@ -155,8 +155,8 @@ const ProductForm = ({ onSave, editingProduct }) => {
                 as="textarea"
                 rows={3}
                 placeholder="Enter product description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value)}
                 required
               />
             </Form.Group>
@@ -165,8 +165,8 @@ const ProductForm = ({ onSave, editingProduct }) => {
               <Form.Control
                 type="number"
                 placeholder="Enter stock quantity"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
                 required
               />
             </Form.Group>

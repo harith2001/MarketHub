@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { Carousel, Form, Button, Card, Row, Col, Container } from 'react-bootstrap';
 import { loginUser, getUserByEmail } from '../api/user';
 import { useUser } from '../UserContext';
+import Cookies from 'js-cookie';
 
-const FirstPage = ({ setUserRole, setVendorId }) => {
-  const { setUser } = useUser();
+const FirstPage = ({ setUserRole }) => {
+  const { setUser, setVendorId } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); 
@@ -25,7 +26,8 @@ const FirstPage = ({ setUserRole, setVendorId }) => {
 
       const userRole = user?.role; 
       const vendorID = user?.user_ID;
-        setUserRole(userRole);
+      setUserRole(userRole);
+      Cookies.set("Role", userRole);
         console.log("user role: ", userRole)
         
         if (userRole === "Admin") {

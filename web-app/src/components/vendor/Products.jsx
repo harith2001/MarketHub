@@ -4,9 +4,11 @@ import ProductForm from "./ProductForm";
 import Header from "../Header";
 import { getProductByVendorId, deleteProduct, updateProduct } from "../../api/product";
 import { useSearch } from "../../SearchContext";
+import { useUser } from "../../UserContext";
 
-const Products = ({ vendorId }) => {
+const Products = ({}) => {
   const { searchTerm } = useSearch();
+  const { vendorId } = useUser();
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showToast, setShowToast] = useState(false);

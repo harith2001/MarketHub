@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Table, Button } from 'react-bootstrap';
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Title } from 'chart.js';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Tooltip, Title } from 'chart.js';
 import Header from '../../components/Header';
 import { getAllOrders } from '../../api/order';
 import { getAllActiveProducts } from '../../api/product';
 import { useSearch } from '../../SearchContext';
+import { useUser } from '../../UserContext';
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Title);
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement, BarElement, Tooltip, Title);
 
-const VendorDashhboard = ({ vendorId }) => {
+const VendorDashhboard = ({ }) => {
   const { searchTerm } = useSearch();
+  const { vendorId } = useUser();
   const [totalProducts, setTotalProducts] = useState(0); // Example data
   const [pendingOrders, setPendingOrders] = useState(0);
   const [completedOrders, setCompletedOrders] = useState(0);
@@ -29,17 +31,17 @@ const VendorDashhboard = ({ vendorId }) => {
     try {
       const orders = await getAllOrders(); // Fetch all orders
       const products = await getAllActiveProducts(); // fetch all products
-
+      
       const vendorOrders = orders.filter(order =>
         order.items.some(item => item.vendorId === vendorId)
       );
       const vendorProducts = products.filter(product => product.vendorId === vendorId);
 
       // Calculate the totals for cards
-      const pending = vendorOrders.filter(order => order.status === 'Pending').length;
-      const completed = vendorOrders.filter(order => order.status === 'Completed').length;
+      const pending = vendorOrders.filter(order => order.status === 'Processing').length;
+      const completed = vendorOrders.filter(order => order.status === 'Delivered').length;
       const totalRevenue = vendorOrders
-        .filter(order => order.status === 'Completed')
+        .filter(order => order.status === 'Delivered')
         .reduce((acc, order) => acc + order.totalPrice, 0);
 
       setPendingOrders(pending);
@@ -132,10 +134,10 @@ const VendorDashhboard = ({ vendorId }) => {
         callbacks: {
           label: function (tooltipItem) {
             const total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
-            const currentValue = tooltipItem.raw;
+            const currentValue = tooltipItem.raw.toFixed(2);
             const percentage = ((currentValue / total) * 100).toFixed(2); // Calculate percentage
             const label = tooltipItem.label || '';
-            return `${label}: ${percentage}% (${currentValue}$)`;
+            return `${label}: ${percentage}% (${currentValue})`;
           },
         },
       },
@@ -166,7 +168,7 @@ const VendorDashhboard = ({ vendorId }) => {
           borderRadius: "20px",
           width: "100px",
         };
-      case "Pending":
+      case "Processing":
         return {
           backgroundColor: "#fff3cd",
           color: "#856404",
@@ -174,7 +176,15 @@ const VendorDashhboard = ({ vendorId }) => {
           borderRadius: "20px",
           width: "120px",
         };
-      case "Confirmed":
+      case "Partially":
+        return {
+          backgroundColor: "#e5d1f1",
+          color: "#7a18b5",
+          border: "none",
+          borderRadius: "20px",
+          width: "120px",
+        };
+      case "Shipped":
         return {
           backgroundColor: "#d1ecf1",
           color: "#0c5460",

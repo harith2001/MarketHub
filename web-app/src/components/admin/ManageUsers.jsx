@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge, Container, Tab, Tabs, Toast, ToastContainer } from 'react-bootstrap';
+import { Table, Button, Badge, Container, Tab, Tabs, Toast, ToastContainer, Modal } from 'react-bootstrap';
 import Header from '../../components/Header';
 import { getUsers, updateUserStatus, deleteUser } from '../../api/user';
 import { useSearch } from '../../SearchContext';
@@ -14,6 +14,9 @@ const ManageUsers = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [showModal, setShowModal] = useState(false);
+  const [currentAction, setCurrentAction] = useState(null); // Action to perform
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // Fetch all users and separate Vendors and CSRs and Customers
   useEffect(() => {
@@ -37,54 +40,46 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
-  const handleDeactivate = async (userId) => {
-    try {
-      console.log("deactivating user:", userId);
-      await updateUserStatus(userId, "false"); // Call the function to deactivate
-      const updatedUsers = users.map(user =>
-        user.user_ID === userId ? { ...user, isActive: "false" } : user
-      );
-      setUsers(updatedUsers);
-
-      // toast messages
-      setToastMessage('User deactivated successfully!');
-      setToastType('success');
-      setShowToast(true);
-    } catch (error) {
-      console.error('Failed to deactivate user:', error);
-    }
+   const handleShowModal = (action, userId) => {
+    setCurrentAction(action);
+    setSelectedUserId(userId);
+    setShowModal(true);
   };
 
-  const handleActivate = async (userId) => {
-    try {
-      console.log("Activating user:", userId);
-      await updateUserStatus(userId, "true"); // Call the function to activate
-      const updatedUsers = users.map(user =>
-        user.user_ID === userId ? { ...user, isActive: "true" } : user
-      );
-      setUsers(updatedUsers);
-
-      // toast messages
-      setToastMessage('User activated successfully!');
-      setToastType('success');
-      setShowToast(true);
-    } catch (error) {
-      console.error('Failed to activate user:', error);
-    }
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setCurrentAction(null);
+    setSelectedUserId(null);
   };
 
-  const handleRemove = async (userId) => {
+  const confirmAction = async () => {
     try {
-      await deleteUser(userId); // Call the function to delete the user
-      const updatedUsers = users.filter(user => user.user_ID !== userId);
-      setUsers(updatedUsers); // Update the local state to remove the user
-
-      // toast message
-      setToastMessage('User removed successfully!');
+      if (currentAction === 'deactivate') {
+        await updateUserStatus(selectedUserId, false);
+        const updatedUsers = users.map(user =>
+          user.user_ID === selectedUserId ? { ...user, isActive: false } : user
+        );
+        setUsers(updatedUsers);
+        setToastMessage('User deactivated successfully!');
+      } else if (currentAction === 'activate') {
+        await updateUserStatus(selectedUserId, true);
+        const updatedUsers = users.map(user =>
+          user.user_ID === selectedUserId ? { ...user, isActive: true } : user
+        );
+        setUsers(updatedUsers);
+        setToastMessage('User activated successfully!');
+      } else if (currentAction === 'remove') {
+        await deleteUser(selectedUserId);
+        const updatedUsers = users.filter(user => user.user_ID !== selectedUserId);
+        setUsers(updatedUsers);
+        setToastMessage('User removed successfully!');
+      }
       setToastType('success');
       setShowToast(true);
     } catch (error) {
-      console.error('Failed to remove user:', error);
+      console.error('Failed to perform action:', error);
+    } finally {
+      handleCloseModal();
     }
   };
 
@@ -147,26 +142,24 @@ const ManageUsers = () => {
                       {user.isActive ? (
                         <Button
                           className="me-2 btn-warning"
-                          style={{ width: "100px"}}
-                          onClick={() => handleDeactivate(user.user_ID)}
-                          
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('deactivate', user.user_ID)}
                         >
                           Deactivate
                         </Button>
                       ) : (
                         <Button
-                            className="me-2 btn-success"
-                            style={{ width: "100px"}}
-                          onClick={() => handleActivate(user.user_ID)}
-                          
+                          className="me-2 btn-success"
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('activate', user.user_ID)}
                         >
                           Activate
                         </Button>
                       )}
                       <Button
                         className="btn-danger"
-                        style={{ width: "100px"}}
-                        onClick={() => handleRemove(user.user_ID)}
+                        style={{ width: "100px" }}
+                        onClick={() => handleShowModal('remove', user.user_ID)}
                       >
                         Remove
                       </Button>
@@ -206,27 +199,27 @@ const ManageUsers = () => {
                       )}
                     </td>
                     <td>
-                      {user.status === 'Active' ? (
+                      {user.isActive ? (
                         <Button
                           className="me-2 btn-warning"
-                          style={{ width: "100px"}}
-                          onClick={() => handleDeactivate(user.id)}
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('deactivate', user.user_ID)}
                         >
                           Deactivate
                         </Button>
                       ) : (
                         <Button
-                            className="me-2 btn-success"
-                            style={{ width: "100px"}}
-                          onClick={() => handleActivate(user.id)}
+                          className="me-2 btn-success"
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('activate', user.user_ID)}
                         >
                           Activate
                         </Button>
                       )}
                       <Button
                         className="btn-danger"
-                        style={{ width: "100px"}}
-                        onClick={() => handleRemove(user.id)}
+                        style={{ width: "100px" }}
+                        onClick={() => handleShowModal('remove', user.user_ID)}
                       >
                         Remove
                       </Button>
@@ -266,27 +259,27 @@ const ManageUsers = () => {
                       )}
                     </td>
                     <td>
-                      {user.status === 'Active' ? (
+                      {user.isActive ? (
                         <Button
                           className="me-2 btn-warning"
-                          style={{ width: "100px"}}
-                          onClick={() => handleDeactivate(user.id)}
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('deactivate', user.user_ID)}
                         >
                           Deactivate
                         </Button>
                       ) : (
                         <Button
-                            className="me-2 btn-success"
-                            style={{ width: "100px"}}
-                          onClick={() => handleActivate(user.id)}
+                          className="me-2 btn-success"
+                          style={{ width: "100px" }}
+                          onClick={() => handleShowModal('activate', user.user_ID)}
                         >
                           Activate
                         </Button>
                       )}
                       <Button
                         className="btn-danger"
-                        style={{ width: "100px"}}
-                        onClick={() => handleRemove(user.id)}
+                        style={{ width: "100px" }}
+                        onClick={() => handleShowModal('remove', user.user_ID)}
                       >
                         Remove
                       </Button>
@@ -308,6 +301,28 @@ const ManageUsers = () => {
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
       </ToastContainer>
+
+      {/* Confirmation Modal */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>{currentAction === 'remove' ? 'Confirm Removal' : 'Confirm Action'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {currentAction === 'remove' ? (
+            <p>Are you sure you want to remove this user?</p>
+          ) : (
+            <p>Are you sure you want to {currentAction} this user?</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-primary" onClick={handleCloseModal}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={confirmAction}>
+            {currentAction === 'remove' ? 'Remove' : currentAction === 'deactivate' ? 'Deactivate' : 'Activate'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

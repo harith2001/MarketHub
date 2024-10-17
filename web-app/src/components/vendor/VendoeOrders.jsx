@@ -3,9 +3,11 @@ import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button, Toast, ToastCon
 import Header from '../Header';
 import { getAllOrders, updateOrderStatus } from '../../api/order';
 import { useSearch } from '../../SearchContext';
+import { useUser } from '../../UserContext';
 
-const VendorOrders = ({ vendorId }) => {
+const VendorOrders = ({ }) => {
   const { searchTerm } = useSearch();
+  const { vendorId } = useUser();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -28,6 +30,9 @@ const VendorOrders = ({ vendorId }) => {
     fetchOrders();
   }, []);
 
+  console.log("vendor Id: ", vendorId)
+  console.log("fetched orders: ", orders)
+
   // get orders by vendorId
   useEffect(() => {
     const vendorSpecificOrders = orders
@@ -41,6 +46,7 @@ const VendorOrders = ({ vendorId }) => {
     setFilteredOrders(vendorSpecificOrders);
   }, [orders, vendorId]);
 
+  console.log("filtered orders: ", filteredOrders)
   // Apply search filter based on search term
   useEffect(() => {
     const searchResults = orders.filter(order =>
@@ -59,6 +65,8 @@ const VendorOrders = ({ vendorId }) => {
     setFilteredOrders(vendorSpecificFilteredOrders);
   }, [searchTerm, orders, vendorId]);
 
+  console.log("filtered orders: ", filteredOrders)
+  
   // handle order status change
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -169,18 +177,18 @@ const VendorOrders = ({ vendorId }) => {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Processing')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Processing')}>
                         Processing
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Shipped')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Shipped')}>
                         Shipped
                       </Dropdown.Item>
                       {order.isMultiVendor && (
-                        <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Partially')}>
+                        <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Partially')}>
                           Partially Delivered
                         </Dropdown.Item>
                       )}
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Delivered')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Delivered')}>
                         Delivered
                       </Dropdown.Item>
                     </Dropdown.Menu>

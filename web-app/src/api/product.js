@@ -68,6 +68,17 @@ export const updateProduct = async (productId, data) => {
   }
 };
 
+// Update product status
+export const updateProductStatus = async (productId, status) => {
+  try {
+    const response = await axios.patch(`${API_URL}/update-product-status/${productId}/${status}`);
+    return response.data; // Return the updated product data if needed
+  } catch (error) {
+    console.error('Error updating product status:', error);
+    throw error;
+  }
+};
+
 // Delete product
 export const deleteProduct = async (productId) => {
   try {

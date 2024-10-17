@@ -23,6 +23,7 @@ const Orders = () => {
   const [showModal, setShowModal] = useState(false); 
   const [cancelledOrder, setCancelledOrder] = useState(null); 
   const [note, setNote] = useState(""); 
+  const DEFAULT_SHIPPING_COST  = 20.00;
 
   // Fetch all orders from API
   useEffect(() => {
@@ -42,8 +43,8 @@ const Orders = () => {
   // Sidebar Overview Data
   const overview = {
     todayOrders: orders.length,
-    pendingOrders: orders.filter((order) => order.status === "Pending").length,
-    deliveredOrders: orders.filter((order) => order.status === "Completed").length,
+    pendingOrders: orders.filter((order) => order.status === "Processing").length,
+    deliveredOrders: orders.filter((order) => order.status === "Completed" || order.status === "Delivered").length,
     cancelledOrders: orders.filter((order) => order.status === "Cancelled").length,
   };
 
@@ -57,6 +58,24 @@ const Orders = () => {
         orders.map((o) => (o.orderId === order.orderId ? { ...o, status: newStatus } : o))
       );
     }
+  };
+
+  // calculate total for each product
+  const calculateProductTotal = (quantity, price) => {
+    return quantity * price;
+  };
+
+  // calculate subtotal
+  const calculateSubtotal = (items) => {
+    return items.reduce((acc, product) => {
+      return acc + calculateProductTotal(product.quantity, product.price);
+    }, 0);
+  };
+
+  // calculate total order cost
+  const calculateOrderTotal = (items) => {
+    const subtotal = calculateSubtotal(items);
+    return subtotal + DEFAULT_SHIPPING_COST;
   };
 
   // Filter orders based on search term
@@ -101,7 +120,7 @@ const Orders = () => {
           borderRadius: "20px",
           width: "120px",
         };
-      case "Pending":
+      case "Processing":
         return {
           backgroundColor: "#fff3cd",
           color: "#856404",
@@ -117,6 +136,22 @@ const Orders = () => {
           borderRadius: "20px",
           width: "120px",
         };
+      case "Partially":
+        return {
+          backgroundColor: "#e5d1f1",
+          color: "#7a18b5",
+          border: "none",
+          borderRadius: "20px",
+          width: "120px",
+        }
+      case "Shipped":
+        return {
+          backgroundColor: "#d1ecf1",
+          color: "#0c5460",
+          border: "none",
+          borderRadius: "20px",
+          width: "120px",
+        }
       default:
         return {
           backgroundColor: "#f8f9fa",
@@ -137,8 +172,8 @@ const Orders = () => {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Created Time</th>
-              <th>Customer</th>
+              <th>Created Date</th>
+              <th>Customer ID</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -147,7 +182,7 @@ const Orders = () => {
               <React.Fragment key={order.orderID}>
                 <tr>
                   <td>{order.orderID}</td>
-                  <td>{order.createdTime}</td>
+                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                   <td>{order.customerId}</td>
                   <td>
                     <Dropdown>
@@ -203,7 +238,6 @@ const Orders = () => {
                             <th>Product ID</th>
                             <th>Product Name</th>
                             <th>Quantity</th>
-                            <th>Discount</th>
                             <th>Total</th>
                           </tr>
                         </thead>
@@ -213,37 +247,31 @@ const Orders = () => {
                               <td>
                                 <img
                                   src={product.image}
-                                  alt={product.name}
+                                  alt={product.productName}
                                   style={{ width: "50px" }}
                                 />
                               </td>
                               <td>{product.productId}</td>
                               <td>{product.productName}</td>
                               <td>{product.quantity}</td>
-                              <td>{product.discount}%</td>
-                              <td>${product.total}</td>
+                              <td>${product.price}</td>
                             </tr>
                           ))}
                           {/* Order Summary */}
                           <tr className="fw-bold">
-                            <td colSpan="4"></td>
+                            <td colSpan="3"></td>
                             <td>Subtotal</td>
-                            <td>${order.subtotal}</td>
+                            <td>${calculateSubtotal(order.items).toFixed(2)}</td>
                           </tr>
                           <tr className="fw-bold">
-                            <td colSpan="4"></td>
+                            <td colSpan="3"></td>
                             <td>Shipping</td>
-                            <td>${order.shipping}</td>
+                            <td>${DEFAULT_SHIPPING_COST.toFixed(2)}</td>
                           </tr>
                           <tr className="fw-bold">
-                            <td colSpan="4"></td>
-                            <td>Discount</td>
-                            <td>${order.discount}</td>
-                          </tr>
-                          <tr className="fw-bold">
-                            <td colSpan="4"></td>
+                            <td colSpan="3"></td>
                             <td>Total</td>
-                            <td>${order.totalPrice}</td>
+                            <td>${calculateOrderTotal(order.items).toFixed(2)}</td>
                           </tr>
                           {order.note && (
                             <tr>
