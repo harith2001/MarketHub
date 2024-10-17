@@ -116,7 +116,8 @@ fun BottomPriceSection(
                             name = product.productName,
                             imageUrl = product.fullImageUrl ?: "",
                             quantity = quantity,
-                            price = product.price
+                            price = product.price,
+                            vendorId = product.vendor?.vendorId ?: ""
                         )
                         cartViewModel.addItem(item)
                     },

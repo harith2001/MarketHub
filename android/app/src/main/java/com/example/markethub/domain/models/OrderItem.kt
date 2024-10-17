@@ -1,8 +1,10 @@
 package com.example.markethub.domain.models
 
 data class OrderItem(
-    val id: Int,
-    val name: String,
-    val image: Int,
+    val productId: String,
+    val vendorId: String,
+    val productName: String,
+    val productStatus: String = "Pending",
+    val quantity: Int,
     val price: Double,
 )
