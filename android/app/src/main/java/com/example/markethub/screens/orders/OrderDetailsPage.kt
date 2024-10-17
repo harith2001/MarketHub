@@ -130,8 +130,7 @@ fun OrderDetailsScreen(
                         .clip(RoundedCornerShape(8.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = Primary)
                 ) {
-                    Text(text = if (orderRating?.productRatings?.isEmpty() == true) "Rate Order" else "View Rating",
-                        fontSize = 16.sp, color = Color.White)
+                    Text(text = "Rate Order", fontSize = 16.sp, color = Color.White)
                 }
             }
         } else if (errorMessage != null) {
