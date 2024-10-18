@@ -31,19 +31,34 @@ builder.Services.AddSingleton<NotificationService>();
 // Add services to the container
 builder.Services.AddControllers();
 
+//enable CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:3000") // web app url
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); 
+    });
+});
+
 //login and cookie
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", config =>
     {
         config.Cookie.Name = "MarketHub.User.Login.Cookie";
+        config.Cookie.SecurePolicy = CookieSecurePolicy.None;
         config.LoginPath = "/api/User/login";
         config.AccessDeniedPath = "/api/User/accessdenied";
     });
 
 
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<OrderRepository>();
 builder.Services.AddSingleton<VendorRatingRepository>();
+builder.Services.AddSingleton<ProductRatingRepository>();
 builder.Services.AddSingleton<PaymentRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -52,6 +67,9 @@ var app = builder.Build();
 //swagger enable
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// CORS policy
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

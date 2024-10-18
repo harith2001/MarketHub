@@ -11,7 +11,7 @@ public class NotificationService
     }
 
     //create new notification
-    public void CreateNotification(string name , string title , string content , string type , string targetUserId)
+    public void CreateNotification(string name , string title , string content , string type , string targetUserId , string? orderId = null)
     {
         var notification = new Notification
         {
@@ -20,6 +20,7 @@ public class NotificationService
             Content = content,
             Type = type,
             TargetUserId = targetUserId,
+            OrderId = orderId,
             CreatedDate = DateTime.Now,
         };
 

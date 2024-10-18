@@ -3,8 +3,11 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { Carousel, Form, Button, Card, Row, Col, Container } from 'react-bootstrap';
 import { loginUser, getUserByEmail } from '../api/user';
+import { useUser } from '../UserContext';
+import Cookies from 'js-cookie';
 
 const FirstPage = ({ setUserRole }) => {
+  const { setUser, setVendorId } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); 
@@ -15,23 +18,27 @@ const FirstPage = ({ setUserRole }) => {
     try {
       const userData = { email, password };
       const response = await loginUser(userData);
-        console.log("Login Successful: ", response);
+      console.log("Login Successful: ", response);
         
-        const user = await getUserByEmail(email);
-        console.log("Fetched User: ", user);
+      const user = await getUserByEmail(email);
+      console.log("Fetched User: ", user);
+      setUser(user);
 
       const userRole = user?.role; 
-        setUserRole(userRole);
+      const vendorID = user?.user_ID;
+      setUserRole(userRole);
+      Cookies.set("Role", userRole);
         console.log("user role: ", userRole)
         
         if (userRole === "Admin") {
             navigate("/admin/dashboard");
         }
-        else if (userRole === "Admin") {
-            navigate("/admin/dashboard");
+        else if (userRole === "Vendor") {
+          setVendorId(vendorID);
+            navigate("/vendor/dashboard");
         }
-        else if (userRole === "Admin") {
-            navigate("/admin/dashboard");
+        else if (userRole === "CSR") {
+            navigate("/csr/dashboard");
         }
         else{
             setErrorMessage("Invalid user role");

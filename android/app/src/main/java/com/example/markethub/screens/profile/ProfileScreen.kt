@@ -1,9 +1,11 @@
 package com.example.markethub.screens.profile
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -29,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,18 +48,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.example.markethub.LocalNavController
 import com.example.markethub.R
 import com.example.markethub.components.PasswordField
 import com.example.markethub.components.ValidatedTextFieldComponent
 import com.example.markethub.extensions.isValidEmail
+import com.example.markethub.screens.auth.saveSignInState
 import com.example.markethub.ui.theme.Primary
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    val user by viewModel.user.collectAsStateWithLifecycle()
+    val updateStatus by viewModel.updateStatus.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+
+    var userName by remember { mutableStateOf("") }
+    var userEmail by remember { mutableStateOf("") }
+
+    var existingPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    // Populate fields when the user data is loaded
+    LaunchedEffect(user) {
+        user?.let {
+            userName = it.name
+            userEmail = it.email
+        }
+    }
+
+    LaunchedEffect(updateStatus) {
+        if (updateStatus == true) {
+            Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+            viewModel.resetUpdateStatus()
+        }
+    }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            viewModel.clearErrorMessage()
+        }
+    }
+
     var profilePictureUri by remember { mutableStateOf<Uri?>(null) }
     var profileBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         profilePictureUri = uri
         profileBitmap = uri?.let {
@@ -69,6 +110,8 @@ fun ProfileScreen() {
             }
         }
     }
+
+    val navController = LocalNavController.current
 
     Surface(
         modifier = Modifier
@@ -137,19 +180,19 @@ fun ProfileScreen() {
                     { input -> if (input.any { it.isDigit() }) "Name should not contain numbers" else null },
                     { input -> if (input.any { !it.isLetter() }) "Name should contain only letters" else null }
                 ),
-                value = "Yashodini Soysa",
-                onValueChange = {}
+                value = userName,
+                onValueChange = { userName = it }
             )
             ValidatedTextFieldComponent(
                 label = "Email",
                 isRequired = true,
                 validationRules = listOf { input -> if (!input.isValidEmail()) "Invalid email address format" else null },
-                value = "yashodini@gmail.com",
-                onValueChange = {}
+                value = userEmail,
+                onValueChange = { userEmail = it }
             )
 
             Button(
-                onClick = { /* Update Profile Logic */ },
+                onClick = { viewModel.updateUserProfile(user?.userId ?: "", userName, userEmail, user?.isActive ?: false) },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape
@@ -164,25 +207,25 @@ fun ProfileScreen() {
                 isRequired = true,
                 minLength = 6,
                 disableValidation = true,
-                value = "",
-                onValueChange = {}
+                value = existingPassword,
+                onValueChange = { existingPassword = it }
             )
             PasswordField(
                 label = "New Password",
                 isRequired = true,
                 minLength = 6,
-                value = "",
-                onValueChange = {}
+                value = newPassword,
+                onValueChange = { newPassword = it }
             )
             PasswordField(
                 label = "Confirm Password",
                 isRequired = true,
                 minLength = 6,
-                value = "",
-                onValueChange = {}
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it }
             )
             Button(
-                onClick = { /* Change Password Logic */ },
+                onClick = { viewModel.changePassword(user?.userId ?: "", existingPassword, newPassword, confirmPassword, context) },
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape
@@ -191,8 +234,17 @@ fun ProfileScreen() {
             }
 
             HorizontalDivider(thickness = 1.dp, color = Color.Gray.copy(alpha = 0.2f))
+            //logout button
             Button(
-                onClick = { /* Deactivate Account Logic */ },
+                onClick = { viewModel.signOut(navController, context) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = CircleShape
+            ) {
+                Text(text = "Logout", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+            Button(
+                onClick = { viewModel.deactivateAccount(user?.userId ?: "", userName, userEmail, navController, context) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = CircleShape

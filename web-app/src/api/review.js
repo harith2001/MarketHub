@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/Review'; 
+const API_URL = 'http://localhost:5003/api/Review'; 
 
 // create a new review
 export const createReview = async (reviewData) => {

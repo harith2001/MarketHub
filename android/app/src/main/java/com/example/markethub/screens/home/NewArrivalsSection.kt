@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.markethub.LocalNavController
 import com.example.markethub.components.ProductCard
 import com.example.markethub.ui.theme.Primary
 
@@ -25,6 +26,7 @@ fun NewArrivalsSection(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val newArrivals by viewModel.newArrivals.collectAsState()
+    val navController = LocalNavController.current
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -37,21 +39,20 @@ fun NewArrivalsSection(
                 text = "See more",
                 fontSize = 16.sp,
                 color = Primary,
-                modifier = Modifier.clickable { /* Navigate to see more products */ }
+                modifier = Modifier.clickable { navController.navigate("Products") }
             )
         }
 
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             items(newArrivals) { product ->
                 ProductCard(
-                    productId = product.id,
-                    image = product.image,
-                    category = formatCategory(product.category),
-                    name = truncateText(product.title, maxLength = 20),
+                    productId = product.productId,
+                    image = product.fullImageUrl ?: "",
+                    category = formatCategory(product.productType),
+                    name = truncateText(product.productName, maxLength = 20),
                     rating = product.rating.rate.toString(),
                     reviews = product.rating.count.toString(),
-                    price = "$${product.price}",
-                    onFavoriteClick = { /* Handle favorite click */ }
+                    price = "Rs.${product.price}"
                 )
             }
         }

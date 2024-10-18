@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.markethub.LocalNavController
 import com.example.markethub.ui.theme.Primary
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -92,11 +93,12 @@ fun CategorySlider() {
 
 @Composable
 fun CategoryCard(category: Category) {
+    val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .size(80.dp)
             .background(Color.White)
-            .clickable { /* Handle category click */ },
+            .clickable { navController.navigate("ProductFilter/${category.label}") },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

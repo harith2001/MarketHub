@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using MongoDB.Bson;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -330,7 +332,10 @@ public class ProductController : ControllerBase
     [FromForm] string productName,
     [FromForm] string productType,
     [FromForm] string vendorId,
-    [FromForm] int? quantity)
+    [FromForm] string productDescription,
+    [FromForm] int? lowerMargin,
+    [FromForm] int? quantity,
+    [FromForm] decimal price)
     {
         try
         {
@@ -353,10 +358,13 @@ public class ProductController : ControllerBase
                 productType = productType,
                 vendorId = vendorId,
                 quantity = quantity,
+                productDescription = productDescription,
+                lowerMargin = lowerMargin,
                 createdDate = DateTime.Now,
                 updatedDate = DateTime.Now,
                 isActive = true,
-                restockRequired = false
+                restockRequired = false,
+                price = price
             };
 
             // Handle the image if provided
@@ -383,6 +391,46 @@ public class ProductController : ControllerBase
             return StatusCode(500, new
             {
                 Message = "Error adding a new product",
+                Error = ex.Message
+            });
+        }
+    }
+
+    //update product status 
+    [HttpPatch("update-product-status/{productId}/{status}")]
+    public IActionResult UpdateProductStatus(String productId, bool status)
+    {
+        try
+        {
+            var existingProduct = _productCollection.Find(p => p.productId == productId).FirstOrDefault();
+
+            if (existingProduct == null)
+            {
+                return NotFound(new
+                {
+                    Message = $"Product with productId {productId} not found."
+                });
+            }
+
+            existingProduct.isActive = status;
+
+            //update the lastUpdate date
+            existingProduct.updatedDate = DateTime.Now;
+
+            //save updated details
+            _productCollection.ReplaceOne(p => p.productId == productId, existingProduct);
+
+            return Ok(new
+            {
+                Message = "Product status updated successfully",
+                Product = existingProduct
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error updating product status",
                 Error = ex.Message
             });
         }
@@ -438,6 +486,11 @@ public class ProductController : ControllerBase
                 {
                     existingProduct.restockRequired = false;
                 }
+            }
+
+            if (updatedProduct.price != 0) 
+            {
+                existingProduct.price = updatedProduct.price;
             }
 
             //update the lastUpdate date
@@ -502,5 +555,57 @@ public class ProductController : ControllerBase
             }
         }
     }
+
+    //search a product
+    [HttpGet("search-products")]
+    public IActionResult SearchProducts([FromQuery] string? productId, [FromQuery] string? productName, [FromQuery] string? productType, [FromQuery] string? vendorId)
+    {
+        try
+        {
+            var filterBuilder = Builders<Product>.Filter;
+            var filter = filterBuilder.Empty;
+
+            if (!string.IsNullOrEmpty(productId))
+            {
+                filter &= filterBuilder.Eq(p => p.productId, productId);
+            }
+
+            if (!string.IsNullOrEmpty(productName))
+            {
+                filter &= filterBuilder.Regex(p => p.productName, new BsonRegularExpression(productName, "i"));
+            }
+
+            if (!string.IsNullOrEmpty(productType))
+            {
+                filter &= filterBuilder.Eq(p => p.productType, productType);
+            }
+
+            if (!string.IsNullOrEmpty(vendorId))
+            {
+                filter &= filterBuilder.Eq(p => p.vendorId, vendorId);
+            }
+
+            var products = _productCollection.Find(filter).ToList();
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new
+                {
+                    Message = "No products found matching the search criteria."
+                });
+            }
+
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                Message = "Error searching for products",
+                Error = ex.Message
+            });
+        }
+    }
+
 
 }

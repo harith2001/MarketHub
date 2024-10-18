@@ -40,7 +40,10 @@ fun SplashScreen(navController: NavHostController, context: MainActivity) {
         )
         delay(3000)
 
-        if (onBoardingIsFinished(context = context)) {
+        if (isAlreadyLoggedIn(context = context)) {
+            navController.popBackStack()
+            navController.navigate("Home")
+        } else if (onBoardingIsFinished(context = context)) {
             navController.popBackStack()
             navController.navigate("SignIn")
         } else {
@@ -77,4 +80,9 @@ fun LoaderAnimation(modifier: Modifier, anim: Int) {
 private fun onBoardingIsFinished(context: MainActivity): Boolean {
     val sharedPreferences = context.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
     return sharedPreferences.getBoolean("isFinished", false)
+}
+
+private fun isAlreadyLoggedIn(context: MainActivity): Boolean {
+    val sharedPreferences = context.getSharedPreferences("userSession", Context.MODE_PRIVATE)
+    return sharedPreferences.getBoolean("isSignedIn", false)
 }

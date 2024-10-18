@@ -1,5 +1,6 @@
 package com.example.markethub.screens.product
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,20 +17,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +51,10 @@ fun BottomPriceSection(
     modifier: Modifier = Modifier,
     cartViewModel: CartViewModel = hiltViewModel()
 ) {
+    var context = LocalContext.current
     var quantity by remember { mutableIntStateOf(1) }
+    var showDialog by remember { mutableStateOf(false) }
+    val vendorCheck = cartViewModel.hasDifferentVendorItems(product.vendor?.vendorId ?: "")
 
     Surface(
         tonalElevation = 8.dp,
@@ -111,14 +119,21 @@ fun BottomPriceSection(
 
                 Button(
                     onClick = {
-                        val item = CartItem(
-                            id = product.id,
-                            name = product.title,
-                            imageUrl = product.image,
-                            quantity = quantity,
-                            price = product.price
-                        )
-                        cartViewModel.addItem(item)
+                        if (vendorCheck) {
+                            showDialog = true
+                        } else {
+                            cartViewModel.addItem(
+                                CartItem(
+                                    id = product.productId,
+                                    name = product.productName,
+                                    imageUrl = product.fullImageUrl ?: "",
+                                    quantity = quantity,
+                                    price = product.price,
+                                    vendorId = product.vendor?.vendorId ?: ""
+                                )
+                            )
+                            Toast.makeText(context, "Item added to cart", Toast.LENGTH_SHORT).show()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF233142)),
                     shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
@@ -136,5 +151,36 @@ fun BottomPriceSection(
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    cartViewModel.clearCartAndAddItem(
+                        CartItem(
+                            id = product.productId,
+                            name = product.productName,
+                            imageUrl = product.fullImageUrl ?: "",
+                            quantity = quantity,
+                            price = product.price,
+                            vendorId = product.vendor?.vendorId ?: ""
+                        )
+                    )
+                    Toast.makeText(context, "Cart cleared and new item added", Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Clear Cart and Add New Item") },
+            text = { Text("Your cart contains items from a different vendor. If you add this item, the cart will be cleared. Do you wish to continue?") }
+        )
     }
 }

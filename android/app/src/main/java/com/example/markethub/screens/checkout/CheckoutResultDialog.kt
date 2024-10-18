@@ -89,7 +89,7 @@ fun CheckoutResultDialog(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    Text(text = if (isSuccess) "View Orders" else "Back to Cart")
+                    Text(text = if (isSuccess) "Go to Home" else "Back to Cart")
                 }
             }
         }

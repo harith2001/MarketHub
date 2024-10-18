@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MarketHub.Repositories;
 using MarketHub.Models.Entities;
+using MarketHub.Models.DTO;
 using MarketHub.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace MarketHub.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserRepository _userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(UserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -122,6 +123,39 @@ namespace MarketHub.Controllers
             return Ok(existingUser);
         }
 
+        //update an exisiting customer user name and email
+        [HttpPut("customer/{User_ID}")]
+        public async Task<IActionResult> UpdateUserNameAndEmail(string User_ID, [FromBody] CustomerDTO updatedUser)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
+            if (existingUser == null) return NotFound();
+
+            existingUser.Name = updatedUser.Name;
+            existingUser.Email = updatedUser.Email;
+            existingUser.IsActive = updatedUser.IsActive;
+
+            await _userRepository.UpdateUserAsync(User_ID, existingUser);
+            return Ok(existingUser);
+        }
+
+        //update an existing customer password
+        [HttpPut("customer/password/{User_ID}")]
+        public async Task<IActionResult> UpdateUserPassword(string User_ID, [FromBody] PasswordDTO passwordDTO)
+        {
+            var existingUser = await _userRepository.GetUserByIdAsync(User_ID);
+            if (existingUser == null) return NotFound();
+
+            if (!PasswordHasherUtil.PasswordVerification(existingUser.Password, passwordDTO.OldPassword))
+            {
+                return BadRequest(new { message = "Invalid old password." });
+            }
+
+            existingUser.Password = PasswordHasherUtil.HashPassword(passwordDTO.NewPassword);
+
+            await _userRepository.UpdateUserAsync(User_ID, existingUser);
+            return Ok(existingUser);
+        }
+
         // delete a user
         [HttpDelete("{User_ID}")]
         public async Task<IActionResult> DeleteUser(string User_ID)
@@ -130,7 +164,7 @@ namespace MarketHub.Controllers
             if (user == null) return NotFound();
 
             await _userRepository.DeleteUserAsync(User_ID);
-            return NoContent();
+            return Ok(new { message = "User deleted." });
         }
 
         //get vendors by name

@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button } from 'react-bootstrap';
+import { Table, Dropdown, ProgressBar, Badge, Offcanvas, Button, Toast, ToastContainer } from 'react-bootstrap';
 import Header from '../Header';
 import { getAllOrders, updateOrderStatus } from '../../api/order';
+import { useSearch } from '../../SearchContext';
+import { useUser } from '../../UserContext';
 
-const VendorOrders = ({ vendorId }) => {
+const VendorOrders = ({ }) => {
+  const { searchTerm } = useSearch();
+  const { vendorId } = useUser();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
   // Fetch all orders from API
   useEffect(() => {
@@ -23,6 +30,9 @@ const VendorOrders = ({ vendorId }) => {
     fetchOrders();
   }, []);
 
+  console.log("vendor Id: ", vendorId)
+  console.log("fetched orders: ", orders)
+
   // get orders by vendorId
   useEffect(() => {
     const vendorSpecificOrders = orders
@@ -36,6 +46,27 @@ const VendorOrders = ({ vendorId }) => {
     setFilteredOrders(vendorSpecificOrders);
   }, [orders, vendorId]);
 
+  console.log("filtered orders: ", filteredOrders)
+  // Apply search filter based on search term
+  useEffect(() => {
+    const searchResults = orders.filter(order =>
+      order.orderID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const vendorSpecificFilteredOrders = searchResults
+      .map(order => ({
+        ...order,
+        vendorItems: order.items.filter(item => item.vendorId === vendorId),
+        isMultiVendor: new Set(order.items.map(item => item.vendorId)).size > 1,
+      }))
+      .filter(order => order.vendorItems.length > 0);
+
+    setFilteredOrders(vendorSpecificFilteredOrders);
+  }, [searchTerm, orders, vendorId]);
+
+  console.log("filtered orders: ", filteredOrders)
+  
   // handle order status change
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -45,8 +76,14 @@ const VendorOrders = ({ vendorId }) => {
           order.orderID === orderId ? { ...order, status: newStatus } : order
         )
       );
+      setToastMessage(`Order status changed to ${newStatus}`);
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
       console.error('Error updating order status:', error);
+      setToastMessage('Failed to change order status.');
+      setToastType('danger');
+      setShowToast(true);
     }
   };
 
@@ -140,18 +177,18 @@ const VendorOrders = ({ vendorId }) => {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Processing')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Processing')}>
                         Processing
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Shipped')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Shipped')}>
                         Shipped
                       </Dropdown.Item>
                       {order.isMultiVendor && (
-                        <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Partially')}>
+                        <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Partially')}>
                           Partially Delivered
                         </Dropdown.Item>
                       )}
-                      <Dropdown.Item onClick={() => handleStatusChange(order.id, 'Delivered')}>
+                      <Dropdown.Item onClick={() => handleStatusChange(order.orderID, 'Delivered')}>
                         Delivered
                       </Dropdown.Item>
                     </Dropdown.Menu>
@@ -192,6 +229,16 @@ const VendorOrders = ({ vendorId }) => {
           )}
         </Offcanvas.Body>
       </Offcanvas>
+
+      {/* Toast for notifications */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast show={showToast} onClose={() => setShowToast(false)} bg={toastType === 'success' ? 'success' : 'danger'}>
+          <Toast.Header>
+            <strong className="me-auto">{toastType === 'success' ? 'Success' : 'Error'}</strong>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };

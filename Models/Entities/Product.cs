@@ -16,6 +16,8 @@ public class Product
 
     public required string productType { get; set; }
 
+    public decimal price { get; set; }
+
     public string vendorId { get; set; }
 
     public int? quantity { get; set; }

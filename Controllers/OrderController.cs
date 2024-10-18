@@ -25,7 +25,7 @@ namespace MarketHub.Controllers
         {
             try {
                 await _orderRepository.CreateOrderAsync(order);
-                return Ok(new { message = "Order placed successfully", orderId = order.Id });
+                return Ok(new { message = "Order placed successfully", orderId = order.OrderID });
             }
             catch
             {

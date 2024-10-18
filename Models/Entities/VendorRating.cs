@@ -1,7 +1,5 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
 
 namespace MarketHub.Models.Entities
 {
@@ -20,6 +18,8 @@ namespace MarketHub.Models.Entities
         public string Rating { get; set; } // 1-5
 
         public string Comment { get; set; }
+
+        public string OrderID { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

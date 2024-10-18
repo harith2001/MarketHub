@@ -2,8 +2,6 @@ using MongoDB.Driver;
 using MarketHub.Models.Entities;
 using MarketHub.Models;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MarketHub.Repositories
 {
@@ -28,6 +26,10 @@ namespace MarketHub.Repositories
         //get all vendor ratings by vendor name
         public async Task<List<VendorRating>> GetVendorRatingsByVendorNameAsync(string VendorName) =>
             await _vendorRating.Find(vendorRating => vendorRating.VendorName == VendorName).ToListAsync();
+
+        //get vendor ratings by order id
+        public async Task<List<VendorRating>> GetVendorRatingsByOrderIdAsync(string OrderID) =>
+            await _vendorRating.Find(vendorRating => vendorRating.OrderID == OrderID).ToListAsync();
 
         //get all vendor ratings
         public async Task<List<VendorRating>> GetAllVendorRatingsAsync() =>
