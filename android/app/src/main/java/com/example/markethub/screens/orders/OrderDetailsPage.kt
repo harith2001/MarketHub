@@ -405,6 +405,7 @@ fun RateOrderDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val submitOrderRatingEnabled = orderRating?.vendorRatings?.find { it.vendorName == vendorName } == null
                 Button(
                     onClick = {
                         val existingVendorRating = vendorRatingList.find { it.vendorName == vendorName }
@@ -428,9 +429,9 @@ fun RateOrderDialog(
                         .padding(vertical = 8.dp)
                         .fillMaxWidth()
                         .height(50.dp),
-                    enabled = orderRating == null
+                    enabled = submitOrderRatingEnabled
                 ) {
-                    Text(if (orderRating == null) "Rate Order" else "Already Rated", color = Color.White)
+                    Text(if (submitOrderRatingEnabled) "Submit" else "Already Rated", color = Color.White)
                 }
 
                 Button(

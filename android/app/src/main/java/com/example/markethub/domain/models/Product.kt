@@ -21,6 +21,5 @@ data class Product(
 data class VendorDetails(
     val vendorId: String,
     val vendorName: String,
-    val averageRating: Double,
-    val totalRatings: Int
+    val rating: Rating
 )
