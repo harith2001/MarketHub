@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,8 +54,12 @@ fun OrdersScreen(
     orderViewModel: OrderViewModel = hiltViewModel()
 ) {
     val orders by orderViewModel.orders.collectAsState()
+    val customerID by orderViewModel.customerId.collectAsState()
     val loading by orderViewModel.loading.collectAsState()
 
+    LaunchedEffect(true) {
+        orderViewModel.fetchOrders(customerID)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

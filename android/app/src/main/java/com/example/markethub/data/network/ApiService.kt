@@ -62,6 +62,9 @@ interface ApiService {
     @GET("Order/{orderId}")
     suspend fun getOrderById(@Path("orderId") orderId: String): Response<Order>
 
+    @PUT("Order/{orderId}/{status}")
+    suspend fun updateOrderStatus(@Path("orderId") orderId: String, @Path("status") status: String): Response<Unit>
+
     @POST("Payment/create")
     suspend fun createPayment(@Body payment: Payment): Response<CreatePaymentResponse>
 

@@ -23,19 +23,21 @@ class OrderViewModel @Inject constructor(
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
 
+    private val _customerId = MutableStateFlow(userLocalDataSource.getUser()?.userId ?: "")
+    val customerId: StateFlow<String> = _customerId
+
     init {
-        val customerId = userLocalDataSource.getUser()?.userId ?: ""
-        fetchOrders(customerId)
+        fetchOrders(customerId.value)
     }
 
-    private fun fetchOrders(customerId: String) {
+    fun fetchOrders(customerId: String) {
         viewModelScope.launch {
             _loading.value = true
             val response = orderRepository.getOrdersByCustomerId(customerId)
             if (response.isSuccessful) {
-                _orders.value = response.body() ?: emptyList()
+                val orders = response.body() ?: emptyList()
+                _orders.value = orders.reversed()
             } else {
-                // Handle error case
                 _orders.value = emptyList()
             }
             _loading.value = false

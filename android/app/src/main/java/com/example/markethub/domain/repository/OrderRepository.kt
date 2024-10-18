@@ -23,4 +23,8 @@ class OrderRepository @Inject constructor(
     suspend fun getOrderById(orderId: String): Response<Order> {
         return apiService.getOrderById(orderId)
     }
+
+    suspend fun updateOrderStatus(orderId: String, status: String): Response<Unit> {
+        return apiService.updateOrderStatus(orderId, status)
+    }
 }

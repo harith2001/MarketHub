@@ -71,6 +71,7 @@ fun OrderDetailsScreen(
     val payment by viewModel.payment.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var showCancelDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(orderId) {
@@ -121,6 +122,19 @@ fun OrderDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            if (order!!.status == "Pending") {
+                Button(
+                    onClick = { showCancelDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text(text = "Cancel Order", fontSize = 16.sp, color = Color.White)
+                }
+            }
+
             if (order!!.status == "Delivered") {
                 Button(
                     onClick = { showDialog = true },
@@ -150,6 +164,16 @@ fun OrderDetailsScreen(
             orderRating = orderRating,
             orderId = orderId,
             customerName = user?.name ?: "",
+        )
+    }
+
+    if(showCancelDialog) {
+        CancelOrderDialog(
+            onDismiss = { showCancelDialog = false },
+            onCancelOrder = {
+                viewModel.updateOrderStatus(orderId, "Cancelled", context)
+                showCancelDialog = false
+            }
         )
     }
 }
@@ -443,6 +467,70 @@ fun RatingBar(
                     .clickable(enabled = !disabled) { onRatingChange(i) },
                 tint = Color(0xFFFFD700)
             )
+        }
+    }
+}
+
+@Composable
+fun CancelOrderDialog(
+    onDismiss: () -> Unit,
+    onCancelOrder: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp)),
+            color = Color.White
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Cancel Order",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Primary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Are you sure you want to cancel this order?", fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onCancelOrder,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text("Yes, Cancel Order", color = Color.White)
+                    }
+
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text("No, Close", color = Color.White)
+                    }
+                }
+            }
         }
     }
 }

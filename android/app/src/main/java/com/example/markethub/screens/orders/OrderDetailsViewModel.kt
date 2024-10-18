@@ -112,4 +112,20 @@ class OrderDetailsViewModel @Inject constructor(
         }
     }
 
+    fun updateOrderStatus(orderId: String, status: String, context: Context) {
+        viewModelScope.launch {
+            try {
+                val response = orderRepository.updateOrderStatus(orderId, status)
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Order cancelled successfully.", Toast.LENGTH_SHORT).show()
+                    fetchOrderDetails(orderId, context)
+                } else {
+                    Toast.makeText(context, "Failed to cancel the order.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "An error occurred: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
