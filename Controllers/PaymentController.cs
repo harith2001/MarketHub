@@ -26,7 +26,7 @@ namespace MarketHub.Controllers
             try
             {
                 await _paymentRepository.CreatePaymentAsync(payment);
-                return Ok(new { message = "Payment created successfully", paymentId = payment.Id });
+                return Ok(new { message = "Payment created successfully", paymentId = payment.PaymentID });
             }
             catch
             {

@@ -29,7 +29,7 @@ namespace MarketHub.Controllers
 
         private string GetImageUrl(string productId)
         {
-            return $"/Product/get-product-image/{productId}";
+            return $"Product/get-product-image/{productId}";
         }
 
         [HttpGet("")]
