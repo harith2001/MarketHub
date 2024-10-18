@@ -105,8 +105,7 @@ fun ProductsViewScreen(
                         name = truncateText(product.productName, maxLength = 20),
                         rating = product.rating.rate.toString(),
                         reviews = product.rating.count.toString(),
-                        price = "Rs.${product.price}",
-                        onFavoriteClick = { /* Handle favorite click */ }
+                        price = "Rs.${product.price}"
                     )
                 }
             }

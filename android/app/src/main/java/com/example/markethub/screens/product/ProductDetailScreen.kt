@@ -17,13 +17,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.markethub.domain.models.FavoriteItem
 import com.example.markethub.screens.PreviewWrapper
+import com.example.markethub.screens.favorites.FavoritesViewModel
 
 @Composable
 fun ProductDetailScreen(
     productId: String,
     viewModel: ProductDetailViewModel = hiltViewModel(),
+    favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
+    val favoriteItems by favoritesViewModel.favoriteItems.collectAsState()
+    val isFavorite = favoriteItems.any { it.id == productId }
+
     if (productId == "0") {
         Box(
             modifier = Modifier
@@ -67,7 +73,23 @@ fun ProductDetailScreen(
                         .fillMaxSize()
                         .padding(bottom = 70.dp)
                 ) {
-                    ProductDetailsHeaderSection()
+                    ProductDetailsHeaderSection(
+                        isFavorite = isFavorite,
+                        onFavoriteClick = {
+                            if (isFavorite) {
+                                favoritesViewModel.removeFavoriteItem(productId)
+                            } else {
+                                favoritesViewModel.addFavoriteItem(
+                                    FavoriteItem(
+                                        id = productId,
+                                        image = productDetail!!.fullImageUrl ?: "",
+                                        name = productDetail!!.productName,
+                                        price = productDetail!!.price
+                                    )
+                                )
+                            }
+                        }
+                    )
 
                     ImageSection(images = listOf(productDetail!!.fullImageUrl ?: ""))
 

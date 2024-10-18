@@ -1,8 +1,8 @@
 package com.example.markethub.domain.models
 
 data class FavoriteItem(
-    val id: Int,
+    val id: String,
     val name: String,
-    val image: Int,
+    val image: String,
     val price: Double,
 )

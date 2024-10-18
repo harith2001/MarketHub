@@ -2,6 +2,7 @@ package com.example.markethub.di
 
 import android.content.Context
 import com.example.markethub.data.local.CartLocalDataSource
+import com.example.markethub.data.local.FavoriteLocalDataSource
 import com.example.markethub.data.local.UserLocalDataSource
 import dagger.Module
 import dagger.Provides
@@ -24,5 +25,11 @@ object DataModule {
     @Singleton
     fun provideCartLocalDataSource(@ApplicationContext context: Context): CartLocalDataSource {
         return CartLocalDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteLocalDataSource(@ApplicationContext context: Context): FavoriteLocalDataSource {
+        return FavoriteLocalDataSource(context)
     }
 }

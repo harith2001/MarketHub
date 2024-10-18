@@ -26,30 +26,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
 import com.example.markethub.domain.models.FavoriteItem
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
+import kotlinx.coroutines.launch
 
 @Composable
 fun MyFavoritesScreen(
-    favoriteItems: List<FavoriteItem> = sampleFavoriteItems()
+    viewModel: FavoritesViewModel = hiltViewModel()
 ) {
-    val favoritesList = remember { mutableStateListOf(*favoriteItems.toTypedArray()) }
+    val favoritesList by viewModel.favoriteItems.collectAsState()
     val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -84,7 +87,11 @@ fun MyFavoritesScreen(
                 items(favoritesList) { item ->
                     FavoriteItemCard(
                         item = item,
-                        onRemoveClick = { favoritesList.remove(item) },
+                        onRemoveClick = {
+                            scope.launch {
+                                viewModel.removeFavoriteItem(item.id)
+                            }
+                        },
                         onClick = { navController.navigate("ProductDetails") }
                     )
                 }
@@ -144,7 +151,7 @@ fun FavoriteItemCard(item: FavoriteItem, onRemoveClick: () -> Unit, onClick: () 
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Image(
-            painter = painterResource(id = item.image),
+            painter = rememberAsyncImagePainter(item.image),
             contentDescription = item.name,
             modifier = Modifier
                 .size(64.dp)
@@ -182,14 +189,6 @@ fun FavoriteItemCard(item: FavoriteItem, onRemoveClick: () -> Unit, onClick: () 
             )
         }
     }
-}
-
-@Composable
-fun sampleFavoriteItems(): List<FavoriteItem> {
-    return listOf(
-        FavoriteItem(id = 1, name = "Makeup Kit", image = R.drawable.ic_placeholder, price = 65.0),
-        FavoriteItem(id = 2, name = "Head Phone", image = R.drawable.ic_placeholder_2, price = 50.0)
-    )
 }
 
 @Preview

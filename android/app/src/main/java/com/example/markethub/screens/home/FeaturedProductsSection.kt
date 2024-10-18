@@ -51,7 +51,6 @@ fun FeaturedProductsSection(
                     rating = product.rating.rate.toString(),
                     reviews = product.rating.count.toString(),
                     price = "Rs.${product.price}",
-                    onFavoriteClick = { /* Handle favorite click */ }
                 )
             }
         }
