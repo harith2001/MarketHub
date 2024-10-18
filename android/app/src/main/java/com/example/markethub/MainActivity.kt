@@ -130,5 +130,10 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
             val query = backStackEntry.arguments?.getString("query") ?: ""
             ProductsViewScreen(searchQuery = query, filterByCategory = null)
         }
+
+        // All Products Screen Route
+        composable("Products") {
+            ProductsViewScreen(filterByCategory = null, searchQuery = null)
+        }
     }
 }

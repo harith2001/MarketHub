@@ -41,6 +41,7 @@ fun ProductsViewScreen(
         when {
             filterByCategory != null -> viewModel.getProductsByCategory(filterByCategory)
             searchQuery != null -> viewModel.searchProducts(searchQuery)
+            else -> viewModel.getProducts()
         }
     }
 

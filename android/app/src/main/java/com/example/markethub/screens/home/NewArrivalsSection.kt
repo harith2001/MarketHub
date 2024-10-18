@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.markethub.LocalNavController
 import com.example.markethub.components.ProductCard
 import com.example.markethub.ui.theme.Primary
 
@@ -25,6 +26,7 @@ fun NewArrivalsSection(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val newArrivals by viewModel.newArrivals.collectAsState()
+    val navController = LocalNavController.current
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -37,7 +39,7 @@ fun NewArrivalsSection(
                 text = "See more",
                 fontSize = 16.sp,
                 color = Primary,
-                modifier = Modifier.clickable { /* Navigate to see more products */ }
+                modifier = Modifier.clickable { navController.navigate("Products") }
             )
         }
 

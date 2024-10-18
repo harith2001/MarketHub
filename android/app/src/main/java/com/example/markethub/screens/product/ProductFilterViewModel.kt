@@ -45,4 +45,17 @@ class ProductFilterViewModel @Inject constructor(
             _isLoading.value = false
         }
     }
+
+    fun getProducts() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val response = productRepository.getProducts()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    _products.value = it
+                }
+            }
+            _isLoading.value = false
+        }
+    }
 }
