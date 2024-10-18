@@ -30,6 +30,9 @@ class CartViewModel @Inject constructor(
     private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
     val cartItems: StateFlow<List<CartItem>> = _cartItems
 
+    private val _cartItemsCount = MutableStateFlow(0)
+    val cartItemsCount: StateFlow<Int> = _cartItemsCount
+
     private val _orderResponse = MutableStateFlow<Response<CreateOrderResponse>?>(null)
     val orderResponse: StateFlow<Response<CreateOrderResponse>?> = _orderResponse
 
@@ -37,9 +40,10 @@ class CartViewModel @Inject constructor(
         loadCartItems()
     }
 
-    private fun loadCartItems() {
+    fun loadCartItems() {
         viewModelScope.launch {
             _cartItems.value = cartLocalDataSource.getCartItems()
+            _cartItemsCount.value = _cartItems.value.size
         }
     }
 

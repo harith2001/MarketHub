@@ -15,13 +15,18 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,12 +36,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.markethub.LocalNavController
+import com.example.markethub.screens.cart.CartViewModel
+import com.example.markethub.screens.favorites.FavoritesViewModel
+import com.example.markethub.screens.product.Badge
 import com.example.markethub.ui.theme.Primary
 
 @Composable
-fun TopBarSection() {
+fun TopBarSection(
+    favoritesViewModel: FavoritesViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
+    val favoriteItems by favoritesViewModel.favoriteItems.collectAsState()
+    val cartItemsCount by cartViewModel.cartItemsCount.collectAsState()
+
+    LaunchedEffect(true) {
+        favoritesViewModel.loadFavoriteItems()
+        cartViewModel.loadCartItems()
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -94,22 +114,38 @@ fun TopBarSection() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val navController = LocalNavController.current
-                IconButton(onClick = { navController.navigate("MyFavorites") }) {
+                Box(modifier = Modifier) {
+                    IconButton(onClick = { navController.navigate("MyFavorites") }) {
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = "Favorites Icon",
+                            tint = Primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    if (favoriteItems.isNotEmpty()) {
+                        Badge(count = favoriteItems.size, Modifier.align(Alignment.TopEnd))
+                    }
+                }
+                IconButton(onClick = { /* Handle Share */ }) {
                     Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorites Icon",
-                        tint = Primary,
-                        modifier = Modifier.size(28.dp)
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                        tint = Primary
                     )
                 }
-                IconButton(onClick = { navController.navigate("Cart") }) {
-                    Icon(
-                        imageVector = Icons.Outlined.ShoppingCart,
-                        contentDescription = "Cart Icon",
-                        tint = Primary,
-                        modifier = Modifier.size(28.dp)
-                    )
+                Box(modifier = Modifier) {
+                    IconButton(onClick = { navController.navigate("Cart") }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ShoppingCart,
+                            contentDescription = "Cart Icon",
+                            tint = Primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    if (cartItemsCount > 0) {
+                        Badge(count = cartItemsCount, Modifier.align(Alignment.TopEnd))
+                    }
                 }
             }
         }

@@ -19,16 +19,24 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.markethub.domain.models.FavoriteItem
 import com.example.markethub.screens.PreviewWrapper
+import com.example.markethub.screens.cart.CartViewModel
 import com.example.markethub.screens.favorites.FavoritesViewModel
 
 @Composable
 fun ProductDetailScreen(
     productId: String,
     viewModel: ProductDetailViewModel = hiltViewModel(),
-    favoritesViewModel: FavoritesViewModel = hiltViewModel()
+    favoritesViewModel: FavoritesViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = hiltViewModel()
 ) {
     val favoriteItems by favoritesViewModel.favoriteItems.collectAsState()
     val isFavorite = favoriteItems.any { it.id == productId }
+    val cartItemsCount by cartViewModel.cartItemsCount.collectAsState()
+
+    LaunchedEffect(true) {
+        favoritesViewModel.loadFavoriteItems()
+        cartViewModel.loadCartItems()
+    }
 
     if (productId == "0") {
         Box(
@@ -42,7 +50,9 @@ fun ProductDetailScreen(
                     .padding(bottom = 70.dp)
             ) {
                 // Header Section
-                ProductDetailsHeaderSection()
+                ProductDetailsHeaderSection(
+                    cartCount = cartItemsCount
+                )
 
                 // Not Found Section
                 Box(
@@ -88,7 +98,8 @@ fun ProductDetailScreen(
                                     )
                                 )
                             }
-                        }
+                        },
+                        cartCount = cartItemsCount
                     )
 
                     ImageSection(images = listOf(productDetail!!.fullImageUrl ?: ""))
