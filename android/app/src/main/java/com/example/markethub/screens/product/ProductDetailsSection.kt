@@ -64,7 +64,7 @@ fun ProductDetailsSection(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = vendorRating,
+                text = vendorRating.substring(0, 3),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
