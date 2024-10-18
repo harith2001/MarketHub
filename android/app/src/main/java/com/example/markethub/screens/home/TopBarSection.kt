@@ -127,13 +127,6 @@ fun TopBarSection(
                         Badge(count = favoriteItems.size, Modifier.align(Alignment.TopEnd))
                     }
                 }
-                IconButton(onClick = { /* Handle Share */ }) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Share",
-                        tint = Primary
-                    )
-                }
                 Box(modifier = Modifier) {
                     IconButton(onClick = { navController.navigate("Cart") }) {
                         Icon(

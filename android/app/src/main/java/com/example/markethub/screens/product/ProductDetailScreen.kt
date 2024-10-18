@@ -111,8 +111,9 @@ fun ProductDetailScreen(
                         reviews = productDetail!!.rating.count.toString(),
                         inStock = productDetail!!.quantity!! > 0,
                         description = productDetail!!.productDescription ?: "",
-                        vendorRating = productDetail!!.vendor?.rating?.toString() ?: "0.0",
-                        vendorReviews = productDetail!!.vendor?.rating?.toString() ?: "0"
+                        //use only one decimal point like 5.0
+                        vendorRating = productDetail!!.vendor?.rating?.rate?.toString() ?: "0.0",
+                        vendorReviews = productDetail!!.vendor?.rating?.count?.toString() ?: "0"
                     )
                 }
 
