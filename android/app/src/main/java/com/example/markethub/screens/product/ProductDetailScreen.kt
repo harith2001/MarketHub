@@ -99,7 +99,9 @@ fun ProductDetailScreen(
                         rating = productDetail!!.rating.rate.toString(),
                         reviews = productDetail!!.rating.count.toString(),
                         inStock = productDetail!!.quantity!! > 0,
-                        description = productDetail!!.productDescription ?: ""
+                        description = productDetail!!.productDescription ?: "",
+                        vendorRating = productDetail!!.vendor?.averageRating.toString(),
+                        vendorReviews = productDetail!!.vendor?.totalRatings.toString()
                     )
                 }
 

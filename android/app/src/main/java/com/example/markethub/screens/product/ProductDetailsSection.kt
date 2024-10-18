@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.Star
@@ -25,6 +26,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ProductDetailsSection(
     vendorName: String,
+    vendorRating: String,
+    vendorReviews: String,
     productName: String,
     rating: String,
     reviews: String,
@@ -51,6 +54,25 @@ fun ProductDetailsSection(
                 color = Color.Gray,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "Star Icon",
+                tint = Color(0xFFFFD700),
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = vendorRating,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "| $vendorReviews",
+                fontSize = 12.sp,
+                color = Color.Gray
             )
         }
 

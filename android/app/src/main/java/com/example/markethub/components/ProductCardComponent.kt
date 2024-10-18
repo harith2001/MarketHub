@@ -23,6 +23,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -51,7 +52,11 @@ fun ProductCard(
 ) {
     val navController = LocalNavController.current
     val favoriteItems by favoritesViewModel.favoriteItems.collectAsState()
-    val isFavorite = favoriteItems.any { it.id == productId }
+    var isFavorite = favoriteItems.any { it.id == productId }
+
+    LaunchedEffect(productId) {
+        favoritesViewModel.loadFavoriteItems()
+    }
 
     Column(
         modifier = Modifier
@@ -78,9 +83,11 @@ fun ProductCard(
                 onClick = {
                     if (isFavorite) {
                         favoritesViewModel.removeFavoriteItem(productId)
+                        isFavorite = false
                     } else {
                         favoritesViewModel.addFavoriteItem(FavoriteItem(productId, name, image,
                             price.replace("Rs.", "").trim().toDouble()))
+                        isFavorite = true
                     }
                 },
                 modifier = Modifier
