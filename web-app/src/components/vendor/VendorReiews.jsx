@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Tab, Tabs, Form, Button } from 'react-bootstrap';
 import Header from '../Header';
 import { getVendorRatingById } from '../../api/vendorRating';
+import { useSearch } from '../../SearchContext';
 
 const VendorReviews = ({ vendorId }) => {
+    const { searchTerm } = useSearch();
     const [unreadReviews, setUnreadReviews] = useState([]);
     const [readReviews, setReadReviews] = useState([]);
     const [activeTab, setActiveTab] = useState('unread');
@@ -28,7 +30,18 @@ const VendorReviews = ({ vendorId }) => {
       setReadReviews([...readReviews, reviewToMark]); // Add to read reviews
       setUnreadReviews(unreadReviews.filter((review) => review.id.timestamp !== reviewId)); // Remove from unread
     }
-    };
+  };
+  
+  // Filter reviews based on the search term
+    const filteredUnreadReviews = unreadReviews.filter(review => 
+        review.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        review.comment.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredReadReviews = readReviews.filter(review => 
+        review.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        review.comment.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     
   return (
     <Container style={{ marginLeft: '200px', padding: '20px' }}>
@@ -42,10 +55,10 @@ const VendorReviews = ({ vendorId }) => {
                   Unread ({unreadReviews.length})
                 </span>
               }>
-          {unreadReviews.length === 0 ? (
+          {filteredUnreadReviews.length === 0 ? (
             <p>No unread reviews.</p>
           ) : (
-            unreadReviews.map((review) => (
+            filteredUnreadReviews.map((review) => (
               <Card key={review.id} className="mb-3 bg-light shadow-sm">
                 <Card.Body>
                   <Card.Title>{review.customerName}</Card.Title>
@@ -72,10 +85,10 @@ const VendorReviews = ({ vendorId }) => {
                   Read ({readReviews.length})
                 </span>
               }>
-          {readReviews.length === 0 ? (
+          {filteredReadReviews.length === 0 ? (
             <p>No read reviews.</p>
           ) : (
-            readReviews.map((review) => (
+            filteredReadReviews.map((review) => (
               <Card key={review.id} className="mb-3 bg-light shadow-sm">
                 <Card.Body>
                   <Card.Title>{review.customerName}</Card.Title>
