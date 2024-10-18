@@ -25,15 +25,16 @@ import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun CheckoutScreen(
-    viewModel: CartViewModel = hiltViewModel()
+    viewModel: CartViewModel = hiltViewModel(),
 ) {
     val cartItems by viewModel.cartItems.collectAsState()
     val address = remember { mutableStateOf("") }
+    val note = remember { mutableStateOf("") }
     val paymentType = remember { mutableStateOf("Cash on Delivery") }
     val totalPrice = cartItems.sumOf { it.price * it.quantity }
     val navController = LocalNavController.current
     var showDialog by remember { mutableStateOf(false) }
-    var isSuccess by remember { mutableStateOf(true) }
+    val orderResponse by viewModel.orderResponse.collectAsState()
 
     Column(
         modifier = Modifier
@@ -96,6 +97,23 @@ fun CheckoutScreen(
                 )
             }
 
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Note",
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                OutlinedTextField(
+                    value = note.value,
+                    onValueChange = { note.value = it },
+                    label = { Text(text = "Enter Note") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
+            }
+
             // Payment Method Selector
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -129,7 +147,7 @@ fun CheckoutScreen(
                 Column {
                     Text(text = "Total Price", color = Color.Gray, fontSize = 14.sp)
                     Text(
-                        text = "$${"%.2f".format(totalPrice)}",
+                        text = "Rs.${"%.2f".format(totalPrice)}",
                         fontSize = 24.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         color = Primary
@@ -138,8 +156,14 @@ fun CheckoutScreen(
 
                 Button(
                     onClick = {
+                        viewModel.createOrder(
+                            cartItems = cartItems,
+                            totalPrice = totalPrice,
+                            note = note.value,
+                            shippingAddress = address.value,
+                            paymentMethod = paymentType.value
+                        )
                         showDialog = true
-                        isSuccess = true
                     },
                     modifier = Modifier
                         .height(50.dp)
@@ -153,13 +177,29 @@ fun CheckoutScreen(
         }
     }
 
-    // Show Result Dialog
     if (showDialog) {
-        CheckoutResultDialog(
-            isSuccess = isSuccess,
-            onDismiss = { showDialog = false },
-            onButtonClick = { showDialog = false }
-        )
+        orderResponse?.let { response ->
+            if (response.isSuccessful) {
+                CheckoutResultDialog(
+                    isSuccess = true,
+                    onDismiss = { showDialog = false },
+                    onButtonClick = {
+                        showDialog = false
+                        viewModel.clearOrderResponse()
+                        navController.navigate("Home")
+                    }
+                )
+            } else {
+                CheckoutResultDialog(
+                    isSuccess = false,
+                    onDismiss = { showDialog = false },
+                    onButtonClick = {
+                        showDialog = false
+                        viewModel.clearOrderResponse()
+                    }
+                )
+            }
+        }
     }
 }
 

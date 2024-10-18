@@ -75,7 +75,7 @@ fun CartScreen(viewModel: CartViewModel = hiltViewModel()) {
             Column {
                 Text(text = "Total", fontSize = 16.sp, color = Color.Gray)
                 Text(
-                    text = "$${"%.2f".format(totalPrice)}",
+                    text = "Rs.${"%.2f".format(totalPrice)}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Primary

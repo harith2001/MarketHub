@@ -23,6 +23,7 @@ import com.example.markethub.screens.cart.CartScreen
 import com.example.markethub.screens.checkout.CheckoutScreen
 import com.example.markethub.screens.favorites.MyFavoritesScreen
 import com.example.markethub.screens.orders.OrderDetailsScreen
+import com.example.markethub.screens.product.ProductsViewScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 val LocalNavController = compositionLocalOf<NavController> { error("No NavController found!") }
@@ -61,7 +62,7 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         // Sign In Screen Route
         composable("SignIn") {
             SignInScreen(
-                onLoginClick = { navController.navigate("Home") },
+                onSignInClick = { navController.navigate("Home") },
                 onSignUpClick = { navController.navigate("SignUp") }
             )
         }
@@ -84,7 +85,7 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
             route = "ProductDetailScreen/{productId}",
             arguments = listOf(navArgument("productId") { defaultValue = "0" })
         ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull() ?: 0
+            val productId = backStackEntry.arguments?.getString("productId") ?: "0"
             ProductDetailScreen(productId = productId)
         }
 
@@ -99,13 +100,40 @@ fun AppNavigation(navController: NavHostController, context: MainActivity) {
         }
 
         // Order Details Screen Route
-        composable("OrderDetails") {
-            OrderDetailsScreen()
+        composable(
+            route = "OrderDetails/{orderId}",
+            arguments = listOf(navArgument("orderId") { defaultValue = "0" })
+        ) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId") ?: "0"
+            OrderDetailsScreen(orderId = orderId)
         }
 
         // My Favorites Screen Route
         composable("MyFavorites") {
             MyFavoritesScreen()
+        }
+
+        // Product Filter Screen Route
+        composable(
+            route = "ProductFilter/{category}",
+            arguments = listOf(navArgument("category") { defaultValue = "All" })
+        ) { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: "All"
+            ProductsViewScreen(filterByCategory = category, searchQuery = null)
+        }
+
+        // Search Screen Route
+        composable(
+            route = "Search/{query}",
+            arguments = listOf(navArgument("query") { defaultValue = "" })
+        ) { backStackEntry ->
+            val query = backStackEntry.arguments?.getString("query") ?: ""
+            ProductsViewScreen(searchQuery = query, filterByCategory = null)
+        }
+
+        // All Products Screen Route
+        composable("Products") {
+            ProductsViewScreen(filterByCategory = null, searchQuery = null)
         }
     }
 }

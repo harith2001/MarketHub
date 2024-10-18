@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -22,30 +23,41 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
+import com.example.markethub.domain.models.FavoriteItem
+import com.example.markethub.screens.favorites.FavoritesViewModel
 import com.example.markethub.ui.theme.Primary
 
 @Composable
 fun ProductCard(
-    productId: Int,
+    productId: String,
     image: String,
     category: String,
     name: String,
     rating: String,
     reviews: String,
     price: String,
-    onFavoriteClick: () -> Unit = {}
+    favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
+    val favoriteItems by favoritesViewModel.favoriteItems.collectAsState()
+    var isFavorite = favoriteItems.any { it.id == productId }
+
+    LaunchedEffect(productId) {
+        favoritesViewModel.loadFavoriteItems()
+    }
+
     Column(
         modifier = Modifier
             .width(160.dp)
@@ -68,13 +80,22 @@ fun ProductCard(
                     }),
             )
             IconButton(
-                onClick = onFavoriteClick,
+                onClick = {
+                    if (isFavorite) {
+                        favoritesViewModel.removeFavoriteItem(productId)
+                        isFavorite = false
+                    } else {
+                        favoritesViewModel.addFavoriteItem(FavoriteItem(productId, name, image,
+                            price.replace("Rs.", "").trim().toDouble()))
+                        isFavorite = true
+                    }
+                },
                 modifier = Modifier
                     .padding(top = 16.dp, end = 4.dp)
                     .size(24.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = "Add to Favorites",
                     tint = Color.Red
                 )

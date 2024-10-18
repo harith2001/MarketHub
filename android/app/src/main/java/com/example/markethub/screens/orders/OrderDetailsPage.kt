@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,8 +26,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,39 +39,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.markethub.BuildConfig
 import com.example.markethub.LocalNavController
-import com.example.markethub.R
 import com.example.markethub.components.ValidatedTextFieldComponent
+import com.example.markethub.domain.models.OrderItem
+import com.example.markethub.domain.models.OrderRating
+import com.example.markethub.domain.models.OrderRatingSubmit
+import com.example.markethub.domain.models.ProductRating
+import com.example.markethub.domain.models.VendorRating
 import com.example.markethub.screens.PreviewWrapper
 import com.example.markethub.ui.theme.Primary
 
-class CartItem(
-    val id: Int,
-    val name: String,
-    val imageRes: Int,
-    val quantity: Int,
-    val price: Double
-)
-
 @Composable
 fun OrderDetailsScreen(
-    orderId: String = "123456",
-    orderDate: String = "25th Sep, 2024",
-    orderStatus: String = "Delivered",
-    vendorName: String = "Best Fashion Store",
-    totalPrice: String = "$95.00",
-    paymentMethod: String = "Cash on Delivery",
-    deliveryAddress: String = "123 Main Street, New York, USA",
-    items: List<CartItem> = sampleOrderItems()
+    orderId: String,
+    viewModel: OrderDetailsViewModel = hiltViewModel()
 ) {
+    val user by viewModel.user.collectAsState()
+    val order by viewModel.order.collectAsState()
+    val orderRating by viewModel.orderRating.collectAsState()
+    val vendor by viewModel.vendor.collectAsState()
+    val payment by viewModel.payment.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
+    var showCancelDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    LaunchedEffect(orderId) {
+        viewModel.fetchOrderDetails(orderId, context)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,43 +103,77 @@ fun OrderDetailsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OrderDetailsHeader(orderId, orderDate, orderStatus)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OrderSummarySection(totalPrice, paymentMethod, deliveryAddress, vendorName)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Items", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(items.size) { index ->
-                OrderItemCard(items[index])
+        if (order != null) {
+            OrderDetailsHeader(orderId, order!!.orderDate, order!!.status)
+            Spacer(modifier = Modifier.height(16.dp))
+            OrderSummarySection(
+                totalPrice = "$${order!!.totalPrice}",
+                paymentMethod = payment?.paymentMethod ?: "",
+                deliveryAddress = order!!.shippingAddress,
+                vendorName = vendor?.vendorName ?: ""
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Items", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(order!!.items.size) { index ->
+                    OrderItemCard(order!!.items[index])
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        if (orderStatus == "Delivered") {
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = Primary)
-            ) {
-                Text(text = "Rate Your Order", fontSize = 16.sp, color = Color.White)
+            if (order!!.status == "Pending") {
+                Button(
+                    onClick = { showCancelDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text(text = "Cancel Order", fontSize = 16.sp, color = Color.White)
+                }
             }
+
+            if (order!!.status == "Delivered") {
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                ) {
+                    Text(text = "Rate Order", fontSize = 16.sp, color = Color.White)
+                }
+            }
+        } else if (errorMessage != null) {
+            Text(text = errorMessage!!, color = Color.Red)
         }
     }
 
     if (showDialog) {
         RateOrderDialog(
-            items = items,
-            vendorName = vendorName,
+            items = order?.items ?: emptyList(),
+            vendorName = vendor?.vendorName ?: "",
             onDismiss = { showDialog = false },
-            onRateOrder = { /* Submit rating logic */ showDialog = false }
+            onRateOrder = {
+                viewModel.rateOrder(it, context)
+                showDialog = false
+                          },
+            orderRating = orderRating,
+            orderId = orderId,
+            customerName = user?.name ?: "",
+        )
+    }
+
+    if(showCancelDialog) {
+        CancelOrderDialog(
+            onDismiss = { showCancelDialog = false },
+            onCancelOrder = {
+                viewModel.updateOrderStatus(orderId, "Cancelled", context)
+                showCancelDialog = false
+            }
         )
     }
 }
@@ -200,7 +242,7 @@ fun OrderSummarySection(
 }
 
 @Composable
-fun OrderItemCard(item: CartItem) {
+fun OrderItemCard(item: OrderItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -209,8 +251,8 @@ fun OrderItemCard(item: CartItem) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = item.imageRes),
-            contentDescription = item.name,
+            painter = rememberAsyncImagePainter(model = "${BuildConfig.BASE_URL}Product/get-product-image/${item.productId}"),
+            contentDescription = item.productName,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -221,7 +263,7 @@ fun OrderItemCard(item: CartItem) {
         Spacer(modifier = Modifier.width(16.dp))
 
         Column {
-            Text(item.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(item.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text("Quantity: ${item.quantity}", fontSize = 14.sp, color = Color.Gray)
         }
 
@@ -238,11 +280,22 @@ fun OrderItemCard(item: CartItem) {
 
 @Composable
 fun RateOrderDialog(
-    items: List<CartItem>,
+    items: List<OrderItem>,
     vendorName: String,
     onDismiss: () -> Unit,
-    onRateOrder: () -> Unit
+    onRateOrder: (OrderRatingSubmit) -> Unit,
+    orderRating: OrderRating?,
+    orderId: String,
+    customerName: String,
 ) {
+    val vendorRatingList = remember { mutableStateListOf<VendorRating>() }
+    val productRatingList = remember { mutableStateListOf<ProductRating>() }
+
+    LaunchedEffect(orderRating) {
+        orderRating?.vendorRatings?.let { vendorRatingList.addAll(it) }
+        orderRating?.productRatings?.let { productRatingList.addAll(it) }
+    }
+
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
             modifier = Modifier
@@ -268,7 +321,9 @@ fun RateOrderDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 items.forEach { item ->
-                    var itemRating by remember { mutableIntStateOf(3) }
+                    val productRating = productRatingList.find { it.productId == item.productId }
+                    val itemRatingValue = productRating?.rating?.toInt() ?: 3
+                    var itemRating by remember { mutableIntStateOf(itemRatingValue) }
 
                     Row(
                         modifier = Modifier
@@ -278,8 +333,8 @@ fun RateOrderDialog(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
-                            painter = painterResource(id = item.imageRes),
-                            contentDescription = item.name,
+                            painter = rememberAsyncImagePainter(model = "${BuildConfig.BASE_URL}Product/get-product-image/${item.productId}"),
+                            contentDescription = item.productName,
                             modifier = Modifier
                                 .size(60.dp)
                                 .clip(RoundedCornerShape(8.dp))
@@ -292,23 +347,51 @@ fun RateOrderDialog(
                         Column(
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text(item.name, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                            Text(item.productName, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                             Spacer(modifier = Modifier.height(4.dp))
 
-                            RatingBar(rating = itemRating, onRatingChange = { itemRating = it })
+                            RatingBar(
+                                rating = itemRating,
+                                onRatingChange = {
+                                    itemRating = it
+                                    val productRatingObj = productRatingList.find { it.productId == item.productId }
+                                    if (productRating != null) {
+                                        productRatingList.remove(productRatingObj)
+                                    }
+                                    productRatingList.add(
+                                        ProductRating(
+                                            productId = item.productId,
+                                            customerName = customerName,
+                                            rating = it.toString(),
+                                            comment = "",
+                                            vendorId = item.vendorId,
+                                            orderID = orderId
+                                        )
+                                    )
+                                },
+                                disabled = orderRating?.productRatings?.find { it.productId == item.productId } != null
+                            )
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                var vendorRating by remember { mutableIntStateOf(4) }
+                var vendorRatingObj = orderRating?.vendorRatings?.find { it.vendorName == vendorName }
+                val vendorRatingValue = vendorRatingObj?.rating?.toInt() ?: 3
+                var vendorRating by remember { mutableIntStateOf(vendorRatingValue) }
+                var comment by remember { mutableStateOf(vendorRatingObj?.comment ?: "") }
+                
                 Text(
                     "Rate the Vendor: $vendorName",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                RatingBar(rating = vendorRating, onRatingChange = { vendorRating = it })
+                RatingBar(
+                    rating = vendorRating,
+                    onRatingChange = { vendorRating = it },
+                    disabled = orderRating?.vendorRatings?.find { it.vendorName == vendorName } != null
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -316,23 +399,39 @@ fun RateOrderDialog(
                 ValidatedTextFieldComponent(
                     label = "Comment",
                     isRequired = false,
-                    value = "",
-                    onValueChange = {}
+                    value = comment,
+                    onValueChange = { comment = it }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val submitOrderRatingEnabled = orderRating?.vendorRatings?.find { it.vendorName == vendorName } == null
                 Button(
                     onClick = {
-                        onRateOrder()
+                        val existingVendorRating = vendorRatingList.find { it.vendorName == vendorName }
+                        if (vendorRatingObj != null) {
+                            vendorRatingList.remove(existingVendorRating)
+                        }
+                        vendorRatingList.add(
+                            VendorRating(
+                                vendorId = items[0].vendorId,
+                                vendorName = vendorName,
+                                customerName = customerName,
+                                rating = vendorRating.toString(),
+                                comment = comment,
+                                orderID = orderId
+                            )
+                        )
+                        onRateOrder(OrderRatingSubmit(vendorRatingList[0], productRatingList))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Primary),
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    enabled = submitOrderRatingEnabled
                 ) {
-                    Text("Submit", color = Color.White)
+                    Text(if (submitOrderRatingEnabled) "Submit" else "Already Rated", color = Color.White)
                 }
 
                 Button(
@@ -354,7 +453,8 @@ fun RateOrderDialog(
 fun RatingBar(
     rating: Int,
     onRatingChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    disabled: Boolean = false
 ) {
     Row(modifier = modifier) {
         for (i in 1..5) {
@@ -365,51 +465,81 @@ fun RatingBar(
                 contentDescription = "Star $i",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { onRatingChange(i) },
+                    .clickable(enabled = !disabled) { onRatingChange(i) },
                 tint = Color(0xFFFFD700)
             )
         }
     }
 }
 
+@Composable
+fun CancelOrderDialog(
+    onDismiss: () -> Unit,
+    onCancelOrder: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp)),
+            color = Color.White
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Cancel Order",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Primary
+                )
 
-fun sampleOrderItems(): List<CartItem> {
-    return listOf(
-        CartItem(
-            id = 1,
-            name = "Casual Shirt",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 30.0
-        ),
-        CartItem(
-            id = 2,
-            name = "Jeans",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 2,
-            price = 65.0
-        ),
-        CartItem(
-            id = 3,
-            name = "Sneakers",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 50.0
-        ),
-        CartItem(
-            id = 4,
-            name = "Sunglasses",
-            imageRes = R.drawable.ic_placeholder,
-            quantity = 1,
-            price = 25.0
-        )
-    )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("Are you sure you want to cancel this order?", fontSize = 16.sp)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = onCancelOrder,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text("Yes, Cancel Order", color = Color.White)
+                    }
+
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text("No, Close", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview
 @Composable
 fun OrderDetailsScreenPreview() {
     PreviewWrapper {
-        OrderDetailsScreen()
+        OrderDetailsScreen(orderId = "0")
     }
 }
